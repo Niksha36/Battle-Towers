@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   data() {
     return {
@@ -36,9 +37,18 @@ export default {
     togglePassword() {
       this.showPassword = !this.showPassword;
     },
-    login() {
-      // Handle login logic here
-      console.log('Logged in:', this.email, this.password);
+    async login() {
+      try {
+        const response = await axios.post('http://your-django-backend.com/api/login/', {
+          email: this.email,
+          password: this.password
+        });
+        console.log('Logged in:', response.data);
+        // Здесь крч будем редиректить в игру :)
+      } catch (error) {
+        console.error('Login failed:', error);
+        alert('Ошибка входа: неверный email или пароль');
+      }
     }
   }
 };
@@ -96,7 +106,9 @@ input {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-
+.input-wrapper:focus-within {
+  border-color: #007bff;
+}
 i {
   padding-left: 10px;
   cursor: pointer;

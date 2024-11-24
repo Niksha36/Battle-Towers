@@ -36,6 +36,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -50,13 +52,23 @@ export default {
     togglePassword() {
       this.showPassword = !this.showPassword;
     },
-    register() {
+    async register() {
       if (this.password !== this.repeatPassword) {
-        alert('Пароли не совпадают');
+        alert('Passwords do not match');
         return;
       }
-      // Handle registration logic here
-      console.log('Registered:', this.nickname, this.email, this.password);
+      try {
+        const response = await axios.post('http://your-django-backend.com/api/register/', {
+          nickname: this.nickname,
+          email: this.email,
+          password: this.password
+        });
+        console.log('Registered:', response.data);
+        // Здесь крч будем редиректить в игру :)
+      } catch (error) {
+        console.error('Registration failed:', error);
+        alert('Registration failed. Please try again.');
+      }
     }
   }
 };
@@ -87,7 +99,9 @@ h2 {
   margin-bottom: 1rem;
   position: relative;
 }
-
+.input-wrapper:focus-within {
+  border-color: #007bff;
+}
 label {
   display: block;
   font-weight: 500;
@@ -108,7 +122,7 @@ input {
   align-items: center;
   justify-content: space-between;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1.5px solid #ccc;
   border-radius: 5px;
 }
 
