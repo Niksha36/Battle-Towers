@@ -3,9 +3,9 @@
     <h2>Вход</h2>
     <form @submit.prevent="login">
       <div class="form-group">
-        <label for="email">Email:</label>
+        <label for="text">Никнейм:</label>
         <div class="input-wrapper">
-          <input type="email" v-model="email" placeholder="Введите email" required />
+          <input type="text" v-model="nickname" placeholder="Введите никнейм" required />
         </div>
       </div>
       <div class="form-group">
@@ -28,7 +28,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      email: '',
+      nickname: '',
       password: '',
       showPassword: false
     };
@@ -40,14 +40,14 @@ export default {
     async login() {
       try {
         const response = await axios.post('http://your-django-backend.com/api/login/', {
-          email: this.email,
+          nickname: this.nickname,
           password: this.password
         });
         console.log('Logged in:', response.data);
         // Здесь крч будем редиректить в игру :)
       } catch (error) {
         console.error('Login failed:', error);
-        alert('Ошибка входа: неверный email или пароль');
+        alert('Ошибка входа: неверный никнейм или пароль');
       }
     }
   }
