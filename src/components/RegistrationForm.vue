@@ -9,12 +9,6 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="email">Email:</label>
-        <div class="input-wrapper">
-          <input type="email" v-model="email" placeholder="Введите email" required/>
-        </div>
-      </div>
-      <div class="form-group">
         <label for="password">Пароль:</label>
         <div class="input-wrapper">
           <input :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="Введите пароль" required/>
@@ -42,7 +36,6 @@ export default {
   data() {
     return {
       nickname: '',
-      email: '',
       password: '',
       repeatPassword: '',
       showPassword: false
@@ -60,7 +53,6 @@ export default {
       try {
         const response = await axios.post('http://your-django-backend.com/api/register/', {
           nickname: this.nickname,
-          email: this.email,
           password: this.password
         });
         console.log('Registered:', response.data);
