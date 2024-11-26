@@ -6,6 +6,9 @@
           v-bind:initialize.prop="true"
       />
     </div>
+      <button @click="get_top">get_top</button>
+      <button @click="get_user_record">get_user_record</button>
+      <button @click="update_user_record">update_user_record</button>
   </div>
 </template>
 
@@ -13,6 +16,7 @@
 import Phaser from "phaser";
 
 import PlayScene from "@/assets/PlayScene";
+import axios from "axios";
 
 export default {
   name: "Game",
@@ -36,5 +40,40 @@ export default {
       }
     }
   },
+
+  methods: {
+    async get_top() {
+      const response = await axios.get("http://localhost:8000/get_top", {
+        withCredentials: true,
+        params: {
+          "username": this.$store.state.username
+
+          }
+        }
+      )
+      console.log(response.data)
+    },
+
+    async get_user_record() {
+      const response = await axios.get("http://localhost:8000/get_user_record", {
+        withCredentials: true,
+        params: {
+          "username": this.$store.state.username,
+        }
+      })
+      console.log(response.data)
+    },
+
+    async update_user_record() {
+       const response = await axios.post("http://localhost:8000/update_user_record", {
+        withCredentials: true,
+        params: {
+          "username": this.$store.state.username,
+          "record": "0:2:1"
+        }
+      })
+      console.log(response.data)
+    }
+  }
 }
 </script>
