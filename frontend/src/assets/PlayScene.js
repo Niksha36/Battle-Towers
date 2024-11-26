@@ -56,6 +56,9 @@ export default class PlayScene extends Scene {
         this.count_tower_types = 4
         
         this.bg = []
+
+        this.wave = 0
+
         this.shop_towers = []
         this.towers = []
         this.slots = []
@@ -63,6 +66,9 @@ export default class PlayScene extends Scene {
         // USER CONFIG
         this.money = 11
 
+        this.enemies = []
+
+        this.physics.add.collider(this.towers, this.enemies, this.hitEnemy, null, this);
 
         this.bg = this.add.image(this.width / 2, this.height / 2, 'mountains')
         this.setBgScale(this.bg, this.height)
@@ -82,6 +88,7 @@ export default class PlayScene extends Scene {
         for (let i = 0; i < this.count_slots; ++i) {
             this.slots.push(this.add.sprite(20 + (20 + 75) * i, 484, 'gray').setOrigin(0, 0).setInteractive())
             this.slots[i].input.dropZone = true
+            this.slots[i].dropZoneIndex = i;
         }
 
         this.towers.push(this.add.existing(new MainTower(this)))
@@ -102,7 +109,7 @@ export default class PlayScene extends Scene {
             dropZone.setTint(0x00ff00)
             dropZone.destroy();
             gameObject.input.enabled = false;
-            this.towers.push(gameObject)
+            this.towers[dropZone.dropZoneIndex] = gameObject
             this.shop_towers = this.shop_towers.filter(item => item !== gameObject);
         });
 
@@ -142,9 +149,11 @@ export default class PlayScene extends Scene {
 
 
     update() {
-        // if (this.enemy.body.velocity.x > -500) {
-        //     this.enemy.body.velocity.x -= 10;
-        // }
+        if (this.enemies[0]) {
+            if (this.enemies[0].body.velocity.x > -800) {
+                this.enemies[0].body.velocity.x -= 70;
+            }
+        }
     }
 
 
@@ -182,20 +191,62 @@ export default class PlayScene extends Scene {
     }
 
     startWave() {
+        console.log(this.money)
+        this.wave++;
         this.startWaveButton.setVisible(false);
         this.clearShop(this.shop_towers)
-        this.time.delayedCall(60, this.endWave, [], this);
+        this.enemies.push(this.add.existing(new Enemy(this, 1200, 484, 'green', this.wave**2, this.wave**2)))
+        this.enemies[0].body.velocity.x = -800
     }
 
     endWave() {
         this.startWaveButton.setVisible(true);
         this.generateShop(this.shop_towers)
 
+        for (let tower of this.towers) {
+            if (tower) {
+                tower.set_default_stats()
+            }
+        }
+
         for (let i = 0; i < this.towers.length; i++) {
-            this.towers[i].buff(i);
+            if (this.towers[i]) {
+                this.towers[i].buff(i);
+            }
+        }
+
+        for (let tower of this.towers) {
+            if (tower) {
+                tower.setAlpha(1)
+                tower.body.enable = true
+            }
         }
         console.log(this.money)
-        console.log(this.towers)
+    }
+
+    hitEnemy(tower, enemy) {
+        tower.hp -= enemy.dmg;
+        enemy.hp -= tower.dmg;
+
+        console.log(enemy.hp, enemy.dmg)
+
+        if (tower.hp <= 0) {
+            if (tower.constructor.name == "MainTower") {
+                console.log("GAME OVER")
+
+            }
+            tower.is_die = true
+            tower.setAlpha(0)
+            tower.body.enable = false
+        }
+
+        if (enemy.hp <= 0) {
+            this.enemies.shift()
+            enemy.destroy()
+            if (this.enemies.length === 0) {
+                this.endWave()
+            }
+        }
     }
 
 
@@ -209,13 +260,26 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.setOrigin(0, 0)
         this.setInteractive({draggable: draggable})
 
+        scene.physics.world.enable(this);
+        this.body.setAllowGravity(false);
+        this.body.immovable = true
+
+        this.default_hp = hp
+        this.default_dmg = dmg
         this.hp = hp
         this.dmg = dmg
         this.cost = cost
+        
+        this.is_die = false
         this.scene.add.existing(this);
     }
 
     buff(index) {}
+
+    set_default_stats() {
+        this.hp = this.default_hp
+        this.dmg = this.default_dmg
+    }
 }
 class MainTower extends Tower {
     constructor(scene) {
@@ -233,8 +297,13 @@ class Chest extends Tower {
     }
 
     buff(index) {
+        if (this.is_die) {
+            this.is_die = false;
+            return; 
+        }
+
         this.scene.money++; 
-        if (this.scene.towers[index - 1].constructor.name == "MainTower") {
+        if (this.scene.towers[index - 1] && this.scene.towers[index - 1].constructor.name == "MainTower") {
             this.scene.money++;
         }
     }
@@ -269,3 +338,19 @@ class Milk extends Tower {
 function getRandomNumber(max) {
     return Math.floor(Math.random() * max)
   }
+
+class Enemy extends Phaser.GameObjects.Sprite {
+
+    constructor(scene, x, y, texture, hp, dmg) {
+        super(scene, x, y, texture);
+
+        this.setOrigin(0, 0)
+        scene.physics.world.enable(this);
+        this.body.velocity.x = 0
+        this.body.setAllowGravity(false);
+        this.body.bounce.set(1, 0)
+        this.hp = hp
+        this.dmg = dmg
+        this.scene.add.existing(this);
+    }
+}
