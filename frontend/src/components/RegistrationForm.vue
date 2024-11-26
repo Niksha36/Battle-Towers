@@ -3,9 +3,9 @@
     <h2>Регистрация</h2>
     <form @submit.prevent="register">
       <div class="form-group">
-        <label for="nickname">Никнейм:</label>
+        <label for="username">Никнейм:</label>
         <div class="input-wrapper">
-          <input type="text" v-model="nickname" placeholder="Введите никнейм" required/>
+          <input type="text" v-model="username" placeholder="Введите никнейм" required/>
         </div>
       </div>
       <div class="form-group">
@@ -35,7 +35,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      nickname: '',
+      username: '',
       password: '',
       repeatPassword: '',
       showPassword: false
@@ -51,8 +51,8 @@ export default {
         return;
       }
       try {
-        const response = await axios.post('http://your-django-backend.com/api/register/', {
-          nickname: this.nickname,
+        const response = await axios.post('http://localhost:8000/create_user', {
+          username: this.username,
           password: this.password
         });
         console.log('Registered:', response.data);
