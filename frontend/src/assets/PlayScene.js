@@ -1,11 +1,7 @@
 import {Scene} from 'phaser'
 import store from "@/store";
 import sky from "../assets/background/sky.png"
-import clouds_bg from '../assets/background/clouds_bg.png'
 import mountains from '../assets/background/glacial_mountains.png'
-import clouds_mg_3 from '../assets/background/clouds_mg_3.png'
-import clouds_mg_2 from '../assets/background/clouds_mg_2.png'
-import clouds_mg_1 from '../assets/background/clouds_mg_1.png'
 
 export default class PlayScene extends Scene {
 
@@ -14,28 +10,23 @@ export default class PlayScene extends Scene {
     }
 
     preload() {
-        this.load.image('sky', sky)
-        this.load.image('mountains', mountains)
-        this.load.image('layer1', clouds_bg)
-        this.load.image('layer2', clouds_mg_3)
-        this.load.image('layer3', clouds_mg_2)
-        this.load.image('layer4', clouds_mg_1)
+            this.load.image('sky', sky)
+            this.load.image('mountains', mountains)
 
-        this.add.graphics()
-            .fillStyle(0x6b6c6b, 1) // Зеленый цвет
-            .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
-            .generateTexture('gray', 75, 100);
+            this.add.graphics()
+                .fillStyle(0x6b6c6b, 1) // Зеленый цвет
+                .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
+                .generateTexture('gray', 75, 100);
 
-        this.add.graphics()
-            .fillStyle(0x00ff00, 1) // Зеленый цвет
-            .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
-            .generateTexture('green', 75, 100);
+            this.add.graphics()
+                .fillStyle(0x00ff00, 1) // Зеленый цвет
+                .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
+                .generateTexture('green', 75, 100);
 
 
     }
 
     create(child) {
-
         this.width = this.scale.width
         this.height = this.scale.height
         this.bg = []
@@ -46,8 +37,8 @@ export default class PlayScene extends Scene {
         this.slots = []
 
 
-        this.bg.push(this.add.image(this.width / 2, this.height / 2, 'sky'))
-        this.bg.push(this.add.image(this.width / 2, this.height / 2, 'mountains'))
+        this.bg = this.add.image(this.width / 2, this.height / 2, 'mountains')
+        this.setBgScale(this.bg, this.height)
 
 
         this.platform = this.physics.add.sprite(0, this.height - 216, "sky").setOrigin(0, 0).setScale(4, 1).setImmovable(true)
@@ -83,6 +74,7 @@ export default class PlayScene extends Scene {
             dropZone.setTint(0x00ff00)
             dropZone.destroy();
             gameObject.input.enabled = false;
+            this.towers.push(gameObject)
         });
 
         this.input.on('dragend', function (pointer, gameObject, dropped) {
@@ -100,9 +92,7 @@ export default class PlayScene extends Scene {
         // this.physics.add.collider(this.enemy, this.main_tower, this.enemyHitTower);
         // this.enemy.body.velocity.x = -500
 
-        for (let i = 0; i < 2; ++i) {
-            this.setBgScale(this.bg[i], this.height)
-        }
+
 
     }
 
