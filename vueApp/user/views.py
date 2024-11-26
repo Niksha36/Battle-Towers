@@ -25,9 +25,6 @@ def create_user(request):
 
 @api_view(['POST'])
 def login_user(request):
-    print(request.data)
-    print(request.user)
-    print(request.method)
     if request.method == 'POST':
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():

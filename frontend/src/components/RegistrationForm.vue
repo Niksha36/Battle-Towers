@@ -31,6 +31,7 @@
 
 <script>
 import axios from 'axios';
+import router from "@/router.js";
 
 export default {
   data() {
@@ -56,7 +57,7 @@ export default {
           password: this.password
         });
         console.log('Registered:', response.data);
-        // Здесь крч будем редиректить в игру :)
+        await router.push("game");
       } catch (error) {
         console.error('Registration failed:', error);
         alert('Registration failed. Please try again.');
