@@ -20,8 +20,8 @@ export default {
     return {
       game: {
         type: Phaser.AUTO,
-        width: 1300,
-        height: 800,
+        width: 1800,
+        height: 1000,
         antialias: false,
         pixelArt: true,
         physics: {
