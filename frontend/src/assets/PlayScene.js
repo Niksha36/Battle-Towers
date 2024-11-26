@@ -31,11 +31,16 @@ export default class PlayScene extends Scene {
         this.height = this.scale.height
         this.bg = []
 
+        this.wave = 0
+
         this.shop_towers = []
         this.towers = []
 
         this.slots = []
 
+        this.enemies = []
+
+        this.physics.add.collider(this.towers, this.enemies, this.hitEnemy, null, this);
 
         this.bg = this.add.image(this.width / 2, this.height / 2, 'mountains')
         this.setBgScale(this.bg, this.height)
@@ -114,9 +119,11 @@ export default class PlayScene extends Scene {
 
 
     update() {
-        // if (this.enemy.body.velocity.x > -500) {
-        //     this.enemy.body.velocity.x -= 10;
-        // }
+        if (this.enemies[0]) {
+            if (this.enemies[0].body.velocity.x > -800) {
+                this.enemies[0].body.velocity.x -= 70;
+            }
+        }
     }
 
 
@@ -139,16 +146,41 @@ export default class PlayScene extends Scene {
     }
 
     startWave() {
+        this.wave++;
         this.startWaveButton.setVisible(false);
         this.clearShop(this.shop_towers)
-        this.time.delayedCall(5000, this.endWave, [], this);
+        this.enemies.push(this.add.existing(new Enemy(this, 1200, 484, 'green', this.wave**2, 5*this.wave**2)))
+        this.enemies[0].body.velocity.x = -800
     }
 
     endWave() {
         this.startWaveButton.setVisible(true);
         this.generateShop(this.shop_towers)
 
+        for (let tower of this.towers) {
+            tower.setAlpha(1)
+            tower.body.enable = true
+        }
+    }
 
+    hitEnemy(tower, enemy) {
+        tower.hp -= enemy.dmg;
+        enemy.hp -= tower.dmg;
+
+        console.log(enemy.hp, enemy.dmg)
+
+        if (tower.hp <= 0) {
+            tower.setAlpha(0)
+            tower.body.enable = false
+        }
+
+        if (enemy.hp <= 0) {
+            this.enemies.shift()
+            enemy.destroy()
+            if (this.enemies.length === 0) {
+                this.endWave()
+            }
+        }
     }
 
 
@@ -160,12 +192,29 @@ class Tower extends Phaser.GameObjects.Sprite {
         super(scene, x, y, texture);
 
         this.setOrigin(0, 0)
+        scene.physics.world.enable(this);
+        this.body.setAllowGravity(false);
+        this.body.immovable = true
         this.setInteractive({draggable: true})
-
-        this.shopPosition = {x: x, y: y}
         this.hp = hp
         this.dmg = dmg
         this.cost = cost
+        this.scene.add.existing(this);
+    }
+}
+
+class Enemy extends Phaser.GameObjects.Sprite {
+
+    constructor(scene, x, y, texture, hp, dmg) {
+        super(scene, x, y, texture);
+
+        this.setOrigin(0, 0)
+        scene.physics.world.enable(this);
+        this.body.velocity.x = 0
+        this.body.setAllowGravity(false);
+        this.body.bounce.set(1, 0)
+        this.hp = hp
+        this.dmg = dmg
         this.scene.add.existing(this);
     }
 }
