@@ -27,6 +27,10 @@ class UserLoginSerializer(serializers.Serializer):
 class UpdateUserRecordSerializer(serializers.ModelSerializer):
     record = serializers.TimeField()
 
+    class Meta:
+        model = User
+        fields = ['record']
+
     def update(self, instance, validated_data) -> User:
         instance.record = validated_data.get('record', instance.record)
         instance.save()

@@ -44,11 +44,14 @@ export default {
       try {
         console.log("123")
         const response = await axios.post('http://localhost:8000/login_user', {
+          withCredentials: true,
           username: this.username,
           password: this.password
         });
         console.log('Logged in:', response.data);
         await router.push("game");
+        this.$store.dispatch("updateUsername", this.username)
+
       } catch (error) {
         console.error('Login failed:', error);
         alert('Ошибка входа: неверный никнейм или пароль');
