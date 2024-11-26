@@ -1,21 +1,19 @@
-from django.http import JsonResponse
-from rest_framework import generics, permissions
-from rest_framework.response import Response
-from django.contrib.auth import authenticate
-from .serializers import UserSerializer, UserLoginSerializer, UpdateUserRecordSerializer
-from django.contrib.auth import get_user_model
-from rest_framework import status, permissions
+import json
+
+from django.contrib.auth import login
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.contrib.auth import login
+
 from .models import User
-import json
+from .serializers import UserSerializer, UserLoginSerializer, UpdateUserRecordSerializer
 
 
 @api_view(['POST'])
 def create_user(request):
     if request.method != 'POST':
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
     serializer = UserSerializer(data=request.data)
     if not serializer.is_valid():
         print(serializer.errors)
@@ -42,6 +40,7 @@ def login_user(request):
 def get_top_user(request):
     if request.method != 'GET':
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
     users = User.objects.all().order_by('-record').limit(10)
     user = User.objects.get(pk=request.user.id)
 
@@ -62,9 +61,11 @@ def get_top_user(request):
 def get_user_record(request):
     if request.method != 'GET':
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
     username = request.GET.get('username', None)
     if not username:
         return Response({"message": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
+
     data = json.loads(request.body.decode())
     try:
         user = User.objects.get(username=data['username'])
