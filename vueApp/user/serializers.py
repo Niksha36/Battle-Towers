@@ -23,3 +23,11 @@ class UserLoginSerializer(serializers.Serializer):
         if user is None:
             raise serializers.ValidationError("Invalid credentials")
         return user
+
+class UpdateUserRecordSerializer(serializers.ModelSerializer):
+    record = serializers.TimeField()
+
+    def update(self, instance, validated_data) -> User:
+        instance.record = validated_data.get('record', instance.record)
+        instance.save()
+        return instance
