@@ -5,7 +5,7 @@
       <div class="form-group">
         <label for="text">Никнейм:</label>
         <div class="input-wrapper">
-          <input type="text" v-model="nickname" placeholder="Введите никнейм" required />
+          <input type="text" v-model="username" placeholder="Введите никнейм" required />
         </div>
       </div>
       <div class="form-group">
@@ -28,7 +28,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      nickname: '',
+      username: '',
       password: '',
       showPassword: false
     };
@@ -39,8 +39,9 @@ export default {
     },
     async login() {
       try {
-        const response = await axios.post('http://your-django-backend.com/api/login/', {
-          nickname: this.nickname,
+        console.log("123")
+        const response = await axios.post('http://localhost:8000/login_user', {
+          username: this.username,
           password: this.password
         });
         console.log('Logged in:', response.data);
