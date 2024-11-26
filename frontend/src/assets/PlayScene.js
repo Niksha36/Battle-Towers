@@ -10,28 +10,38 @@ export default class PlayScene extends Scene {
     }
 
     preload() {
-            this.load.image('sky', sky)
-            this.load.image('mountains', mountains)
+        this.load.image('sky', sky)
+        this.load.image('mountains', mountains)
 
-            this.add.graphics()
-                .fillStyle(0x6b6c6b, 1) // Зеленый цвет
-                .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
-                .generateTexture('gray', 75, 100);
+        this.add.graphics()
+            .fillStyle(0x6b6c6b, 1)
+            .fillRect(0, 0, 75, 100) 
+            .generateTexture('gray', 75, 100);
 
-            this.add.graphics()
-                .fillStyle(0x00ff00, 1) // Зеленый цвет
-                .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
-                .generateTexture('green', 75, 100);
-            
-            this.add.graphics()
-                .fillStyle(0xff0000, 1) // Зеленый цвет
-                .fillRect(0, 0, 75, 150) // Параметры: x, y, ширина, высота
-                .generateTexture('mainTower', 75, 100);
+        this.add.graphics()
+            .fillStyle(0x00ff00, 1)
+            .fillRect(0, 0, 75, 100)
+            .generateTexture('green', 75, 100);
+        
+        this.add.graphics()
+            .fillStyle(0xff0000, 1)
+            .fillRect(0, 0, 75, 150) 
+            .generateTexture('mainTower', 75, 100);
 
-            this.add.graphics()
-                .fillStyle(0xff9999, 1) // Зеленый цвет
-                .fillRect(0, 0, 75, 150) // Параметры: x, y, ширина, высота
-                .generateTexture('chest', 75, 100);
+        this.add.graphics()
+            .fillStyle(0xff9999, 1) 
+            .fillRect(0, 0, 75, 150) 
+            .generateTexture('chest', 75, 100);
+
+        this.add.graphics()
+            .fillStyle(0x1128dc, 1) 
+            .fillRect(0, 0, 75, 150)
+            .generateTexture('cat', 75, 100);
+        
+        this.add.graphics()
+            .fillStyle(0x000000, 1) 
+            .fillRect(0, 0, 75, 150)
+            .generateTexture('milk', 75, 100);
 
 
     }
@@ -40,17 +50,18 @@ export default class PlayScene extends Scene {
         // GAME CONFIG
         this.width = this.scale.width
         this.height = this.scale.height
+        
         this.count_slots = 10
-        this.count_shop_slots = 5
+        this.count_shop_slots = 7
+        this.count_tower_types = 4
+        
         this.bg = []
-
         this.shop_towers = []
         this.towers = []
-
         this.slots = []
 
         // USER CONFIG
-        this.money = 0
+        this.money = 11
 
 
         this.bg = this.add.image(this.width / 2, this.height / 2, 'mountains')
@@ -73,6 +84,7 @@ export default class PlayScene extends Scene {
             this.slots[i].input.dropZone = true
         }
 
+        this.towers.push(this.add.existing(new MainTower(this)))
         this.generateShop(this.shop_towers)
 
         this.input.on('dragstart', function (pointer, gameObject) {
@@ -91,6 +103,7 @@ export default class PlayScene extends Scene {
             dropZone.destroy();
             gameObject.input.enabled = false;
             this.towers.push(gameObject)
+            this.shop_towers = this.shop_towers.filter(item => item !== gameObject);
         });
 
         this.input.on('dragend', function (pointer, gameObject, dropped) {
@@ -101,13 +114,28 @@ export default class PlayScene extends Scene {
 
         });
 
+        this.startWaveButton = this.add.text(this.width - 250, this.height - 100, 'Start Wave', {
+            fontSize: '32px',
+            fill: '#fff'
+        })
+            .setOrigin(0, 0)
+            .setInteractive();
+
+        // Добавляем обработчик событий на кнопку
+        this.startWaveButton.on('pointerdown', this.startWave, this);
+        this.startWaveButton.on('pointerover', () => {
+            this.startWaveButton.setStyle({fill: '#aaa'}); // Темный цвет при наведении
+        });
+        this.startWaveButton.on('pointerout', () => {
+            this.startWaveButton.setStyle({fill: '#fff'}); // Возвращаем исходный цвет
+        });
+
         // this.enemy = this.physics.add.sprite(700, height - 324, "layer1").setOrigin(0, 0).setScale(0.2, 0.5)
         // this.enemy.setBounce(0.3, 0.1);
         // this.main_tower.setCollideWorldBounds(true);
         // this.physics.add.collider(this.enemy, this.platform);
         // this.physics.add.collider(this.enemy, this.main_tower, this.enemyHitTower);
         // this.enemy.body.velocity.x = -500
-
 
 
     }
@@ -117,12 +145,6 @@ export default class PlayScene extends Scene {
         // if (this.enemy.body.velocity.x > -500) {
         //     this.enemy.body.velocity.x -= 10;
         // }
-        for (let i = 1; i < this.towers.length; i++) {
-            if (this.towers[i]) {
-                this.towers[i].buff(i);
-            }
-        }
-        console.log(this.money)
     }
 
 
@@ -132,16 +154,50 @@ export default class PlayScene extends Scene {
     }
 
     generateShop(shop_towers) {
-        shop_towers.push(this.add.existing(new MainTower(this, this.height - 154, 5, 10, 2)));
-        this.towers.push(shop_towers[0])
         for (let i = 0; i < this.count_shop_slots; ++i) {
-            if (i < 3) {
-                shop_towers.push(this.add.existing(new Chest(this, 20 + (20 + 75) * i + 1, this.height - 154, 2, 2, 2)));
-            } else {
-                shop_towers.push(this.add.existing(new Tower(this, 20 + (20 + 75) * i + 1, this.height - 154, 'green', 2, 2, 2)));
+            let x_pos = 0 + (20 + 75) * i + 1
+            let y_pos =  this.height - 154
+            switch(getRandomNumber(this.count_tower_types)) {
+                case 0: 
+                    shop_towers.push(this.add.existing(new Chest(this, x_pos, y_pos)));
+                    break
+                case 1: 
+                    shop_towers.push(this.add.existing(new Tower(this, x_pos, y_pos , 'green', 2, 2, 2)));
+                    break
+                case 2:
+                    shop_towers.push(this.add.existing(new Cat(this, x_pos, y_pos)));
+                    break
+                case 3:
+                    shop_towers.push(this.add.existing(new Milk(this, x_pos, y_pos)));
+                    break
             }
         }
     }
+
+    clearShop(shop_towers) {
+        for (let i = 0; i < shop_towers.length; ++i) {
+            shop_towers[i].destroy()
+        }
+        shop_towers.length = 0
+    }
+
+    startWave() {
+        this.startWaveButton.setVisible(false);
+        this.clearShop(this.shop_towers)
+        this.time.delayedCall(60, this.endWave, [], this);
+    }
+
+    endWave() {
+        this.startWaveButton.setVisible(true);
+        this.generateShop(this.shop_towers)
+
+        for (let i = 0; i < this.towers.length; i++) {
+            this.towers[i].buff(i);
+        }
+        console.log(this.money)
+        console.log(this.towers)
+    }
+
 
 }
 
@@ -153,7 +209,6 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.setOrigin(0, 0)
         this.setInteractive({draggable: draggable})
 
-        this.shopPosition = {x: x, y: y}
         this.hp = hp
         this.dmg = dmg
         this.cost = cost
@@ -163,14 +218,18 @@ class Tower extends Phaser.GameObjects.Sprite {
     buff(index) {}
 }
 class MainTower extends Tower {
-    constructor(scene, hp, dmg, cost) {
-        super(scene, 20, 484, "mainTower", hp, dmg, cost, false);
+    constructor(scene) {
+        super(scene, 20, 484, "mainTower", 5, 1, 0, false);
+    }
+
+    buff(index) {
+        this.scene.money += 6;
     }
 }
 
 class Chest extends Tower {
-    constructor(scene, x, y, hp, dmg, cost) {
-        super(scene, x, y, "chest", hp, dmg, cost);
+    constructor(scene, x, y) {
+        super(scene, x, y, "chest", 2, 1, 5);
     }
 
     buff(index) {
@@ -181,5 +240,32 @@ class Chest extends Tower {
     }
 }
 
+class Cat extends Tower {
+    constructor(scene, x, y) {
+        super(scene, x, y, "cat", 2, 2, 3);
+    }
+}
 
+class Milk extends Tower {
+    constructor(scene, x, y) {
+        super(scene, x, y, "milk", 2, 2, 3);
+    }
 
+    buff(index) {
+        if (index == this.scene.towers.length - 1) {
+            return;
+        }
+        
+        if (this.scene.towers[index + 1].constructor.name == "Cat") {
+            this.scene.towers[index + 1].hp += 2
+            this.scene.towers[index + 1].dmg += 2
+        } else {
+            this.scene.towers[index + 1].hp++;
+        }
+    
+    }
+}
+
+function getRandomNumber(max) {
+    return Math.floor(Math.random() * max)
+  }
