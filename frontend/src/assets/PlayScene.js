@@ -22,19 +22,35 @@ export default class PlayScene extends Scene {
                 .fillStyle(0x00ff00, 1) // Зеленый цвет
                 .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
                 .generateTexture('green', 75, 100);
+            
+            this.add.graphics()
+                .fillStyle(0xff0000, 1) // Зеленый цвет
+                .fillRect(0, 0, 75, 150) // Параметры: x, y, ширина, высота
+                .generateTexture('mainTower', 75, 100);
+
+            this.add.graphics()
+                .fillStyle(0xff9999, 1) // Зеленый цвет
+                .fillRect(0, 0, 75, 150) // Параметры: x, y, ширина, высота
+                .generateTexture('chest', 75, 100);
 
 
     }
 
     create(child) {
+        // GAME CONFIG
         this.width = this.scale.width
         this.height = this.scale.height
+        this.count_slots = 10
+        this.count_shop_slots = 5
         this.bg = []
 
         this.shop_towers = []
         this.towers = []
 
         this.slots = []
+
+        // USER CONFIG
+        this.money = 0
 
 
         this.bg = this.add.image(this.width / 2, this.height / 2, 'mountains')
@@ -52,7 +68,7 @@ export default class PlayScene extends Scene {
         this.main_tower.inputEnabled = true;
 
 
-        for (let i = 0; i < 10; ++i) {
+        for (let i = 0; i < this.count_slots; ++i) {
             this.slots.push(this.add.sprite(20 + (20 + 75) * i, 484, 'gray').setOrigin(0, 0).setInteractive())
             this.slots[i].input.dropZone = true
         }
@@ -101,6 +117,12 @@ export default class PlayScene extends Scene {
         // if (this.enemy.body.velocity.x > -500) {
         //     this.enemy.body.velocity.x -= 10;
         // }
+        for (let i = 1; i < this.towers.length; i++) {
+            if (this.towers[i]) {
+                this.towers[i].buff(i);
+            }
+        }
+        console.log(this.money)
     }
 
 
@@ -110,8 +132,14 @@ export default class PlayScene extends Scene {
     }
 
     generateShop(shop_towers) {
-        for (let i = 0; i < 5; ++i) {
-            shop_towers.push(this.add.existing(new Tower(this, 20 + (20 + 75) * i + 1, this.height - 154, 'green', 2, 2, 2)));
+        shop_towers.push(this.add.existing(new MainTower(this, this.height - 154, 5, 10, 2)));
+        this.towers.push(shop_towers[0])
+        for (let i = 0; i < this.count_shop_slots; ++i) {
+            if (i < 3) {
+                shop_towers.push(this.add.existing(new Chest(this, 20 + (20 + 75) * i + 1, this.height - 154, 2, 2, 2)));
+            } else {
+                shop_towers.push(this.add.existing(new Tower(this, 20 + (20 + 75) * i + 1, this.height - 154, 'green', 2, 2, 2)));
+            }
         }
     }
 
@@ -119,11 +147,11 @@ export default class PlayScene extends Scene {
 
 class Tower extends Phaser.GameObjects.Sprite {
 
-    constructor(scene, x, y, texture, hp, dmg, cost) {
+    constructor(scene, x, y, texture, hp, dmg, cost, draggable=true) {
         super(scene, x, y, texture);
 
         this.setOrigin(0, 0)
-        this.setInteractive({draggable: true})
+        this.setInteractive({draggable: draggable})
 
         this.shopPosition = {x: x, y: y}
         this.hp = hp
@@ -131,5 +159,27 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.cost = cost
         this.scene.add.existing(this);
     }
+
+    buff(index) {}
 }
+class MainTower extends Tower {
+    constructor(scene, hp, dmg, cost) {
+        super(scene, 20, 484, "mainTower", hp, dmg, cost, false);
+    }
+}
+
+class Chest extends Tower {
+    constructor(scene, x, y, hp, dmg, cost) {
+        super(scene, x, y, "chest", hp, dmg, cost);
+    }
+
+    buff(index) {
+        this.scene.money++; 
+        if (this.scene.towers[index - 1].constructor.name == "MainTower") {
+            this.scene.money++;
+        }
+    }
+}
+
+
 
