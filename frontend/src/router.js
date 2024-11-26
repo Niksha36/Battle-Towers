@@ -5,7 +5,7 @@ import LoginForm from './components/LoginForm.vue';
 import Game from "@/components/Game.vue";
 
 const routes = [
-    { path: '/', redirect: '/register' },
+    { path: '/', redirect: '/game' },
     { path: '/register', component: RegistrationForm },
     { path: '/login', component: LoginForm },
     { path: '/game', component: Game},
