@@ -26,7 +26,7 @@ export default class PlayScene extends Scene {
             .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
             .generateTexture('gray', 75, 100);
 
-         this.add.graphics()
+        this.add.graphics()
             .fillStyle(0x00ff00, 1) // Зеленый цвет
             .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
             .generateTexture('green', 75, 100);
@@ -62,33 +62,31 @@ export default class PlayScene extends Scene {
 
 
         for (let i = 0; i < 10; ++i) {
-            this.slots.push(this.add.sprite(20 + (20 + 75) * i , 484, 'gray').setOrigin(0, 0).setInteractive())
+            this.slots.push(this.add.sprite(20 + (20 + 75) * i, 484, 'gray').setOrigin(0, 0).setInteractive())
             this.slots[i].input.dropZone = true
         }
 
         this.generateShop(this.shop_towers)
 
         this.input.on('dragstart', function (pointer, gameObject) {
+            this.children.bringToTop(gameObject);
             gameObject.setTint(0xeeeeee);
-        });
+        }, this);
 
         this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
             gameObject.x = dragX;
             gameObject.y = dragY;
         });
-
-        this.input.on('drop', (pointer, gameObject, dropZone) =>
-        {
+        this.input.on('drop', (pointer, gameObject, dropZone) => {
             gameObject.x = dropZone.x;
             gameObject.y = dropZone.y;
-            gameObject.setScale(0.2);
-
+            dropZone.setTint(0x00ff00)
+            dropZone.destroy();
             gameObject.input.enabled = false;
         });
 
         this.input.on('dragend', function (pointer, gameObject, dropped) {
-             if (!dropped)
-            {
+            if (!dropped) {
                 gameObject.x = gameObject.input.dragStartX;
                 gameObject.y = gameObject.input.dragStartY;
             }
