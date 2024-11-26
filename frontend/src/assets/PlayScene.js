@@ -10,18 +10,18 @@ export default class PlayScene extends Scene {
     }
 
     preload() {
-            this.load.image('sky', sky)
-            this.load.image('mountains', mountains)
+        this.load.image('sky', sky)
+        this.load.image('mountains', mountains)
 
-            this.add.graphics()
-                .fillStyle(0x6b6c6b, 1) // Зеленый цвет
-                .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
-                .generateTexture('gray', 75, 100);
+        this.add.graphics()
+            .fillStyle(0x6b6c6b, 1) // Зеленый цвет
+            .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
+            .generateTexture('gray', 75, 100);
 
-            this.add.graphics()
-                .fillStyle(0x00ff00, 1) // Зеленый цвет
-                .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
-                .generateTexture('green', 75, 100);
+        this.add.graphics()
+            .fillStyle(0x00ff00, 1) // Зеленый цвет
+            .fillRect(0, 0, 75, 100) // Параметры: x, y, ширина, высота
+            .generateTexture('green', 75, 100);
 
 
     }
@@ -75,6 +75,7 @@ export default class PlayScene extends Scene {
             dropZone.destroy();
             gameObject.input.enabled = false;
             this.towers.push(gameObject)
+            this.shop_towers = this.shop_towers.filter(item => item !== gameObject);
         });
 
         this.input.on('dragend', function (pointer, gameObject, dropped) {
@@ -85,13 +86,28 @@ export default class PlayScene extends Scene {
 
         });
 
+        this.startWaveButton = this.add.text(this.width - 250, this.height - 100, 'Start Wave', {
+            fontSize: '32px',
+            fill: '#fff'
+        })
+            .setOrigin(0, 0)
+            .setInteractive();
+
+        // Добавляем обработчик событий на кнопку
+        this.startWaveButton.on('pointerdown', this.startWave, this);
+        this.startWaveButton.on('pointerover', () => {
+            this.startWaveButton.setStyle({fill: '#aaa'}); // Темный цвет при наведении
+        });
+        this.startWaveButton.on('pointerout', () => {
+            this.startWaveButton.setStyle({fill: '#fff'}); // Возвращаем исходный цвет
+        });
+
         // this.enemy = this.physics.add.sprite(700, height - 324, "layer1").setOrigin(0, 0).setScale(0.2, 0.5)
         // this.enemy.setBounce(0.3, 0.1);
         // this.main_tower.setCollideWorldBounds(true);
         // this.physics.add.collider(this.enemy, this.platform);
         // this.physics.add.collider(this.enemy, this.main_tower, this.enemyHitTower);
         // this.enemy.body.velocity.x = -500
-
 
 
     }
@@ -114,6 +130,27 @@ export default class PlayScene extends Scene {
             shop_towers.push(this.add.existing(new Tower(this, 20 + (20 + 75) * i + 1, this.height - 154, 'green', 2, 2, 2)));
         }
     }
+
+    clearShop(shop_towers) {
+        for (let i = 0; i < shop_towers.length; ++i) {
+            shop_towers[i].destroy()
+        }
+        shop_towers.length = 0
+    }
+
+    startWave() {
+        this.startWaveButton.setVisible(false);
+        this.clearShop(this.shop_towers)
+        this.time.delayedCall(5000, this.endWave, [], this);
+    }
+
+    endWave() {
+        this.startWaveButton.setVisible(true);
+        this.generateShop(this.shop_towers)
+
+
+    }
+
 
 }
 
