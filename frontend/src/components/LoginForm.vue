@@ -25,6 +25,9 @@
 
 <script>
 import axios from 'axios';
+
+import router from "@/router.js";
+
 export default {
   data() {
     return {
@@ -45,7 +48,7 @@ export default {
           password: this.password
         });
         console.log('Logged in:', response.data);
-        // Здесь крч будем редиректить в игру :)
+        await router.push("game");
       } catch (error) {
         console.error('Login failed:', error);
         alert('Ошибка входа: неверный никнейм или пароль');
