@@ -1,7 +1,12 @@
 import {Scene} from 'phaser'
 import store from "@/store";
-import sky from "../assets/background/sky.png"
-import mountains from '../assets/background/glacial_mountains.png'
+import bg from "../assets/background/background.png"
+import mainTower from "../assets/towers/towerS_0.png"
+import milk from "../assets/towers/towerS_1.png"
+import cat from "../assets/towers/towerS_2.png"
+import guard from "../assets/towers/towerS_3.png"
+import chest from "../assets/towers/towerS_4.png"
+
 
 export default class PlayScene extends Scene {
 
@@ -10,8 +15,12 @@ export default class PlayScene extends Scene {
     }
 
     preload() {
-        this.load.image('sky', sky)
-        this.load.image('mountains', mountains)
+        this.load.image('bg', bg)
+        this.load.image('mainTower', mainTower)
+        this.load.image('milk', milk)
+        this.load.image('cat', cat)
+        this.load.image('guard', guard)
+        this.load.image('chest', chest)
 
         this.add.graphics()
             .fillStyle(0x6b6c6b, 1) // Зеленый цвет
@@ -42,19 +51,15 @@ export default class PlayScene extends Scene {
 
         this.physics.add.collider(this.towers, this.enemies, this.hitEnemy, null, this);
 
-        this.bg = this.add.image(this.width / 2, this.height / 2, 'mountains')
+        this.bg = this.add.image(this.width / 2, this.height / 2, 'bg')
         this.setBgScale(this.bg, this.height)
 
-
-        this.platform = this.physics.add.sprite(0, this.height - 216, "sky").setOrigin(0, 0).setScale(4, 1).setImmovable(true)
-        this.platform.body.setAllowGravity(false)
-
-        this.main_tower = this.physics.add.sprite(10, this.height - 324, "layer1").setOrigin(0, 0).setScale(0.2, 0.5).setImmovable(true).setInteractive({draggable: true});
-        this.main_tower.body.setAllowGravity(false)
-        this.main_tower.setBounce(0, 0.2);
-        this.main_tower.setCollideWorldBounds(true);
-        this.physics.add.collider(this.main_tower, this.platform);
-        this.main_tower.inputEnabled = true;
+        // this.main_tower = this.physics.add.sprite(10, this.height - 324, "layer1").setOrigin(0, 0).setScale(0.2, 0.5).setImmovable(true).setInteractive({draggable: true});
+        // this.main_tower.body.setAllowGravity(false)
+        // this.main_tower.setBounce(0, 0.2);
+        // this.main_tower.setCollideWorldBounds(true);
+        // this.physics.add.collider(this.main_tower, this.platform);
+        // this.main_tower.inputEnabled = true;
 
 
         for (let i = 0; i < 10; ++i) {
