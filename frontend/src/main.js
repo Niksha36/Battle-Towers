@@ -7,4 +7,4 @@ import store from "@/store.js";
 
 defineIonPhaser(window);
 
-createApp(App).use(router, store).mount('#app');
+createApp(App).use(router).use(store).mount('#app');

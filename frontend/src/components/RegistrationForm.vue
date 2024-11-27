@@ -53,10 +53,12 @@ export default {
       }
       try {
         const response = await axios.post('http://localhost:8000/create_user', {
+          withCredentials: true,
           username: this.username,
           password: this.password
         });
         console.log('Registered:', response.data);
+        this.$store.dispatch("updateUsername", this.username)
         await router.push("game");
       } catch (error) {
         console.error('Registration failed:', error);

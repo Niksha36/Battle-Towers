@@ -3,14 +3,20 @@ import {createStore} from 'vuex'
 const store = createStore({
     state () {
         return {
-            count: 0
+            username: ''
         }
     },
     mutations: {
-        increment (state) {
-            state.count++
+        setUsername(state, username) {
+            state.username = username
         }
-    }
+    },
+
+    actions: {
+    updateUsername({ commit }, username) {
+      commit('setUsername', username);
+        },
+    },
 })
 
 export default store;

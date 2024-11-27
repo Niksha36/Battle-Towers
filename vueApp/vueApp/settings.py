@@ -33,7 +33,19 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'vueApp.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:5174',
+    'http://localhost:5173',
+    'http://localhost:5172',
+    'http://localhost:5171',
+    'http://localhost:5175',
+    'http://localhost:5176',
+    'http://localhost:5177',
+    'http://localhost:5178',
+    'http://localhost:5179'
+]
 
 TEMPLATES = [
     {
