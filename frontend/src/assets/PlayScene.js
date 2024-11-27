@@ -17,8 +17,9 @@ import money from "../assets/sprites/spr_money_0.png"
 import shop_plate from "../assets/sprites/plate_common_0.png"
 import turnBtn from "../assets/sprites/btn_end_turn_1.png"
 import slot from "../assets/sprites/pngwing_com_0.png"
+import shopLine from "../assets/sprites/shop_line_spr_0.png"
 import wave from "../assets/sprites/progressbar_green_bg_0.png"
-import { default as stor } from "@/store.js"
+import {default as stor} from "@/store.js"
 import axios from "axios";
 
 
@@ -46,13 +47,13 @@ export default class PlayScene extends Scene {
         this.load.image('shopPlate', shop_plate)
         this.load.image('turnBtn', turnBtn)
         this.load.image('slot', slot)
+        this.load.image('shopLine', shopLine)
     }
 
     create(child) {
         // GAME CONFIG
         this.width = this.scale.width
         this.height = this.scale.height
-
 
         this.bgSky = this.add.image(this.width / 2, this.height / 2, 'bgSky')
         this.bgCluds = this.add.tileSprite(this.width / 2, this.height / 3.5, 1920, 645, 'bgClouds').setScrollFactor(1, 1);
@@ -81,15 +82,30 @@ export default class PlayScene extends Scene {
         this.physics.add.collider(this.towers, this.enemies, this.hitEnemy, null, this);
 
 
-
         for (let i = 1; i < this.count_slots; ++i) {
             this.slots.push(this.add.sprite(100 + this.step_sprite * (i), this.platform_start, 'slot').setInteractive().setAlpha(0))
             this.slots[i - 1].input.dropZone = true
             this.slots[i - 1].dropZoneIndex = i;
         }
 
+        this.shopLine = this.add.sprite(-1400, this.platform_start + 118, 'shopLine').setScale(0.8).setOrigin(0)
+
         this.towers.push(this.add.existing(new MainTower(this)))
         this.generateShop(this.shop_towers, this.shop_plates)
+
+         this.tweens.add({
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
+                ...this.shop_towers.map(el => el.dmgIcon),
+                ...this.shop_towers.map(el => el.dmgIcon),
+                ...this.shop_towers.map(el => el.coinIcon),
+                ...this.shop_towers.map(el => el.hpText),
+                ...this.shop_towers.map(el => el.dmgText),
+                ...this.shop_towers.map(el => el.coinText),
+                ...this.shop_towers.map(el => el.nameText)],
+            x: '+=1400',
+            duration: 1000,
+            ease: 'Power2',
+        });
 
         this.input.on('dragstart', function (pointer, gameObject) {
 
@@ -103,8 +119,7 @@ export default class PlayScene extends Scene {
             gameObject.updatePosition(gameObject.x, gameObject.y)
         });
 
-        this.input.on('dragenter', (pointer, gameObject, dropZone) =>
-        {
+        this.input.on('dragenter', (pointer, gameObject, dropZone) => {
 
             dropZone.setTexture(gameObject.texture)
             dropZone.setTint(0x00ff00);
@@ -112,8 +127,7 @@ export default class PlayScene extends Scene {
 
         });
 
-        this.input.on('dragleave', (pointer, gameObject, dropZone) =>
-        {
+        this.input.on('dragleave', (pointer, gameObject, dropZone) => {
 
             dropZone.setScale(1)
             dropZone.setTexture('slot')
@@ -210,8 +224,8 @@ export default class PlayScene extends Scene {
 
     generateShop(shop_towers, shop_plates) {
         for (let i = 0; i < this.count_shop_slots; ++i) {
-            let x_pos = (this.step_sprite + 40) * i + 120
-            let y_pos = this.height - this.show_start + 80
+            let x_pos = (this.step_sprite + 40) * i + 120 - 1400
+            let y_pos = this.platform_start * 1.45
 
             shop_plates.push(this.add.sprite(x_pos, y_pos, "shopPlate").setScale(1.1, 0.95));
             let shop_tower;
@@ -232,7 +246,6 @@ export default class PlayScene extends Scene {
                     shop_tower = new Thief(this, x_pos, y_pos + 15)
                     break
             }
-
             shop_towers.push(this.add.existing(shop_tower))
             for (let slot of this.slots) {
                 if (slot) {
@@ -242,9 +255,6 @@ export default class PlayScene extends Scene {
                             alpha: 0.4, // Конечная прозрачность (полностью видимый)
                             duration: 500, // Длительность анимации в миллисекундах
                             ease: 'Power2', // Тип easing
-                            onComplete: () => {
-                                console.log('Прозрачность увеличена!'); // Действие после завершения анимации
-                            }
                         });
                     });
                     shop_tower.on('pointerout', () => {
@@ -253,13 +263,11 @@ export default class PlayScene extends Scene {
                             alpha: 0, // Конечная прозрачность (полностью видимый)
                             duration: 500, // Длительность анимации в миллисекундах
                             ease: 'Power2', // Тип easing
-                            onComplete: () => {
-                                console.log('Прозрачность увеличена!'); // Действие после завершения анимации
-                            }
                         });
                     });
                 }
             }
+            this.children.bringToTop(this.shopLine);
         }
     }
 
@@ -269,12 +277,12 @@ export default class PlayScene extends Scene {
             shop_towers[i].nameText.destroy()
             shop_towers[i].component_destroy()
             shop_plates[i].destroy()
-        }        
+        }
 
         for (let i = 0; i < shop_plates.length; ++i) {
             shop_plates[i].destroy()
         }
-        
+
         shop_towers.length = 0
         shop_plates.length = 0
     }
@@ -286,17 +294,45 @@ export default class PlayScene extends Scene {
             }
         }
 
+        this.tweens.add({
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
+                ...this.shop_towers.map(el => el.dmgIcon),
+                ...this.shop_towers.map(el => el.dmgIcon),
+                ...this.shop_towers.map(el => el.coinIcon),
+                ...this.shop_towers.map(el => el.hpText),
+                ...this.shop_towers.map(el => el.dmgText),
+                ...this.shop_towers.map(el => el.coinText),
+                ...this.shop_towers.map(el => el.nameText)],
+            x: '-=1400',
+            duration: 1000,
+            ease: 'Power2',
+            onComplete: () => this.clearShop(this.shop_towers, this.shop_plates)
+        });
+
         this.wave++;
         this.startWaveButton.setVisible(false);
-        this.clearShop(this.shop_towers, this.shop_plates)
+        // this.clearShop(this.shop_towers, this.shop_plates)
         for (let i = 0; i < 5; i++) {
-            this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30*i, this.platform_start-20, 'ghost', this.wave + 1, this.wave + 1)))
+            this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 20, 'ghost', this.wave + 1, this.wave + 1)))
         }
     }
 
     endWave() {
         this.startWaveButton.setVisible(true);
         this.generateShop(this.shop_towers, this.shop_plates)
+        this.tweens.add({
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
+                ...this.shop_towers.map(el => el.dmgIcon),
+                ...this.shop_towers.map(el => el.dmgIcon),
+                ...this.shop_towers.map(el => el.coinIcon),
+                ...this.shop_towers.map(el => el.hpText),
+                ...this.shop_towers.map(el => el.dmgText),
+                ...this.shop_towers.map(el => el.coinText),
+                ...this.shop_towers.map(el => el.nameText)],
+            x: '+=1400',
+            duration: 1000,
+            ease: 'Power2',
+        });
 
         for (let tower of this.towers) {
             if (tower) {
@@ -348,8 +384,8 @@ export default class PlayScene extends Scene {
         const response = await axios.post("http://localhost:8000/update_user_record", {
             withCredentials: true,
             params: {
-              "username": stor.state.username,
-              "record": stor.state.record
+                "username": stor.state.username,
+                "record": stor.state.record
             }
         })
         console.log(response.data)
@@ -360,7 +396,7 @@ export default class PlayScene extends Scene {
 
 class Tower extends Phaser.GameObjects.Sprite {
 
-    constructor(scene, x, y, texture, hp, dmg, cost, draggable=true) {
+    constructor(scene, x, y, texture, hp, dmg, cost, draggable = true) {
         super(scene, x, y, texture);
 
         this.setInteractive({draggable: draggable})
@@ -398,14 +434,15 @@ class Tower extends Phaser.GameObjects.Sprite {
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 6) // "" дабы не отображалось название башни
-        
-        
+
+
         this.is_die = false
         this.scene.add.existing(this);
     }
 
 
-    buff(index) {}
+    buff(index) {
+    }
 
     set_default_stats() {
         this.hp = this.default_hp
@@ -498,10 +535,10 @@ class Chest extends Tower {
     buff(index) {
         if (this.is_die) {
             this.is_die = false;
-            return; 
+            return;
         }
 
-        this.scene.money++; 
+        this.scene.money++;
         if (this.scene.towers[index - 1] && this.scene.towers[index - 1].constructor.name === "MainTower") {
             this.scene.money++;
         }
@@ -523,14 +560,14 @@ class Milk extends Tower {
         if (index === this.scene.towers.length - 1 || this.scene.towers[index + 1] == null) {
             return;
         }
-        
+
         if (this.scene.towers[index + 1].constructor.name === "Cat") {
             this.scene.towers[index + 1].default_hp += 2
             this.scene.towers[index + 1].default_dmg += 2
         } else {
             this.scene.towers[index + 1].default_hp++;
         }
-        
+
         this.scene.towers[index + 1].set_default_stats()
     }
 }
@@ -566,7 +603,7 @@ class Thief extends Tower {
         super(scene, x, y, "thief", 1, 2, 3);
     }
 
-    buff (index) {
+    buff(index) {
         if (this.scene.towers[index - 1] != null &&
             this.scene.towers[index - 1].constructor.name === "Chest") {
 
@@ -578,7 +615,7 @@ class Thief extends Tower {
         if (index !== this.scene.towers.length - 1 &&
             this.scene.towers[index + 1] != null &&
             this.scene.towers[index + 1].constructor.name === "Chest") {
-                
+
             this.scene.towers[index + 1].dmg += 5
             this.scene.towers[index + 1].updateHPText();
             this.scene.towers[index + 1].updateDMGText();
@@ -598,7 +635,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
         this.body.velocity.x = 0
         this.body.setAllowGravity(false);
         this.body.bounce.set(1, 0)
-        
+
         this.hp = hp
         this.dmg = dmg
 
@@ -614,7 +651,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
             fill: '#fff'
         })
 
-        
+
         this.scene.add.existing(this);
     }
 
@@ -637,7 +674,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
         this.hpIcon.setPosition(this.x - 50, this.y + 100);
         this.hpText.setPosition(this.hpIcon.x + 20, this.hpIcon.y - 13)
 
-        this.dmgIcon.setPosition(this.x , this.y + 100)
+        this.dmgIcon.setPosition(this.x, this.y + 100)
         this.dmgText.setPosition(this.dmgIcon.x + 20, this.dmgIcon.y - 13);
 
         if (this.body.velocity.x > -800) {
