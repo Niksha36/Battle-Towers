@@ -1,5 +1,4 @@
 import {Scene} from 'phaser'
-import store from "@/store";
 import bg from "../assets/background/background.png"
 import mainTower from "../assets/towers/towerS_0.png"
 import milk from "../assets/towers/towerS_1.png"
@@ -13,6 +12,8 @@ import dmg from "../assets/sprites/spr_sword_0.png"
 import coin from "../assets/sprites/spr_coin_0.png"
 import money from "../assets/sprites/spr_money_0.png"
 import shop_plate from "../assets/sprites/plate_common_0.png"
+import { default as stor } from "@/store.js"
+import axios from "axios";
 
 
 export default class PlayScene extends Scene {
@@ -52,7 +53,7 @@ export default class PlayScene extends Scene {
         this.setBgScale(this.bg, this.height)
 
         this.money = 11
-        
+
         this.count_slots = 10
         this.count_shop_slots = 7
         this.count_tower_types = 5
@@ -60,7 +61,7 @@ export default class PlayScene extends Scene {
         this.show_start = 225
         this.platform_start = 655
         this.step_sprite = 130
-    
+
         this.wave = 0
 
         this.shop_towers = []
@@ -278,7 +279,8 @@ export default class PlayScene extends Scene {
 
         if (tower.hp <= 0) {
             if (tower.constructor.name === "MainTower") {
-                console.log("GAME OVER")
+                stor.dispatch("updateRecord", this.wave)
+                this.update_user_record()
             }
             tower.is_die = true
             tower.hide();
@@ -293,6 +295,20 @@ export default class PlayScene extends Scene {
                 this.endWave()
             }
         }
+    }
+
+    async update_user_record() {
+        console.log(stor.state.username)
+        console.log(stor.state.record)
+        console.log(stor.state)
+        const response = await axios.post("http://localhost:8000/update_user_record", {
+            withCredentials: true,
+            params: {
+              "username": stor.state.username,
+              "record": stor.state.record
+            }
+        })
+        console.log(response.data)
     }
 
 

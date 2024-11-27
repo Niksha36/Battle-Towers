@@ -25,7 +25,7 @@ class UserLoginSerializer(serializers.Serializer):
         return user
 
 class UpdateUserRecordSerializer(serializers.ModelSerializer):
-    record = serializers.TimeField()
+    record = serializers.IntegerField()
 
     class Meta:
         model = User

@@ -69,7 +69,7 @@ export default {
         withCredentials: true,
         params: {
           "username": this.$store.state.username,
-          "record": "0:2:1"
+          "record": 0
         }
       })
       console.log(response.data)
