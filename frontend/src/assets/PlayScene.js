@@ -18,6 +18,8 @@ import shop_plate from "../assets/sprites/plate_common_0.png"
 import turnBtn from "../assets/sprites/btn_end_turn_1.png"
 import slot from "../assets/sprites/pngwing_com_0.png"
 import wave from "../assets/sprites/progressbar_green_bg_0.png"
+import { default as stor } from "@/store.js"
+import axios from "axios";
 
 
 export default class PlayScene extends Scene {
@@ -77,6 +79,13 @@ export default class PlayScene extends Scene {
         this.shop_plates = []
 
         this.physics.add.collider(this.towers, this.enemies, this.hitEnemy, null, this);
+
+        // this.main_tower = this.physics.add.sprite(10, this.height - 324, "layer1").setOrigin(0, 0).setScale(0.2, 0.5).setImmovable(true).setInteractive({draggable: true});
+        // this.main_tower.body.setAllowGravity(false)
+        // this.main_tower.setBounce(0, 0.2);
+        // this.main_tower.setCollideWorldBounds(true);
+        // this.physics.add.collider(this.main_tower, this.platform);
+        // this.main_tower.inputEnabled = true;
 
 
         for (let i = 1; i < this.count_slots; ++i) {
@@ -164,6 +173,7 @@ export default class PlayScene extends Scene {
             fill: '#fff'
         });
 
+        // Добавляем обработчик событий на кнопку
         this.startWaveButton.on('pointerdown', this.startWave, this);
         this.startWaveButton.on('pointerover', () => {
             this.startWaveButton.setStyle({fill: '#aaa'});
@@ -184,7 +194,6 @@ export default class PlayScene extends Scene {
 
 
     update() {
-        this.bgCluds.tilePositionX -= 0.4
         if (this.enemies[0]) {
             this.enemies[0].updatePosition()
         }
@@ -255,12 +264,12 @@ export default class PlayScene extends Scene {
             shop_towers[i].destroy()
             shop_towers[i].component_destroy()
             shop_plates[i].destroy()
-        }
+        }        
 
         for (let i = 0; i < shop_plates.length; ++i) {
             shop_plates[i].destroy()
         }
-
+        
         shop_towers.length = 0
         shop_plates.length = 0
     }
@@ -276,7 +285,7 @@ export default class PlayScene extends Scene {
         this.startWaveButton.setVisible(false);
         this.clearShop(this.shop_towers, this.shop_plates)
         for (let i = 0; i < 5; i++) {
-            this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 197, 'ghost', this.wave + 1, this.wave + 1)))
+            this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30*i, this.platform_start - 197, 'ghost', this.wave + 1, this.wave + 1)))
         }
         this.enemies[0].body.velocity.x = -800
     }
@@ -310,8 +319,8 @@ export default class PlayScene extends Scene {
 
         if (tower.hp <= 0) {
             if (tower.constructor.name === "MainTower") {
-                console.log("GAME OVER")
-                this.scene.restart()
+                stor.dispatch("updateRecord", this.wave)
+                this.update_user_record()
             }
             tower.is_die = true
             tower.hide();
@@ -328,12 +337,26 @@ export default class PlayScene extends Scene {
         }
     }
 
+    async update_user_record() {
+        console.log(stor.state.username)
+        console.log(stor.state.record)
+        console.log(stor.state)
+        const response = await axios.post("http://localhost:8000/update_user_record", {
+            withCredentials: true,
+            params: {
+              "username": stor.state.username,
+              "record": stor.state.record
+            }
+        })
+        console.log(response.data)
+    }
+
 
 }
 
 class Tower extends Phaser.GameObjects.Sprite {
 
-    constructor(scene, x, y, texture, hp, dmg, cost, draggable = true) {
+    constructor(scene, x, y, texture, hp, dmg, cost, draggable=true) {
         super(scene, x, y, texture);
 
         this.setOrigin(0, 0)
@@ -373,14 +396,13 @@ class Tower extends Phaser.GameObjects.Sprite {
             fontSize: '20px',
             fill: '#f1ff9b'
         }) // "" дабы не отображалось название башни
-
-
+        
+        
         this.is_die = false
         this.scene.add.existing(this);
     }
 
-    buff(index) {
-    }
+    buff(index) {}
 
     set_default_stats() {
         this.hp = this.default_hp
@@ -477,10 +499,10 @@ class Chest extends Tower {
     buff(index) {
         if (this.is_die) {
             this.is_die = false;
-            return;
+            return; 
         }
 
-        this.scene.money++;
+        this.scene.money++; 
         if (this.scene.towers[index - 1] && this.scene.towers[index - 1].constructor.name === "MainTower") {
             this.scene.money++;
         }
@@ -502,14 +524,14 @@ class Milk extends Tower {
         if (index === this.scene.towers.length - 1 || this.scene.towers[index + 1] == null) {
             return;
         }
-
+        
         if (this.scene.towers[index + 1].constructor.name === "Cat") {
             this.scene.towers[index + 1].default_hp += 2
             this.scene.towers[index + 1].default_dmg += 2
         } else {
             this.scene.towers[index + 1].default_hp++;
         }
-
+        
         this.scene.towers[index + 1].set_default_stats()
     }
 }
@@ -545,7 +567,7 @@ class Thief extends Tower {
         super(scene, x, y, "thief", 1, 2, 3);
     }
 
-    buff(index) {
+    buff (index) {
         if (this.scene.towers[index - 1] != null &&
             this.scene.towers[index - 1].constructor.name === "Chest") {
 
@@ -557,7 +579,7 @@ class Thief extends Tower {
         if (index !== this.scene.towers.length - 1 &&
             this.scene.towers[index + 1] != null &&
             this.scene.towers[index + 1].constructor.name === "Chest") {
-
+                
             this.scene.towers[index + 1].dmg += 5
             this.scene.towers[index + 1].updateHPText();
             this.scene.towers[index + 1].updateDMGText();
@@ -578,7 +600,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
         this.body.velocity.x = 0
         this.body.setAllowGravity(false);
         this.body.bounce.set(1, 0)
-
+        
         this.hp = hp
         this.dmg = dmg
 
@@ -588,12 +610,12 @@ class Enemy extends Phaser.GameObjects.Sprite {
             fill: '#fff'
         })
 
-        this.dmgIcon = scene.add.sprite(x + this.width / 6 + 60, y + this.height, 'dmgIcon');
-        this.dmgText = scene.add.text(x + this.width / 6 + 80, y + this.height - 5, dmg.toString(), {
+        this.dmgIcon = scene.add.sprite(x + this.width/6 + 60, y + this.height, 'dmgIcon');
+        this.dmgText = scene.add.text(x + this.width/6 + 80, y + this.height - 5, dmg.toString(), {
             fontSize: '16px',
             fill: '#fff'
         })
-
+        
         this.scene.add.existing(this);
     }
 
