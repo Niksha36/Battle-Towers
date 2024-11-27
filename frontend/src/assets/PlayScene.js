@@ -58,7 +58,7 @@ export default class PlayScene extends Scene {
         this.count_shop_slots = 7
         this.count_tower_types = 5
 
-        this.show_start = 250
+        this.show_start = 225
         this.platform_start = 655
         this.step_sprite = 130
     
@@ -180,26 +180,26 @@ export default class PlayScene extends Scene {
 
     generateShop(shop_towers, shop_plates) {
         for (let i = 0; i < this.count_shop_slots; ++i) {
-            let x_pos = (this.step_sprite + 30) * i + 30
+            let x_pos = (this.step_sprite + 40) * i + 40
             let y_pos = this.height - this.show_start
             
-            shop_plates.push(this.add.sprite(x_pos + 75, y_pos + 75, "shopPlate").setScale(1, 0.8));
+            shop_plates.push(this.add.sprite(x_pos + 80, y_pos + 80, "shopPlate").setScale(1.1, 0.95));
             let shop_tower;
             switch(getRandomNumber(this.count_tower_types)) {
                 case 0: 
-                    shop_tower = new Chest(this, x_pos, y_pos)
+                    shop_tower = new Chest(this, x_pos, y_pos + 15)
                     break
                 case 1:
-                    shop_tower = new Cat(this, x_pos, y_pos)
+                    shop_tower = new Cat(this, x_pos, y_pos + 15)
                     break
                 case 2:
-                    shop_tower = new Milk(this, x_pos, y_pos)
+                    shop_tower = new Milk(this, x_pos, y_pos + 15)
                     break
                 case 3:
-                    shop_tower = new Guard(this, x_pos, y_pos)
+                    shop_tower = new Guard(this, x_pos, y_pos + 15)
                     break
                 case 4:
-                    shop_tower = new Thief(this, x_pos, y_pos)
+                    shop_tower = new Thief(this, x_pos, y_pos + 15)
                     break
             }
 
@@ -278,9 +278,8 @@ export default class PlayScene extends Scene {
         enemy.updateHPText();
 
         if (tower.hp <= 0) {
-            if (tower.constructor.name == "MainTower") {
+            if (tower.constructor.name === "MainTower") {
                 console.log("GAME OVER")
-
             }
             tower.is_die = true
             tower.hide();
@@ -320,28 +319,28 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.dmg = dmg
         this.cost = cost
      
-        this.hpIcon = scene.add.sprite(x + this.width/6 - 10, y + this.height/1.8, 'hpIcon');
-        this.hpText = scene.add.text(x + this.width/6 + 10, y + this.height/1.8 - 5, hp.toString(), {
-            fontSize: '16px',
+        this.hpIcon = scene.add.sprite(x + this.width/6 - 10, y + this.height/1.75, 'hpIcon');
+        this.hpText = scene.add.text(x + this.width/6 + 10, y + this.height/1.75 - 10, hp.toString(), {
+            fontSize: '24px',
             fill: '#fff'
         })
 
-        this.dmgIcon = scene.add.sprite(x + this.width/6 + 50, y + this.height/1.8, 'dmgIcon');
-        this.dmgText = scene.add.text(x + this.width/6 + 70, y + this.height/1.8 - 5, dmg.toString(), {
-            fontSize: '16px',
+        this.dmgIcon = scene.add.sprite(x + this.width/6 + 50, y + this.height/1.75, 'dmgIcon');
+        this.dmgText = scene.add.text(x + this.width/6 + 70, y + this.height/1.75 - 10, dmg.toString(), {
+            fontSize: '24px',
             fill: '#fff'
         })
 
-        this.coinIcon = scene.add.sprite(x + this.width/6, y, 'coin');
-        this.coinText = scene.add.text(x + this.width/6 + 30, y - 8, cost.toString(), {
-            fontSize: '16px',
-            fill: '#fff'
+        this.coinIcon = scene.add.sprite(x + this.width/6, y - 20, 'coin').setScale(0.75, 0.75);
+        this.coinText = scene.add.text(x + this.width/6 + 20, y - 34, cost.toString(), {
+            fontSize: '30px',
+            fill: '#fadb00'
         })
 
-        this.nameText = scene.add.text(x + this.width/6 + 70, y + this.height/1.8 - 5, this.constructor.name, {
-            fontSize: '16px',
-            fill: '#fff'
-        })
+        this.nameText = scene.add.text(x + this.width / (this.constructor.name === "Cat" ? 5 : 5.8), y - this.height / 4.5, this.constructor.name, {
+            fontSize: '20px',
+            fill: '#f1ff9b'
+        }) // "" дабы не отображалось название башни
         
         
         this.is_die = false
@@ -448,7 +447,7 @@ class Chest extends Tower {
         }
 
         this.scene.money++; 
-        if (this.scene.towers[index - 1] && this.scene.towers[index - 1].constructor.name == "MainTower") {
+        if (this.scene.towers[index - 1] && this.scene.towers[index - 1].constructor.name === "MainTower") {
             this.scene.money++;
         }
     }
@@ -462,15 +461,15 @@ class Cat extends Tower {
 
 class Milk extends Tower {
     constructor(scene, x, y) {
-        super(scene, x, y, "milk", 2, 1, 3, true, true);
+        super(scene, x, y, "milk", 2, 1, 3);
     }
 
     buff(index) {
-        if (index == this.scene.towers.length - 1 || this.scene.towers[index + 1] == null) {
+        if (index === this.scene.towers.length - 1 || this.scene.towers[index + 1] == null) {
             return;
         }
         
-        if (this.scene.towers[index + 1].constructor.name == "Cat") {
+        if (this.scene.towers[index + 1].constructor.name === "Cat") {
             this.scene.towers[index + 1].default_hp += 2
             this.scene.towers[index + 1].default_dmg += 2
         } else {
@@ -514,16 +513,16 @@ class Thief extends Tower {
 
     buff (index) {
         if (this.scene.towers[index - 1] != null &&
-            this.scene.towers[index - 1].constructor.name == "Chest") {
+            this.scene.towers[index - 1].constructor.name === "Chest") {
 
             this.scene.towers[index - 1].dmg += 5;
             this.scene.towers[index - 1].updateHPText();
             this.scene.towers[index - 1].updateDMGText();
             this.scene.money++;
         }
-        if (index != this.scene.towers.length - 1 && 
+        if (index !== this.scene.towers.length - 1 &&
             this.scene.towers[index + 1] != null &&
-            this.scene.towers[index + 1].constructor.name == "Chest") {
+            this.scene.towers[index + 1].constructor.name === "Chest") {
                 
             this.scene.towers[index + 1].dmg += 5
             this.scene.towers[index + 1].updateHPText();
