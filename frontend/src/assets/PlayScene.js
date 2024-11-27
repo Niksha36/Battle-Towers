@@ -41,7 +41,6 @@ export default class PlayScene extends Scene {
             .fillRect(0, 0, 150, 150) 
             .setAlpha(0.5)
             .generateTexture('gray', 90, 150);
-
     }
 
     create(child) {
@@ -382,18 +381,18 @@ class Tower extends Phaser.GameObjects.Sprite {
     updatePosition(dragX, dragY) {
         this.hpText.x = dragX + this.width/6 + 10;
         this.hpIcon.x = dragX + this.width/6 - 10;
-        this.hpText.y = dragY + this.height/1.8 - 5;
-        this.hpIcon.y = dragY + this.height/1.8;
+        this.hpText.y = dragY + this.height/1.75 - 10;
+        this.hpIcon.y = dragY + this.height/1.75;
        
-        this.dmgText.y = dragY + this.height/1.8 - 5;
-        this.dmgIcon.y = dragY + this.height/1.8;
+        this.dmgText.y = dragY + this.height/1.75 - 10;
+        this.dmgIcon.y = dragY + this.height/1.75;
         this.dmgText.x = dragX + this.width/6 + 70;
         this.dmgIcon.x = dragX + this.width/6 + 50;
         
         this.coinIcon.x = dragX + this.width/6;
-        this.coinText.x = dragX + this.width/6 + 30;
-        this.coinIcon.y = dragY;
-        this.coinText.y = dragY - 8;
+        this.coinText.x = dragX + this.width/6 + 20;
+        this.coinIcon.y = dragY - 20;
+        this.coinText.y = dragY - 34;
 
     }
 
