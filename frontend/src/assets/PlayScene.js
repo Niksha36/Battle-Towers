@@ -1,5 +1,4 @@
 import {Scene} from 'phaser'
-import store from "@/store";
 import bg from "../assets/background/bg_ground1_spr_0.png"
 import bgClouds from "../assets/background/bg_clouds1_spr_0.png"
 import bgSky from "../assets/background/bg_sky1_spr_0.png"
@@ -18,7 +17,7 @@ import shop_plate from "../assets/sprites/plate_common_0.png"
 import turnBtn from "../assets/sprites/btn_end_turn_1.png"
 import slot from "../assets/sprites/pngwing_com_0.png"
 import shopLine from "../assets/sprites/shop_line_spr_0.png"
-import wave from "../assets/sprites/progressbar_green_bg_0.png"
+import loseBackground from "../assets/background/lose_background.png"
 import {default as stor} from "@/store.js"
 import axios from "axios";
 
@@ -48,10 +47,13 @@ export default class PlayScene extends Scene {
         this.load.image('turnBtn', turnBtn)
         this.load.image('slot', slot)
         this.load.image('shopLine', shopLine)
+        this.load.image('loseBackground', loseBackground)
     }
 
     create(child) {
         // GAME CONFIG
+        this.es = null
+
         this.width = this.scale.width
         this.height = this.scale.height
 
@@ -359,6 +361,27 @@ export default class PlayScene extends Scene {
 
         if (tower.hp <= 0) {
             if (tower.constructor.name === "MainTower") {
+                this.get_user_record().then(
+                    r =>
+                        this.es = new EndScreen(
+                    this,
+                    900,
+                    500,
+                    "loseBackground",
+                    this.wave,
+                    r.record
+                    )
+                )
+
+                // this.tweens.add ({ TODO hz
+                //     targets: [this.es],
+                //     alpha: 0,
+                //     duration: 500,
+                //     ease: "Power2",
+                //     onComplete() {
+                //         console.log("ido")
+                //     }
+                // })
                 stor.dispatch("updateRecord", this.wave)
                 this.update_user_record()
             }
@@ -378,17 +401,26 @@ export default class PlayScene extends Scene {
     }
 
     async update_user_record() {
-        console.log(stor.state.username)
-        console.log(stor.state.record)
-        console.log(stor.state)
-        const response = await axios.post("http://localhost:8000/update_user_record", {
+        return await axios.post("http://localhost:8000/update_user_record", {
             withCredentials: true,
             params: {
                 "username": stor.state.username,
                 "record": stor.state.record
             }
         })
-        console.log(response.data)
+    }
+
+    async get_user_record() {
+        return await axios.get("http://localhost:8000/get_user_record", {
+          withCredentials: true,
+          params: {
+              "username": stor.state.username,
+          }
+      })
+    }
+
+    removeScreen() {
+        this.es = null
     }
 
 
@@ -685,4 +717,73 @@ class Enemy extends Phaser.GameObjects.Sprite {
 
 function getRandomNumber(max) {
     return Math.floor(Math.random() * max)
+}
+
+class EndScreen extends Phaser.GameObjects.Sprite {
+    TEXTS  = {
+        new_record:
+            {
+                text: "Это ваш новый рекорд",
+                style: {
+                    fontSize: "20px",
+                    fill: "#000000"
+                }
+            },
+        you_died: {
+            text: "Вы умерли",
+                style: {
+                    fontSize: "30px",
+                    fill: "#000000"
+                }
+        }
+
+    }
+
+    constructor(scene, x, y, texture, waves, playerRecord) {
+        super(scene, x, y, texture);
+        this.height = this.texture.height
+        this.width = this.texture.width
+        this.waves = waves
+        this.playerRecord = playerRecord
+        this.setInteractive({
+            clickable: true
+        })
+
+        if (this.isUserRecord()) {
+            this.record_text = scene.add.text(
+                this.x + this.width,
+                this.y + this.height,
+                this.TEXTS.new_record.text,
+                this.TEXTS.new_record.style
+            );
+        }
+
+        this.died_text = scene.add.text(
+            this.x - 80,
+            this.y - 150,
+            this.TEXTS.you_died.text,
+            this.TEXTS.you_died.style
+        )
+
+        scene.add.existing(this);
+        this.bringToTop()
+
+
+    }
+
+    isUserRecord() {
+        return this.waves >= this.playerRecord
+    }
+
+    show() {
+
+    }
+
+    destroy(fromScene) {
+        super.destroy(fromScene)
+    }
+
+    bringToTop() {
+        this.scene.children.bringToTop(this.died_text);
+    }
 }

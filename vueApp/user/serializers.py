@@ -32,6 +32,6 @@ class UpdateUserRecordSerializer(serializers.ModelSerializer):
         fields = ['record']
 
     def update(self, instance, validated_data) -> User:
-        instance.record = validated_data.get('record', instance.record)
+        instance.record = max(instance.record, validated_data.get('record', instance.record))
         instance.save()
         return instance

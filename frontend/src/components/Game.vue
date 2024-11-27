@@ -72,7 +72,7 @@ export default {
           "record": 0
         }
       })
-      console.log(response.data)
+      console.log(response.data.record)
     }
   }
 }
