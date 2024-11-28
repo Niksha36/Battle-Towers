@@ -373,15 +373,18 @@ export default class PlayScene extends Scene {
                     )
                 )
 
-                // this.tweens.add ({ TODO hz
-                //     targets: [this.es],
-                //     alpha: 0,
-                //     duration: 500,
-                //     ease: "Power2",
-                //     onComplete() {
-                //         console.log("ido")
-                //     }
-                // })
+                this.tweens.add ({
+                    targets: [this.es],
+                    alpha: {
+                        from: 1,
+                        to: 0
+                    },
+                    duration: 2000,
+                    ease: "Power2",
+                    onComplete() {
+                        console.log("ido")
+                    }
+                })
                 stor.dispatch("updateRecord", this.wave)
                 this.update_user_record()
             }
@@ -745,9 +748,7 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         this.width = this.texture.width
         this.waves = waves
         this.playerRecord = playerRecord
-        this.setInteractive({
-            clickable: true
-        })
+        this.setInteractive()
 
         if (this.isUserRecord()) {
             this.record_text = scene.add.text(
