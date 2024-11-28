@@ -213,7 +213,7 @@ export default class PlayScene extends Scene {
 
 
     update() {
-        this.bgCluds.x += 0.4
+        this.bgCluds.tilePositionX += 0.4
         if (this.enemies[0]) {
             this.enemies[0].updatePosition()
         }
