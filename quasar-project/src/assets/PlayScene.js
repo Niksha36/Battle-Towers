@@ -59,7 +59,7 @@ export default class PlayScene extends Scene {
 
         this.bgSky = this.add.image(this.width / 2, this.height / 2, 'bgSky')
         this.bgCluds = this.add.tileSprite(this.width / 2, this.height / 3.5, 1920, 645, 'bgClouds').setScrollFactor(1, 1);
-        this.bg = this.add.image(this.width / 2, this.height / 2, 'bg')
+        this.bg = this.add.sprite(this.width / 2, this.height / 2, 'bg')
         this.setBgScale(this.bg)
         this.setBgScale(this.bgSky)
 
@@ -95,7 +95,7 @@ export default class PlayScene extends Scene {
         this.towers.push(this.add.existing(new MainTower(this)))
         this.generateShop(this.shop_towers, this.shop_plates)
 
-         this.tweens.add({
+        this.tweens.add({
             targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
                 ...this.shop_towers.map(el => el.dmgIcon),
                 ...this.shop_towers.map(el => el.dmgIcon),
@@ -154,13 +154,6 @@ export default class PlayScene extends Scene {
                 }
             }
 
-            if (gameObject.cost > this.money) {
-                gameObject.x = gameObject.input.dragStartX;
-                gameObject.y = gameObject.input.dragStartY;
-                gameObject.updatePosition(gameObject.x, gameObject.y)
-                return;
-            }
-
             this.money -= gameObject.cost;
             this.moneyText.setText(this.money.toString());
 
@@ -174,7 +167,17 @@ export default class PlayScene extends Scene {
 
             gameObject.input.enabled = false;
             this.towers[dropZone.dropZoneIndex] = gameObject
-            this.shop_towers = this.shop_towers.filter(item => item !== gameObject);
+            const index = this.shop_towers.indexOf(gameObject);
+            this.shop_towers.splice(index, 1);
+            this.shop_plates[index].destroy()
+
+             for (let tower of this.shop_towers) {
+                if (tower.cost > this.money) {
+                    tower.input.enabled = false
+                    tower.setTint(0x6c6c6c)
+
+                }
+            }
         });
 
         this.input.on('dragend', (pointer, gameObject, dropped) => {
@@ -213,7 +216,7 @@ export default class PlayScene extends Scene {
 
 
     update() {
-        this.bgCluds.tilePositionX += 0.4
+        this.bgCluds.tilePositionX -= 0.4
         if (this.enemies[0]) {
             this.enemies[0].updatePosition()
         }
@@ -364,16 +367,16 @@ export default class PlayScene extends Scene {
                 this.get_user_record().then(
                     r =>
                         this.es = new EndScreen(
-                    this,
-                    900,
-                    500,
-                    "loseBackground",
-                    this.wave,
-                    r.record
-                    )
+                            this,
+                            900,
+                            500,
+                            "loseBackground",
+                            this.wave,
+                            r.record
+                        )
                 )
 
-                this.tweens.add ({
+                this.tweens.add({
                     targets: [this.es],
                     alpha: {
                         from: 1,
@@ -415,11 +418,11 @@ export default class PlayScene extends Scene {
 
     async get_user_record() {
         return await axios.get("http://localhost:8000/get_user_record", {
-          withCredentials: true,
-          params: {
-              "username": stor.state.username,
-          }
-      })
+            withCredentials: true,
+            params: {
+                "username": stor.state.username,
+            }
+        })
     }
 
     removeScreen() {
@@ -736,23 +739,23 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         this.setInteractive()
 
         this.TEXTS = {
-        new_record:
-            {
-                text: "Это ваш новый рекорд",
-                style: {
-                    fontSize: "20px",
-                    fill: "#000000"
-                }
-            },
-        you_died: {
-            text: "Вы умерли",
+            new_record:
+                {
+                    text: "Это ваш новый рекорд",
+                    style: {
+                        fontSize: "20px",
+                        fill: "#000000"
+                    }
+                },
+            you_died: {
+                text: "Вы умерли",
                 style: {
                     fontSize: "30px",
                     fill: "#000000"
                 }
-        }
+            }
 
-    }
+        }
 
         if (this.isUserRecord()) {
             this.record_text = scene.add.text(
