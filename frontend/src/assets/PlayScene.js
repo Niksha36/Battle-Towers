@@ -723,7 +723,15 @@ function getRandomNumber(max) {
 }
 
 class EndScreen extends Phaser.GameObjects.Sprite {
-    TEXTS  = {
+    constructor(scene, x, y, texture, waves, playerRecord) {
+        super(scene, x, y, texture);
+        this.height = this.texture.height
+        this.width = this.texture.width
+        this.waves = waves
+        this.playerRecord = playerRecord
+        this.setInteractive()
+
+        this.TEXTS = {
         new_record:
             {
                 text: "Это ваш новый рекорд",
@@ -741,14 +749,6 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         }
 
     }
-
-    constructor(scene, x, y, texture, waves, playerRecord) {
-        super(scene, x, y, texture);
-        this.height = this.texture.height
-        this.width = this.texture.width
-        this.waves = waves
-        this.playerRecord = playerRecord
-        this.setInteractive()
 
         if (this.isUserRecord()) {
             this.record_text = scene.add.text(
