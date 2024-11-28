@@ -373,15 +373,18 @@ export default class PlayScene extends Scene {
                     )
                 )
 
-                // this.tweens.add ({ TODO hz
-                //     targets: [this.es],
-                //     alpha: 0,
-                //     duration: 500,
-                //     ease: "Power2",
-                //     onComplete() {
-                //         console.log("ido")
-                //     }
-                // })
+                this.tweens.add ({
+                    targets: [this.es],
+                    alpha: {
+                        from: 1,
+                        to: 0
+                    },
+                    duration: 2000,
+                    ease: "Power2",
+                    onComplete() {
+                        console.log("ido")
+                    }
+                })
                 stor.dispatch("updateRecord", this.wave)
                 this.update_user_record()
             }
@@ -636,7 +639,7 @@ class Guard extends Tower {
 
 class Thief extends Tower {
     constructor(scene, x, y) {
-        super(scene, x, y, 'thief', 1, 2, 3);
+        super(scene, x, y, "thief", 1, 2, 3);
     }
 
     buff(index) {
@@ -723,71 +726,69 @@ function getRandomNumber(max) {
     return Math.floor(Math.random() * max)
 }
 
-// class EndScreen extends Phaser.GameObjects.Sprite {
-//     TEXTS = {
-//         new_record:
-//             {
-//                 text: "Это ваш новый рекорд",
-//                 style: {
-//                     fontSize: "20px",
-//                     fill: "#000000"
-//                 }
-//             },
-//         you_died: {
-//             text: "Вы умерли",
-//                 style: {
-//                     fontSize: "30px",
-//                     fill: "#000000"
-//                 }
-//         }
-//
-//     }
-//
-//     constructor(scene, x, y, texture, waves, playerRecord) {
-//         super(scene, x, y, texture);
-//         this.height = this.texture.height
-//         this.width = this.texture.width
-//         this.waves = waves
-//         this.playerRecord = playerRecord
-//         this.setInteractive({
-//             clickable: true
-//         })
-//
-//         if (this.isUserRecord()) {
-//             this.record_text = scene.add.text(
-//                 this.x + this.width,
-//                 this.y + this.height,
-//                 this.TEXTS.new_record.text,
-//                 this.TEXTS.new_record.style
-//             );
-//         }
-//
-//         this.died_text = scene.add.text(
-//             this.x - 80,
-//             this.y - 150,
-//             this.TEXTS.you_died.text,
-//             this.TEXTS.you_died.style
-//         )
-//
-//         scene.add.existing(this);
-//         this.bringToTop()
-//
-//
-//     }
-//
-//     isUserRecord() {
-//         return this.waves >= this.playerRecord
-//     }
-//
-//     show() {
-//
-//     }
-//
-//     destroy(fromScene) {
-//         super.destroy(fromScene)
-//     }
-//
-//     bringToTop() {
-//         this.scene.children.bringToTop(this.died_text);
-//     }
-// }
+class EndScreen extends Phaser.GameObjects.Sprite {
+    constructor(scene, x, y, texture, waves, playerRecord) {
+        super(scene, x, y, texture);
+        this.height = this.texture.height
+        this.width = this.texture.width
+        this.waves = waves
+        this.playerRecord = playerRecord
+        this.setInteractive()
+
+        this.TEXTS = {
+        new_record:
+            {
+                text: "Это ваш новый рекорд",
+                style: {
+                    fontSize: "20px",
+                    fill: "#000000"
+                }
+            },
+        you_died: {
+            text: "Вы умерли",
+                style: {
+                    fontSize: "30px",
+                    fill: "#000000"
+                }
+        }
+
+    }
+
+        if (this.isUserRecord()) {
+            this.record_text = scene.add.text(
+                this.x + this.width,
+                this.y + this.height,
+                this.TEXTS.new_record.text,
+                this.TEXTS.new_record.style
+            );
+        }
+
+        this.died_text = scene.add.text(
+            this.x - 80,
+            this.y - 150,
+            this.TEXTS.you_died.text,
+            this.TEXTS.you_died.style
+        )
+
+        scene.add.existing(this);
+        this.bringToTop()
+
+
+    }
+
+    isUserRecord() {
+        return this.waves >= this.playerRecord
+    }
+
+    show() {
+
+    }
+
+    destroy(fromScene) {
+        super.destroy(fromScene)
+    }
+
+    bringToTop() {
+        this.scene.children.bringToTop(this.died_text);
+    }
+}
