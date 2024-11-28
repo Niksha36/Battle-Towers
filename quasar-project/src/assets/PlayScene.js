@@ -18,7 +18,7 @@ import turnBtn from "../assets/sprites/btn_end_turn_1.png"
 import slot from "../assets/sprites/pngwing_com_0.png"
 import shopLine from "../assets/sprites/shop_line_spr_0.png"
 import loseBackground from "../assets/background/lose_background.png"
-// import {default as stor} from "@/store.js"
+import stor from "../store.js"
 import axios from "axios";
 
 

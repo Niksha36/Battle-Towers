@@ -1,5 +1,5 @@
 const routes = [
-    {path: '/', redirect: () => '/game'},
+    {path: '/', redirect: () => '/register'},
     {path: '/game', component: () => import('components/Game.vue')},
     {path: '/register', component: () => import('components/RegistrationForm.vue')},
     {path: '/login', component: () => import('components/LoginForm.vue')},
