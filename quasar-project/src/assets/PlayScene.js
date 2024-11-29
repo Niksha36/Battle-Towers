@@ -114,7 +114,7 @@ export default class PlayScene extends Scene {
 
         this.towers.push(this.add.existing(new MainTower(this)))
         this.generateShop(this.shop_towers, this.shop_plates)
-
+        console.log(this.shop_towers)
         this.tweens.add({
             targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
                 ...this.shop_towers.map(el => el.dmgIcon),
@@ -129,6 +129,16 @@ export default class PlayScene extends Scene {
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
+            onStart: () => {
+              this.shop_towers.forEach((element) => {
+                  element.disableInteractive()
+              })
+            },
+            onComplete: () => {
+                this.shop_towers.forEach((element) => {
+                    element.setupInteractive();
+                });
+            },
         });
 
         this.towers[0].on('pointerover', (pointer, localX, localY, event) => {
@@ -419,7 +429,17 @@ export default class PlayScene extends Scene {
             x: '-=1400',
             duration: 1000,
             ease: 'Power2',
-            onComplete: () => this.clearShop(this.shop_towers, this.shop_plates)
+            onStart: () => {
+              this.shop_towers.forEach((element) => {
+                  element.disableInteractive()
+              })
+            },
+            onComplete: () => {
+                this.shop_towers.forEach((element) => {
+                    element.setupInteractive();
+                    this.clearShop(this.shop_towers, this.shop_plates)
+                });
+            },
         });
 
         this.wave++;
@@ -449,6 +469,16 @@ export default class PlayScene extends Scene {
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
+            onStart: () => {
+              this.shop_towers.forEach((element) => {
+                  element.disableInteractive()
+              })
+            },
+            onComplete: () => {
+                this.shop_towers.forEach((element) => {
+                    element.setupInteractive();
+                });
+            },
         });
 
         for (let tower of this.towers) {
@@ -596,7 +626,6 @@ class Tower extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, texture, hp, dmg, cost, description, draggable = true) {
         super(scene, x, y, texture);
 
-        this.setInteractive({draggable: draggable})
         this.setDisplaySize(150, 150)
 
         scene.physics.world.enable(this);
@@ -612,6 +641,7 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.dmg = dmg
         this.cost = cost
         this.description = description
+        this.draggable = draggable
 
         this.descriptionIcon = scene.add.sprite(x, y, 'description').setOrigin(0, 1)
         this.descriptionText = scene.add.text(x, y, this.description, {
@@ -665,6 +695,10 @@ class Tower extends Phaser.GameObjects.Sprite {
             this.exp += exp
         }
 
+    }
+
+    setupInteractive() {
+        this.setInteractive({draggable: this.draggable})
     }
 
     showDescription(x, y) {
