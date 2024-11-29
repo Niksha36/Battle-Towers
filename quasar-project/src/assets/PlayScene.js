@@ -22,6 +22,7 @@ import enemies_attack_sprite from "../assets/sprites/enemies_attack_sprite.png"
 import tower_destroy_sprite from "../assets/sprites/tower_destroy_sprite.png"
 import ghost_destroy_sprite from "../assets/sprites/ghoust_defeated_sprite.png"
 import roundsFlag from "../assets/sprites/flag_with_rounds.png"
+import description from "../assets/sprites/description.png"
 
 import stor from "../store.js"
 import axios from "axios";
@@ -54,6 +55,7 @@ export default class PlayScene extends Scene {
         this.load.image('shopLine', shopLine)
         this.load.image('loseBackground', loseBackground)
         this.load.image('roundsFlag', roundsFlag)
+        this.load.image('description', description)
         this.load.spritesheet('enemyAttack', enemies_attack_sprite, {
             frameWidth: 192,
             frameHeight: 192,
@@ -118,9 +120,11 @@ export default class PlayScene extends Scene {
                 ...this.shop_towers.map(el => el.dmgIcon),
                 ...this.shop_towers.map(el => el.dmgIcon),
                 ...this.shop_towers.map(el => el.coinIcon),
+                ...this.shop_towers.map(el => el.descriptionIcon),
                 ...this.shop_towers.map(el => el.hpText),
                 ...this.shop_towers.map(el => el.dmgText),
                 ...this.shop_towers.map(el => el.coinText),
+                ...this.shop_towers.map(el => el.descriptionText),
                 ...this.shop_towers.map(el => el.nameText)],
             x: '+=1400',
             duration: 1000,
@@ -330,14 +334,23 @@ export default class PlayScene extends Scene {
             shop_towers.push(this.add.existing(shop_tower))
             for (let slot of this.slots) {
                 if (slot) {
-                    shop_tower.on('pointerover', () => {
+                    shop_tower.on('pointerover', (pointer, localX, localY, event) => {
                         this.tweens.add({
                             targets: slot,
                             alpha: 0.4, // Конечная прозрачность (полностью видимый)
                             duration: 500, // Длительность анимации в миллисекундах
                             ease: 'Power2', // Тип easing
                         });
+
+                        shop_tower.showDescription(pointer.x, pointer.y)
+
+
                     });
+
+                    shop_tower.on('pointermove', (pointer, localX, localY, event) => {
+                        shop_tower.showDescription(pointer.x, pointer.y)
+                    })
+
                     shop_tower.on('pointerout', () => {
                         this.tweens.add({
                             targets: slot,
@@ -345,6 +358,8 @@ export default class PlayScene extends Scene {
                             duration: 500, // Длительность анимации в миллисекундах
                             ease: 'Power2', // Тип easing
                         });
+
+                        shop_tower.hideDescription()
                     });
                 }
             }
@@ -381,9 +396,11 @@ export default class PlayScene extends Scene {
                 ...this.shop_towers.map(el => el.dmgIcon),
                 ...this.shop_towers.map(el => el.dmgIcon),
                 ...this.shop_towers.map(el => el.coinIcon),
+                ...this.shop_towers.map(el => el.descriptionIcon),
                 ...this.shop_towers.map(el => el.hpText),
                 ...this.shop_towers.map(el => el.dmgText),
                 ...this.shop_towers.map(el => el.coinText),
+                ...this.shop_towers.map(el => el.descriptionText),
                 ...this.shop_towers.map(el => el.nameText)],
             x: '-=1400',
             duration: 1000,
@@ -409,9 +426,11 @@ export default class PlayScene extends Scene {
                 ...this.shop_towers.map(el => el.dmgIcon),
                 ...this.shop_towers.map(el => el.dmgIcon),
                 ...this.shop_towers.map(el => el.coinIcon),
+                ...this.shop_towers.map(el => el.descriptionIcon),
                 ...this.shop_towers.map(el => el.hpText),
                 ...this.shop_towers.map(el => el.dmgText),
                 ...this.shop_towers.map(el => el.coinText),
+                ...this.shop_towers.map(el => el.descriptionText),
                 ...this.shop_towers.map(el => el.nameText)],
             x: '+=1400',
             duration: 1000,
@@ -560,7 +579,7 @@ export default class PlayScene extends Scene {
 
 class Tower extends Phaser.GameObjects.Sprite {
 
-    constructor(scene, x, y, texture, hp, dmg, cost, draggable = true) {
+    constructor(scene, x, y, texture, hp, dmg, cost, description, draggable = true) {
         super(scene, x, y, texture);
 
         this.setInteractive({draggable: draggable})
@@ -578,6 +597,16 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.hp = hp
         this.dmg = dmg
         this.cost = cost
+        this.description = description
+
+        this.descriptionIcon = scene.add.sprite(x, y, 'description').setOrigin(0, 1)
+        this.descriptionText = scene.add.text(x, y, this.description, {
+            fontSize: '25px',
+            fill: '#ffffff'
+        }).setOrigin(-0.5, 3)
+
+        this.descriptionIcon.visible = false
+        this.descriptionText.visible = false
 
         this.hpIcon = scene.add.sprite(x, y, 'hpIcon').setOrigin(2, -2.5);
         this.hpText = scene.add.text(x, y, hp.toString(), {
@@ -600,7 +629,7 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.nameText = scene.add.text(x, y, '', {
             fontSize: '25px',
             fill: '#f1ff9b'
-        }).setOrigin(0.5, 6) // "" дабы не отображалось название башни
+        }).setOrigin(0.5, 6)
 
 
         this.is_die = false
@@ -620,6 +649,23 @@ class Tower extends Phaser.GameObjects.Sprite {
             this.exp += exp
         }
 
+    }
+
+    showDescription(x, y) {
+        this.descriptionIcon.x = x
+        this.descriptionText.x = x
+        this.descriptionIcon.y = y
+        this.descriptionText.y = y
+        this.descriptionIcon.visible = true
+        this.descriptionText.visible = true
+
+        this.scene.children.bringToTop(this.descriptionIcon)
+        this.scene.children.bringToTop(this.descriptionText)
+    }
+
+    hideDescription() {
+        this.descriptionText.visible = false
+        this.descriptionIcon.visible = false
     }
 
     set_default_stats() {
@@ -673,6 +719,8 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.hpIcon.setAlpha(0);
         this.dmgText.setAlpha(0);
         this.dmgIcon.setAlpha(0);
+        this.descriptionIcon.setAlpha(0);
+        this.descriptionText.setAlpha(0);
     }
 
     show() {
@@ -681,6 +729,8 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.hpIcon.setAlpha(1);
         this.dmgText.setAlpha(1);
         this.dmgIcon.setAlpha(1);
+        this.descriptionIcon.setAlpha(1);
+        this.descriptionText.setAlpha(1);
     }
 
     bringToTop() {
@@ -691,6 +741,8 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.scene.children.bringToTop(this.coinIcon);
         this.scene.children.bringToTop(this.coinText);
         this.scene.children.bringToTop(this);
+        this.scene.children.bringToTop(this.descriptionIcon)
+        this.scene.children.bringToTop(this.descriptionText)
     }
 
 
@@ -698,7 +750,10 @@ class Tower extends Phaser.GameObjects.Sprite {
 
 class MainTower extends Tower {
     constructor(scene) {
-        super(scene, 100, scene.platform_start, "mainTower", 5, 1, 0, false);
+        super(scene, 100, scene.platform_start, "mainTower", 5, 1, 0,
+            "это главная башня",
+        false
+        );
         this.shop_info_destroy()
         this.nameText = scene.add.text(scene, 100, scene.platform_start, "Королевская Башня", {
             fontSize: '25px',
@@ -714,7 +769,9 @@ class MainTower extends Tower {
 
 class Chest extends Tower {
     constructor(scene, x, y) {
-        super(scene, x, y, "chest", 2, 1, 5);
+        super(scene, x, y, "chest", 2, 1, 5,
+                "это сундук."
+        );
         this.nameText = scene.add.text(x, y, "Сундук", {
             fontSize: '25px',
             fill: '#f1ff9b'
@@ -736,7 +793,9 @@ class Chest extends Tower {
 
 class Cat extends Tower {
     constructor(scene, x, y) {
-        super(scene, x, y, "cat", 3, 2, 3);
+        super(scene, x, y, "cat", 3, 2, 3,
+                "это кот."
+        );
         this.nameText = scene.add.text(x, y, "Кот", {
             fontSize: '25px',
             fill: '#f1ff9b'
@@ -747,7 +806,9 @@ class Cat extends Tower {
 
 class Milk extends Tower {
     constructor(scene, x, y) {
-        super(scene, x, y, "milk", 2, 1, 3);
+        super(scene, x, y, "milk", 2, 1, 3,
+            "это молоко."
+        );
         this.nameText = scene.add.text(x, y, "Молоко", {
             fontSize: '25px',
             fill: '#f1ff9b'
@@ -773,7 +834,9 @@ class Milk extends Tower {
 
 class Guard extends Tower {
     constructor(scene, x, y) {
-        super(scene, x, y, "guard", 2, 1, 3);
+        super(scene, x, y, "guard", 2, 1, 3,
+               " это гуард."
+        );
         this.nameText = scene.add.text(x, y, "Страж", {
             fontSize: '25px',
             fill: '#f1ff9b'
@@ -803,7 +866,9 @@ class Guard extends Tower {
 
 class Thief extends Tower {
     constructor(scene, x, y) {
-        super(scene, x, y, "thief", 1, 2, 3);
+        super(scene, x, y, "thief", 1, 2, 3,
+                "это вор."
+        );
         this.nameText = scene.add.text(x, y, "Вор", {
             fontSize: '25px',
             fill: '#f1ff9b'
