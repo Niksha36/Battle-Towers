@@ -782,6 +782,13 @@ class MainTower extends Tower {
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 6)
+
+        this.descriptionText = scene.add.text(100, scene.platform_start, this.description, {
+            fontSize: '25px',
+            fill: '#ffffff'
+        }).setOrigin(-0.23, 3)
+
+        this.descriptionText.visible = false
     }
 
     buff(index) {
