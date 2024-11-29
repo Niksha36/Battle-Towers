@@ -20,6 +20,9 @@ import shopLine from "../assets/sprites/shop_line_spr_0.png"
 import loseBackground from "../assets/background/lose_background.png"
 import enemies_attack_sprite from "../assets/sprites/enemies_attack_sprite.png"
 import tower_destroy_sprite from "../assets/sprites/tower_destroy_sprite.png"
+import ghost_destroy_sprite from "../assets/sprites/ghoust_defeated_sprite.png"
+import roundsFlag from "../assets/sprites/flag_with_rounds.png"
+
 import stor from "../store.js"
 import axios from "axios";
 
@@ -50,6 +53,7 @@ export default class PlayScene extends Scene {
         this.load.image('slot', slot)
         this.load.image('shopLine', shopLine)
         this.load.image('loseBackground', loseBackground)
+        this.load.image('roundsFlag', roundsFlag)
         this.load.spritesheet('enemyAttack', enemies_attack_sprite, {
             frameWidth: 192,
             frameHeight: 192,
@@ -57,6 +61,10 @@ export default class PlayScene extends Scene {
         this.load.spritesheet('tower_destroy', tower_destroy_sprite, {
             frameWidth: 224,
             frameHeight: 224,
+        });
+        this.load.spritesheet('ghost_destroy', ghost_destroy_sprite, {
+            frameWidth: 179,
+            frameHeight: 217,
         });
     }
 
@@ -181,7 +189,7 @@ export default class PlayScene extends Scene {
             this.shop_towers.splice(index, 1);
             this.shop_plates[index].destroy()
 
-             for (let tower of this.shop_towers) {
+            for (let tower of this.shop_towers) {
                 if (tower.cost > this.money) {
                     tower.input.enabled = false
                     tower.setTint(0x6c6c6c)
@@ -211,8 +219,27 @@ export default class PlayScene extends Scene {
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
 
-        this.startWaveButtonContainer.add([this.startWaveButton, this.startWaveButtonText]);
+        this.roundsFlag = this.add.sprite(0, 0, 'roundsFlag').setOrigin(1, 1);
+        this.roundsFlagText = this.add.text(-this.roundsFlag.width / 2, -this.roundsFlag.height / 2, '1', {
+            fontSize: '30px',
+            fill: '#fff'
+        }).setOrigin(0.5, 0.5);
 
+        this.roundsFlagContainer = this.add.container(this.width - 85, this.height - 85);
+        this.roundsFlagContainer.add([this.roundsFlag, this.roundsFlagText]);
+
+        this.add.existing(this.roundsFlagContainer);
+        this.startWaveButtonContainer.add([this.startWaveButton, this.startWaveButtonText])
+        this.startWaveButton.on('pointerover', () => {
+            this.startWaveButton.setTint(0xc1c1c1);
+            this.startWaveButtonText.setTint(0xc1c1c1);
+        });
+
+// Add event listener for pointerout to reset tint
+        this.startWaveButton.on('pointerout', () => {
+            this.startWaveButton.clearTint();
+            this.startWaveButtonText.clearTint();
+        });
         this.add.sprite(146, 50, 'money');
         this.moneyText = this.add.text(100, 35, this.money.toString(), {
             fontSize: '32px',
@@ -226,16 +253,25 @@ export default class PlayScene extends Scene {
         //создаю анимацию удара врагов по башне
         this.anims.create({
             key: 'attack',
-            frames: this.anims.generateFrameNumbers('enemyAttack', { start: 0, end: 10 }),
+            frames: this.anims.generateFrameNumbers('enemyAttack', {start: 0, end: 10}),
             frameRate: 24,
             repeat: 0
         });
 
-        const destroyFrames = this.anims.generateFrameNumbers('tower_destroy', { start: 0, end: 10 });
+        const destroyFrames = this.anims.generateFrameNumbers('tower_destroy', {start: 0, end: 10});
         this.anims.create({
             key: 'destroy',
             frames: destroyFrames,
             frameRate: 24,
+            repeat: 0
+        });
+
+        //анимация смерти тени
+        const ghostDiesFrames = this.anims.generateFrameNumbers("ghost_destroy", {start: 0, end: 23});
+        this.anims.create({
+            key: 'ghostDies',
+            frames: ghostDiesFrames,
+            frameRate: 30,
             repeat: 0
         });
     }
@@ -319,6 +355,7 @@ export default class PlayScene extends Scene {
     }
 
     startWave() {
+        this.roundsFlagText.text = (parseInt(this.roundsFlagText.text) + 1).toString();
         for (let i = 0; i < this.towers.length; i++) {
             if (this.towers[i]) {
                 this.towers[i].buff(i);
@@ -342,6 +379,7 @@ export default class PlayScene extends Scene {
 
         this.wave++;
         this.startWaveButtonContainer.setVisible(false);
+        this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
         for (let i = 0; i < 5; i++) {
             this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 20, 'ghost', this.wave + 1, this.wave + 1)))
@@ -350,6 +388,7 @@ export default class PlayScene extends Scene {
 
     endWave() {
         this.startWaveButtonContainer.setVisible(true);
+        this.roundsFlagContainer.setVisible(true)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
             targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
@@ -382,7 +421,7 @@ export default class PlayScene extends Scene {
     }
 
     hitEnemy(tower, enemy) {
-        const attackAnim = this.add.sprite(enemy.x-100, enemy.y, 'enemyAttack');
+        const attackAnim = this.add.sprite(enemy.x - 100, enemy.y, 'enemyAttack');
 
         attackAnim.play('attack');
         attackAnim.on('animationcomplete', () => {
@@ -396,7 +435,7 @@ export default class PlayScene extends Scene {
 
 
         if (tower.hp <= 0) {
-            const destroyAnim = this.add.sprite(tower.x,tower.y, 'tower_destroy');
+            const destroyAnim = this.add.sprite(tower.x, tower.y, 'tower_destroy');
             try {
                 destroyAnim.play('destroy');
             } catch (error) {
@@ -440,6 +479,15 @@ export default class PlayScene extends Scene {
         }
 
         if (enemy.hp <= 0) {
+            const destroyAnim = this.add.sprite(enemy.x, enemy.y, 'ghost_destroy');
+            try {
+                destroyAnim.play('ghostDies');
+            } catch (error) {
+                console.error('Error playing destroy animation:', error);
+            }
+            destroyAnim.on('animationcomplete', () => {
+                destroyAnim.destroy('ghostDies');
+            });
             this.enemies.shift()
             enemy.destroy()
             enemy.component_destroy();
