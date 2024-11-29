@@ -607,12 +607,16 @@ class Tower extends Phaser.GameObjects.Sprite {
     buff(index) {
     }
 
-    gainExp(tower, exp) {
-        if (tower.exp + exp >= tower.neededExp) {
-            tower.level += 1
-            tower.exp -= tower.neededExp
-            tower.neededExp += 5
+    gainExp(exp) {
+        if (this.exp + exp >= this.neededExp) {
+            this.level += 1
+            this.exp += exp - this.neededExp
+            this.neededExp += 5
         }
+        else {
+            this.exp += exp
+        }
+
     }
 
     set_default_stats() {
@@ -722,7 +726,7 @@ class Chest extends Tower {
 
         this.scene.money++;
         if (this.scene.towers[index - 1] && this.scene.towers[index - 1].constructor.name === "MainTower") {
-            this.scene.money++;
+            this.scene.money += this.level;
         }
     }
 }
@@ -748,18 +752,19 @@ class Milk extends Tower {
     }
 
     buff(index) {
-        if (index === this.scene.towers.length - 1 || this.scene.towers[index + 1] == null) {
-            return;
+        for (let i = index; i < index + this.level; ++i) {
+            if (i === this.scene.towers.length - 1 || this.scene.towers[i + 1] == null) {
+                return;
+            }
+            if (this.scene.towers[i + 1].constructor.name === "Cat") {
+                this.scene.towers[i + 1].default_hp += 2 * this.scene.towers[i + 1].level
+                this.scene.towers[i + 1].default_dmg += 2  * this.scene.towers[i + 1].level
+            } else {
+                this.scene.towers[i + 1].default_hp += this.level;
+            }
+            this.scene.towers[i + 1].set_default_stats()
         }
 
-        if (this.scene.towers[index + 1].constructor.name === "Cat") {
-            this.scene.towers[index + 1].default_hp += 2
-            this.scene.towers[index + 1].default_dmg += 2
-        } else {
-            this.scene.towers[index + 1].default_hp++;
-        }
-
-        this.scene.towers[index + 1].set_default_stats()
     }
 }
 
@@ -806,7 +811,7 @@ class Thief extends Tower {
         if (this.scene.towers[index - 1] != null &&
             this.scene.towers[index - 1].constructor.name === "Chest") {
 
-            this.scene.towers[index - 1].dmg += 5;
+            this.scene.towers[index - 1].dmg += 5 * this.level;
             this.scene.towers[index - 1].updateHPText();
             this.scene.towers[index - 1].updateDMGText();
             this.scene.money++;
@@ -815,7 +820,7 @@ class Thief extends Tower {
             this.scene.towers[index + 1] != null &&
             this.scene.towers[index + 1].constructor.name === "Chest") {
 
-            this.scene.towers[index + 1].dmg += 5
+            this.scene.towers[index + 1].dmg += 5 * this.level
             this.scene.towers[index + 1].updateHPText();
             this.scene.towers[index + 1].updateDMGText();
             this.scene.money++;
