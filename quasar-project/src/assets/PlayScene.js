@@ -468,7 +468,7 @@ class Tower extends Phaser.GameObjects.Sprite {
             fill: '#fadb00'
         }).setOrigin(1.8, 4.1)
 
-        this.nameText = scene.add.text(x, y, this.constructor.name, {
+        this.nameText = scene.add.text(x, y, '', {
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 6) // "" дабы не отображалось название башни
@@ -558,6 +558,10 @@ class MainTower extends Tower {
     constructor(scene) {
         super(scene, 100, scene.platform_start, "mainTower", 5, 1, 0, false);
         this.shop_info_destroy()
+        this.nameText = scene.add.text(scene, 100, scene.platform_start, "Королевская Башня", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
     }
 
     buff(index) {
@@ -568,7 +572,7 @@ class MainTower extends Tower {
 class Chest extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "chest", 2, 1, 5);
-        this.nameText = scene.add.text(x, y, "chest", {
+        this.nameText = scene.add.text(x, y, "Сундук", {
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 6)
@@ -590,12 +594,21 @@ class Chest extends Tower {
 class Cat extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "cat", 3, 2, 3);
+        this.nameText = scene.add.text(x, y, "Кот", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
+
     }
 }
 
 class Milk extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "milk", 2, 1, 3);
+        this.nameText = scene.add.text(x, y, "Молоко", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
     }
 
     buff(index) {
@@ -617,6 +630,10 @@ class Milk extends Tower {
 class Guard extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "guard", 2, 1, 3);
+        this.nameText = scene.add.text(x, y, "Страж", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
     }
 
     buff() {
@@ -643,6 +660,10 @@ class Guard extends Tower {
 class Thief extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "thief", 1, 2, 3);
+        this.nameText = scene.add.text(x, y, "Вор", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
     }
 
     buff(index) {
