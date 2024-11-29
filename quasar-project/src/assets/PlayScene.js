@@ -76,7 +76,7 @@ export default class PlayScene extends Scene {
         this.height = this.scale.height
 
         this.bgSky = this.add.image(this.width / 2, this.height / 2, 'bgSky')
-        this.bgCluds = this.add.tileSprite(this.width / 2, this.height / 3.5, 1920, 645, 'bgClouds').setScrollFactor(1, 1);
+        this.bgCluds = this.add.tileSprite(0, 0, this.width, 645, 'bgClouds').setOrigin(0, 0).setScrollFactor(1, 1);
         this.bg = this.add.sprite(this.width / 2, this.height / 2, 'bg')
         this.setBgScale(this.bg)
         this.setBgScale(this.bgSky)
@@ -140,55 +140,64 @@ export default class PlayScene extends Scene {
         });
 
         this.input.on('dragenter', (pointer, gameObject, dropZone) => {
-
-            dropZone.setTexture(gameObject.texture)
-            dropZone.setTint(0x00ff00);
-            dropZone.setScale(0.5)
+            if (this.slots[dropZone.dropZoneIndex] !== 0) {
+                dropZone.setTexture(gameObject.texture)
+                dropZone.setTint(0x00ff00);
+                dropZone.setScale(0.5)
+            }
 
         });
 
         this.input.on('dragleave', (pointer, gameObject, dropZone) => {
-
-            dropZone.setScale(1)
-            dropZone.setTexture('slot')
-            dropZone.clearTint();
-
+            if (this.slots[dropZone.dropZoneIndex] !== 0) {
+                dropZone.setScale(1)
+                dropZone.setTexture('slot')
+                dropZone.clearTint();
+            }
         });
         this.input.on('drop', (pointer, gameObject, dropZone) => {
-            dropZone.setScale(1)
-            dropZone.setTexture('slot')
-            dropZone.clearTint();
-            for (let slot of this.slots) {
-                if (slot) {
-                    this.tweens.add({
-                        targets: slot,
-                        alpha: 0, // Конечная прозрачность (полностью видимый)
-                        duration: 500, // Длительность анимации в миллисекундах
-                        ease: 'Power2', // Тип easing
-                        onComplete: () => {
-                            console.log('Прозрачность увеличена!'); // Действие после завершения анимации
-                        }
-                    });
-                }
+            console.log(this.towers[dropZone.dropZoneIndex])
+            if (this.slots[dropZone.dropZoneIndex] !== 0) {
+                dropZone.setScale(1)
+                dropZone.setTexture('slot')
+                dropZone.clearTint();
+                gameObject.x = dropZone.x;
+                gameObject.y = dropZone.y;
+                gameObject.updatePosition(gameObject.x, gameObject.y)
+                dropZone.setTint(0x00ff00)
+                dropZone.destroy();
+                this.towers[dropZone.dropZoneIndex] = gameObject
+                this.towers[dropZone.dropZoneIndex].input.draggable = false
+                this.towers[dropZone.dropZoneIndex].input.dropZone = true
+                this.towers[dropZone.dropZoneIndex].dropZoneIndex = dropZone.dropZoneIndex
+                this.slots[dropZone.dropZoneIndex] = 0
+                this.money -= gameObject.cost;
+                this.moneyText.setText(this.money.toString());
+                gameObject.shop_info_destroy()
+                const index = this.shop_towers.indexOf(gameObject);
+                this.shop_plates[index].destroy()
+                this.shop_plates.splice(index, 1);
+                this.shop_towers.splice(index, 1);
+            } else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
+                var index = this.shop_towers.indexOf(gameObject);
+                this.shop_towers[index].component_destroy()
+                this.shop_towers[index].destroy()
+                this.money -= gameObject.cost;
+                this.moneyText.setText(this.money.toString());
+                index = this.shop_towers.indexOf(gameObject);
+                this.shop_plates[index].destroy()
+                this.shop_plates.splice(index, 1);
+                this.shop_towers.splice(index, 1);
+
+                var tower = this.towers[dropZone.dropZoneIndex]
+                tower.gainExp(5)
+
+            } else {
+                gameObject.x = gameObject.input.dragStartX;
+                gameObject.y = gameObject.input.dragStartY;
+                gameObject.updatePosition(gameObject.x, gameObject.y)
             }
 
-            this.money -= gameObject.cost;
-            this.moneyText.setText(this.money.toString());
-
-            gameObject.x = dropZone.x;
-            gameObject.y = dropZone.y;
-
-            gameObject.updatePosition(gameObject.x, gameObject.y)
-            dropZone.setTint(0x00ff00)
-            dropZone.destroy();
-            gameObject.shop_info_destroy()
-
-            gameObject.input.enabled = false;
-            this.towers[dropZone.dropZoneIndex] = gameObject
-            const index = this.shop_towers.indexOf(gameObject);
-            this.shop_plates[index].destroy()
-            this.shop_plates.splice(index, 1);
-            this.shop_towers.splice(index, 1);
 
             for (let tower of this.shop_towers) {
                 if (tower.cost > this.money) {
@@ -516,11 +525,10 @@ export default class PlayScene extends Scene {
                     "record": stor.state.record
                 }
             })
+        } catch (e) {
+            console.log(e);
+            return null;
         }
-            catch (e) {
-                console.log(e);
-                return null;
-            }
 
     }
 
@@ -533,8 +541,7 @@ export default class PlayScene extends Scene {
                 }
             })
             return response;
-    }
-        catch (e) {
+        } catch (e) {
             console.log(e);
             return null;
         }
@@ -559,6 +566,9 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.body.setAllowGravity(false);
         this.body.immovable = true
 
+        this.level = 1
+        this.exp = 0
+        this.neededExp = 10
         this.default_hp = hp
         this.default_dmg = dmg
         this.hp = hp
@@ -597,6 +607,14 @@ class Tower extends Phaser.GameObjects.Sprite {
     buff(index) {
     }
 
+    gainExp(tower, exp) {
+        if (tower.exp + exp >= tower.neededExp) {
+            tower.level += 1
+            tower.exp -= tower.neededExp
+            tower.neededExp += 5
+        }
+    }
+
     set_default_stats() {
         this.hp = this.default_hp
         this.dmg = this.default_dmg
@@ -618,6 +636,7 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.hpIcon.destroy();
         this.dmgText.destroy();
         this.dmgIcon.destroy();
+        this.nameText.destroy()
         this.shop_info_destroy()
     }
 
@@ -667,6 +686,7 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.scene.children.bringToTop(this);
     }
 
+
 }
 
 class MainTower extends Tower {
@@ -682,6 +702,7 @@ class MainTower extends Tower {
     buff(index) {
         this.scene.money += 6;
     }
+
 }
 
 class Chest extends Tower {
