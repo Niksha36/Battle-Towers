@@ -148,8 +148,7 @@ export default class PlayScene extends Scene {
                 dropZone.setTexture(gameObject.texture)
                 dropZone.setTint(0x00ff00);
                 dropZone.setScale(0.5)
-            }
-            else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
+            } else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
                 dropZone.setTint(0x00ff00);
             }
 
@@ -646,8 +645,7 @@ class Tower extends Phaser.GameObjects.Sprite {
             this.level += 1
             this.exp += exp - this.neededExp
             this.neededExp += 5
-        }
-        else {
+        } else {
             this.exp += exp
         }
 
@@ -824,7 +822,7 @@ class Milk extends Tower {
             }
             if (this.scene.towers[i + 1].constructor.name === "Cat") {
                 this.scene.towers[i + 1].default_hp += 2 * this.scene.towers[i + 1].level
-                this.scene.towers[i + 1].default_dmg += 2  * this.scene.towers[i + 1].level
+                this.scene.towers[i + 1].default_dmg += 2 * this.scene.towers[i + 1].level
             } else {
                 this.scene.towers[i + 1].default_hp += this.level;
             }
