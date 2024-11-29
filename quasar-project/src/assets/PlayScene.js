@@ -938,9 +938,7 @@ class EndScreen extends Phaser.GameObjects.Sprite {
 
         this.setAlpha(0)
         this.died_text.setAlpha(0)
-        if (this.record_text) {
-            this.record_text.setAlpha(0)
-        }
+        this.record_text?.setAlpha(0)
     }
 
     isUserRecord() {
