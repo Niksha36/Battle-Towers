@@ -21,7 +21,7 @@ import loseBackground from "../assets/background/lose_background.png"
 import enemies_attack_sprite from "../assets/sprites/enemies_attack_sprite.png"
 import tower_destroy_sprite from "../assets/sprites/tower_destroy_sprite.png"
 
-import {default as stor} from "@/store.js"
+import {default as stor} from "../store.js"
 import axios from "axios";
 
 
@@ -179,8 +179,9 @@ export default class PlayScene extends Scene {
             gameObject.input.enabled = false;
             this.towers[dropZone.dropZoneIndex] = gameObject
             const index = this.shop_towers.indexOf(gameObject);
-            this.shop_towers.splice(index, 1);
             this.shop_plates[index].destroy()
+            this.shop_plates.splice(index, 1);
+            this.shop_towers.splice(index, 1);
 
              for (let tower of this.shop_towers) {
                 if (tower.cost > this.money) {
