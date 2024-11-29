@@ -61,7 +61,7 @@ export default {
         });
         console.log('Registered:', response.data);
         await stor.dispatch("updateUsername", this.username)
-        await router().push("/game");
+        await this.$router.push("/game");
       } catch (error) {
         console.error('Registration failed:', error);
         alert('Registration failed. Please try again.');

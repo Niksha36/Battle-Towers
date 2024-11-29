@@ -50,7 +50,7 @@ export default {
           username: this.username,
           password: this.password
         });
-        router().push( { path: "register" } );
+        await this.$router.push({path: "game"});
         await stor.dispatch("updateUsername", this.username)
         console.log("123")
       } catch (error) {
