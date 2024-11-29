@@ -20,8 +20,7 @@ import shopLine from "../assets/sprites/shop_line_spr_0.png"
 import loseBackground from "../assets/background/lose_background.png"
 import enemies_attack_sprite from "../assets/sprites/enemies_attack_sprite.png"
 import tower_destroy_sprite from "../assets/sprites/tower_destroy_sprite.png"
-
-import {default as stor} from "../store.js"
+import stor from "../store.js"
 import axios from "axios";
 
 
