@@ -145,6 +145,9 @@ export default class PlayScene extends Scene {
                 dropZone.setTint(0x00ff00);
                 dropZone.setScale(0.5)
             }
+            else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
+                dropZone.setTint(0x00ff00);
+            }
 
         });
 
@@ -152,6 +155,9 @@ export default class PlayScene extends Scene {
             if (this.slots[dropZone.dropZoneIndex] !== 0) {
                 dropZone.setScale(1)
                 dropZone.setTexture('slot')
+                dropZone.clearTint();
+            }
+            else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
                 dropZone.clearTint();
             }
         });
