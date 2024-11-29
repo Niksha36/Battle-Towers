@@ -18,6 +18,11 @@ import turnBtn from "../assets/sprites/btn_end_turn_1.png"
 import slot from "../assets/sprites/pngwing_com_0.png"
 import shopLine from "../assets/sprites/shop_line_spr_0.png"
 import loseBackground from "../assets/background/lose_background.png"
+import enemies_attack_sprite from "../assets/sprites/enemies_attack_sprite.png"
+import tower_destroy_sprite from "../assets/sprites/tower_destroy_sprite.png"
+import ghost_destroy_sprite from "../assets/sprites/ghoust_defeated_sprite.png"
+import roundsFlag from "../assets/sprites/flag_with_rounds.png"
+
 import stor from "../store.js"
 import axios from "axios";
 
@@ -48,6 +53,19 @@ export default class PlayScene extends Scene {
         this.load.image('slot', slot)
         this.load.image('shopLine', shopLine)
         this.load.image('loseBackground', loseBackground)
+        this.load.image('roundsFlag', roundsFlag)
+        this.load.spritesheet('enemyAttack', enemies_attack_sprite, {
+            frameWidth: 192,
+            frameHeight: 192,
+        });
+        this.load.spritesheet('tower_destroy', tower_destroy_sprite, {
+            frameWidth: 224,
+            frameHeight: 224,
+        });
+        this.load.spritesheet('ghost_destroy', ghost_destroy_sprite, {
+            frameWidth: 179,
+            frameHeight: 217,
+        });
     }
 
     create(child) {
@@ -168,10 +186,11 @@ export default class PlayScene extends Scene {
             gameObject.input.enabled = false;
             this.towers[dropZone.dropZoneIndex] = gameObject
             const index = this.shop_towers.indexOf(gameObject);
-            this.shop_towers.splice(index, 1);
             this.shop_plates[index].destroy()
+            this.shop_plates.splice(index, 1);
+            this.shop_towers.splice(index, 1);
 
-             for (let tower of this.shop_towers) {
+            for (let tower of this.shop_towers) {
                 if (tower.cost > this.money) {
                     tower.input.enabled = false
                     tower.setTint(0x6c6c6c)
@@ -190,13 +209,38 @@ export default class PlayScene extends Scene {
         });
 
 
-        this.startWaveButton = this.add.sprite(this.width - 250, this.height - 200, 'turnBtn').setOrigin(0, 0).setInteractive()
-        this.startWaveButtonText = this.add.text(this.startWaveButton.x + 15, this.startWaveButton.y + 15, 'Start Wave', {
+        this.startWaveButtonContainer = this.add.container(this.width - 250, this.height - 200);
+
+        this.startWaveButton = this.add.sprite(0, 0, 'turnBtn').setOrigin(0, 0).setInteractive();
+        this.startWaveButtonText = this.add.text(15, 15, 'Ход', {
+            fontSize: '35px',
+            fontFamily: 'Roboto',
+            fontWeight: 700,
+            textAlign: 'center',
+            fill: '#E8CA8F'
+        }).setOrigin(-0.98, 0.1);
+
+        this.roundsFlag = this.add.sprite(0, 0, 'roundsFlag').setOrigin(1, 1);
+        this.roundsFlagText = this.add.text(-this.roundsFlag.width / 2, -this.roundsFlag.height / 2, '1', {
             fontSize: '30px',
             fill: '#fff'
-        })
-            .setOrigin(0, 0)
+        }).setOrigin(0.5, 0.5);
 
+        this.roundsFlagContainer = this.add.container(this.width - 85, this.height - 85);
+        this.roundsFlagContainer.add([this.roundsFlag, this.roundsFlagText]);
+
+        this.add.existing(this.roundsFlagContainer);
+        this.startWaveButtonContainer.add([this.startWaveButton, this.startWaveButtonText])
+        this.startWaveButton.on('pointerover', () => {
+            this.startWaveButton.setTint(0xc1c1c1);
+            this.startWaveButtonText.setTint(0xc1c1c1);
+        });
+
+// Add event listener for pointerout to reset tint
+        this.startWaveButton.on('pointerout', () => {
+            this.startWaveButton.clearTint();
+            this.startWaveButtonText.clearTint();
+        });
         this.add.sprite(146, 50, 'money');
         this.moneyText = this.add.text(100, 35, this.money.toString(), {
             fontSize: '32px',
@@ -205,13 +249,32 @@ export default class PlayScene extends Scene {
 
         // Добавляем обработчик событий на кнопку
         this.startWaveButton.on('pointerdown', this.startWave, this);
-        this.startWaveButton.on('pointerover', () => {
-            this.startWaveButton.setTint(0xeeeeee)
-        });
-        this.startWaveButton.on('pointerout', () => {
-            this.startWaveButton.clearTint();
+
+
+        //создаю анимацию удара врагов по башне
+        this.anims.create({
+            key: 'attack',
+            frames: this.anims.generateFrameNumbers('enemyAttack', {start: 0, end: 10}),
+            frameRate: 24,
+            repeat: 0
         });
 
+        const destroyFrames = this.anims.generateFrameNumbers('tower_destroy', {start: 0, end: 10});
+        this.anims.create({
+            key: 'destroy',
+            frames: destroyFrames,
+            frameRate: 24,
+            repeat: 0
+        });
+
+        //анимация смерти тени
+        const ghostDiesFrames = this.anims.generateFrameNumbers("ghost_destroy", {start: 0, end: 23});
+        this.anims.create({
+            key: 'ghostDies',
+            frames: ghostDiesFrames,
+            frameRate: 30,
+            repeat: 0
+        });
     }
 
 
@@ -293,6 +356,7 @@ export default class PlayScene extends Scene {
     }
 
     startWave() {
+        this.roundsFlagText.text = (parseInt(this.roundsFlagText.text) + 1).toString();
         for (let i = 0; i < this.towers.length; i++) {
             if (this.towers[i]) {
                 this.towers[i].buff(i);
@@ -315,7 +379,8 @@ export default class PlayScene extends Scene {
         });
 
         this.wave++;
-        this.startWaveButton.setVisible(false);
+        this.startWaveButtonContainer.setVisible(false);
+        this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
         for (let i = 0; i < 5; i++) {
             this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 20, 'ghost', this.wave + 1, this.wave + 1)))
@@ -323,7 +388,8 @@ export default class PlayScene extends Scene {
     }
 
     endWave() {
-        this.startWaveButton.setVisible(true);
+        this.startWaveButtonContainer.setVisible(true);
+        this.roundsFlagContainer.setVisible(true)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
             targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
@@ -356,13 +422,30 @@ export default class PlayScene extends Scene {
     }
 
     hitEnemy(tower, enemy) {
+        const attackAnim = this.add.sprite(enemy.x - 100, enemy.y, 'enemyAttack');
+
+        attackAnim.play('attack');
+        attackAnim.on('animationcomplete', () => {
+            attackAnim.destroy();
+        });
         tower.hp -= enemy.dmg;
         enemy.hp -= tower.dmg;
 
         tower.updateHPText();
         enemy.updateHPText();
 
+
         if (tower.hp <= 0) {
+            const destroyAnim = this.add.sprite(tower.x, tower.y, 'tower_destroy');
+            try {
+                destroyAnim.play('destroy');
+            } catch (error) {
+                console.error('Error playing destroy animation:', error);
+            }
+            destroyAnim.on('animationcomplete', () => {
+                destroyAnim.destroy();
+            });
+
             if (tower.constructor.name === "MainTower") {
                 const response = this.get_user_record();
                 this.es = new EndScreen(
@@ -406,6 +489,15 @@ export default class PlayScene extends Scene {
         }
 
         if (enemy.hp <= 0) {
+            const destroyAnim = this.add.sprite(enemy.x, enemy.y, 'ghost_destroy');
+            try {
+                destroyAnim.play('ghostDies');
+            } catch (error) {
+                console.error('Error playing destroy animation:', error);
+            }
+            destroyAnim.on('animationcomplete', () => {
+                destroyAnim.destroy('ghostDies');
+            });
             this.enemies.shift()
             enemy.destroy()
             enemy.component_destroy();
@@ -491,7 +583,7 @@ class Tower extends Phaser.GameObjects.Sprite {
             fill: '#fadb00'
         }).setOrigin(1.8, 4.1)
 
-        this.nameText = scene.add.text(x, y, this.constructor.name, {
+        this.nameText = scene.add.text(x, y, '', {
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 6) // "" дабы не отображалось название башни
@@ -581,6 +673,10 @@ class MainTower extends Tower {
     constructor(scene) {
         super(scene, 100, scene.platform_start, "mainTower", 5, 1, 0, false);
         this.shop_info_destroy()
+        this.nameText = scene.add.text(scene, 100, scene.platform_start, "Королевская Башня", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
     }
 
     buff(index) {
@@ -591,7 +687,7 @@ class MainTower extends Tower {
 class Chest extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "chest", 2, 1, 5);
-        this.nameText = scene.add.text(x, y, "chest", {
+        this.nameText = scene.add.text(x, y, "Сундук", {
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 6)
@@ -613,12 +709,21 @@ class Chest extends Tower {
 class Cat extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "cat", 3, 2, 3);
+        this.nameText = scene.add.text(x, y, "Кот", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
+
     }
 }
 
 class Milk extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "milk", 2, 1, 3);
+        this.nameText = scene.add.text(x, y, "Молоко", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
     }
 
     buff(index) {
@@ -640,6 +745,10 @@ class Milk extends Tower {
 class Guard extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "guard", 2, 1, 3);
+        this.nameText = scene.add.text(x, y, "Страж", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
     }
 
     buff() {
@@ -666,6 +775,10 @@ class Guard extends Tower {
 class Thief extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "thief", 1, 2, 3);
+        this.nameText = scene.add.text(x, y, "Вор", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
     }
 
     buff(index) {
