@@ -157,9 +157,7 @@ export default class PlayScene extends Scene {
                 dropZone.setTexture('slot')
                 dropZone.clearTint();
             }
-            else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
-                dropZone.clearTint();
-            }
+            dropZone.clearTint();
         });
         this.input.on('drop', (pointer, gameObject, dropZone) => {
             console.log(this.towers[dropZone.dropZoneIndex])
@@ -185,6 +183,7 @@ export default class PlayScene extends Scene {
                 this.shop_plates.splice(index, 1);
                 this.shop_towers.splice(index, 1);
             } else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
+                dropZone.clearTint();
                 var index = this.shop_towers.indexOf(gameObject);
                 this.shop_towers[index].component_destroy()
                 this.shop_towers[index].destroy()
