@@ -131,10 +131,23 @@ export default class PlayScene extends Scene {
             ease: 'Power2',
         });
 
-        this.input.on('dragstart', function (pointer, gameObject) {
+        this.towers[0].on('pointerover', (pointer, localX, localY, event) => {
+            this.towers[0].showDescription(pointer.x, pointer.y)
+        });
 
+        this.towers[0].on('pointermove', (pointer, localX, localY, event) => {
+            this.towers[0].showDescription(pointer.x, pointer.y)
+        })
+
+        this.towers[0].on('pointerout', () => {
+            this.towers[0].hideDescription()
+        });
+
+        this.input.on('dragstart', function (pointer, gameObject) {
             gameObject.bringToTop();
             gameObject.setTint(0xeeeeee);
+            gameObject.hideDescription()
+            gameObject.toggleAbilityOfShowingDescription()
         }, this);
 
         this.input.on('drag', (pointer, gameObject, dragX, dragY, dropZone) => {
@@ -223,6 +236,7 @@ export default class PlayScene extends Scene {
                 gameObject.y = gameObject.input.dragStartY;
                 gameObject.updatePosition(gameObject.x, gameObject.y)
             }
+            gameObject.toggleAbilityOfShowingDescription()
         });
 
 
@@ -605,6 +619,8 @@ class Tower extends Phaser.GameObjects.Sprite {
             fill: '#ffffff'
         }).setOrigin(-0.5, 3)
 
+        this.canShowDescription = true
+
         this.descriptionIcon.visible = false
         this.descriptionText.visible = false
 
@@ -652,6 +668,9 @@ class Tower extends Phaser.GameObjects.Sprite {
     }
 
     showDescription(x, y) {
+        if (!this.canShowDescription) {
+            return
+        }
         this.descriptionIcon.x = x
         this.descriptionText.x = x
         this.descriptionIcon.y = y
@@ -666,6 +685,10 @@ class Tower extends Phaser.GameObjects.Sprite {
     hideDescription() {
         this.descriptionText.visible = false
         this.descriptionIcon.visible = false
+    }
+
+    toggleAbilityOfShowingDescription() {
+        this.canShowDescription = !this.canShowDescription
     }
 
     set_default_stats() {
@@ -751,7 +774,7 @@ class Tower extends Phaser.GameObjects.Sprite {
 class MainTower extends Tower {
     constructor(scene) {
         super(scene, 100, scene.platform_start, "mainTower", 5, 1, 0,
-            "это главная башня",
+            "это главная башня.",
         false
         );
         this.shop_info_destroy()
@@ -776,6 +799,14 @@ class Chest extends Tower {
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 6)
+
+        this.descriptionText = scene.add.text(100, scene.platform_start, this.description, {
+            fontSize: '25px',
+            fill: '#ffffff'
+        }).setOrigin(-0.2, 3)
+
+        this.descriptionText.visible = false
+
     }
 
     buff(index) {
