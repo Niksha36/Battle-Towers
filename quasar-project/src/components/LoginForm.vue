@@ -29,6 +29,8 @@ import axios from 'axios';
 import stor from "../store.js"
 import router from "../router/index.js";
 
+import {useRouter} from 'vue-router'
+
 export default {
   data() {
     return {
@@ -48,7 +50,7 @@ export default {
           username: this.username,
           password: this.password
         });
-        router().push( { path: "/game" } );
+        router().push( { path: "register" } );
         await stor.dispatch("updateUsername", this.username)
         console.log("123")
       } catch (error) {

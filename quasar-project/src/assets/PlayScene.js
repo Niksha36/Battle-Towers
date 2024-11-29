@@ -364,24 +364,33 @@ export default class PlayScene extends Scene {
 
         if (tower.hp <= 0) {
             if (tower.constructor.name === "MainTower") {
-                this.get_user_record().then(
-                    r =>
-                        this.es = new EndScreen(
-                            this,
-                            900,
-                            500,
-                            "loseBackground",
-                            this.wave,
-                            r.record
-                        )
+                const response = this.get_user_record();
+                this.es = new EndScreen(
+                    this,
+                    900,
+                    500,
+                    "loseBackground",
+                    this.wave,
+                    response ? response.record : 0
+                )
+
+                console.log(this.es)
+
+                this.es?.on(
+                    'pointerdown',
+                    () => {
+                        this.es.destroyComponents()
+                        this.es.destroy()
+                        this.removeScreen()
+
+                        this.scene.restart()
+                        console.log("data")
+                    }
                 )
 
                 this.tweens.add({
-                    targets: [this.es],
-                    alpha: {
-                        from: 1,
-                        to: 0
-                    },
+                    targets: [this.es, this.es.died_text],
+                    alpha: 1,
                     duration: 2000,
                     ease: "Power2",
                     onComplete() {
@@ -407,22 +416,36 @@ export default class PlayScene extends Scene {
     }
 
     async update_user_record() {
-        return await axios.post("http://localhost:8000/update_user_record", {
-            withCredentials: true,
-            params: {
-                "username": stor.state.username,
-                "record": stor.state.record
+        try {
+            return await axios.post("http://localhost:8000/update_user_record", {
+                withCredentials: true,
+                params: {
+                    "username": stor.state.username,
+                    "record": stor.state.record
+                }
+            })
+        }
+            catch (e) {
+                console.log(e);
+                return null;
             }
-        })
+
     }
 
     async get_user_record() {
-        return await axios.get("http://localhost:8000/get_user_record", {
-            withCredentials: true,
-            params: {
-                "username": stor.state.username,
-            }
-        })
+        try {
+            const response = await axios.get("http://localhost:8000/get_user_record", {
+                withCredentials: true,
+                params: {
+                    "username": stor.state.username,
+                }
+            })
+            return response;
+    }
+        catch (e) {
+            console.log(e);
+            return null;
+        }
     }
 
     removeScreen() {
@@ -738,6 +761,9 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         this.playerRecord = playerRecord
         this.setInteractive()
 
+        this.record_text = null
+
+
         this.TEXTS = {
             new_record:
                 {
@@ -751,7 +777,7 @@ class EndScreen extends Phaser.GameObjects.Sprite {
                 text: "Вы умерли",
                 style: {
                     fontSize: "30px",
-                    fill: "#000000"
+                    fill: "#600000"
                 }
             }
 
@@ -776,7 +802,11 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);
         this.bringToTop()
 
-
+        this.setAlpha(0)
+        this.died_text.setAlpha(0)
+        if (this.record_text) {
+            this.record_text.setAlpha(0)
+        }
     }
 
     isUserRecord() {
@@ -787,8 +817,9 @@ class EndScreen extends Phaser.GameObjects.Sprite {
 
     }
 
-    destroy(fromScene) {
-        super.destroy(fromScene)
+    destroyComponents() {
+        this.record_text?.destroy()
+        this.died_text.destroy()
     }
 
     bringToTop() {

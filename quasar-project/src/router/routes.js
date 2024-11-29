@@ -1,16 +1,12 @@
+import game from '../components/Game.vue'
+import register from '../components/RegistrationForm.vue'
+import login from '../components/LoginForm.vue'
+
 const routes = [
     {path: '/', redirect: () => '/register'},
-    {path: '/game', component: () => import('components/Game.vue')},
-    {path: '/register', component: () => import('components/RegistrationForm.vue')},
-    {path: '/login', component: () => import('components/LoginForm.vue')},
-
-
-    // Always leave this as last one,
-    // but you can also remove it
-    {
-        path: '/:catchAll(.*)*',
-        component: () => import('pages/ErrorNotFound.vue')
-    }
+    {path: '/game', component: game},
+    {path: '/register', component: register},
+    {path: '/login', component: login},
 ]
 
 export default routes
