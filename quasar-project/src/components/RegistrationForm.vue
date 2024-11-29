@@ -33,6 +33,8 @@
 import axios from 'axios';
 import router from "../router/index.js";
 
+import stor from "../store.js"
+
 export default {
   data() {
     return {
@@ -58,8 +60,8 @@ export default {
           password: this.password
         });
         console.log('Registered:', response.data);
-        this.$store.dispatch("updateUsername", this.username)
-        await router.push("game");
+        await stor.dispatch("updateUsername", this.username)
+        await router().push("/game");
       } catch (error) {
         console.error('Registration failed:', error);
         alert('Registration failed. Please try again.');

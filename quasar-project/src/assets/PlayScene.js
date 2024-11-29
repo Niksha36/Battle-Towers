@@ -18,7 +18,10 @@ import turnBtn from "../assets/sprites/btn_end_turn_1.png"
 import slot from "../assets/sprites/pngwing_com_0.png"
 import shopLine from "../assets/sprites/shop_line_spr_0.png"
 import loseBackground from "../assets/background/lose_background.png"
-// import {default as stor} from "@/store.js"
+import enemies_attack_sprite from "../assets/sprites/enemies_attack_sprite.png"
+import tower_destroy_sprite from "../assets/sprites/tower_destroy_sprite.png"
+
+import {default as stor} from "@/store.js"
 import axios from "axios";
 
 
@@ -48,6 +51,14 @@ export default class PlayScene extends Scene {
         this.load.image('slot', slot)
         this.load.image('shopLine', shopLine)
         this.load.image('loseBackground', loseBackground)
+        this.load.spritesheet('enemyAttack', enemies_attack_sprite, {
+            frameWidth: 192,
+            frameHeight: 192,
+        });
+        this.load.spritesheet('tower_destroy', tower_destroy_sprite, {
+            frameWidth: 224,
+            frameHeight: 224,
+        });
     }
 
     create(child) {
@@ -190,12 +201,18 @@ export default class PlayScene extends Scene {
         });
 
 
-        this.startWaveButton = this.add.sprite(this.width - 250, this.height - 200, 'turnBtn').setOrigin(0, 0).setInteractive()
-        this.startWaveButtonText = this.add.text(this.startWaveButton.x + 15, this.startWaveButton.y + 15, 'Start Wave', {
-            fontSize: '30px',
-            fill: '#fff'
-        })
-            .setOrigin(0, 0)
+        this.startWaveButtonContainer = this.add.container(this.width - 250, this.height - 200);
+
+        this.startWaveButton = this.add.sprite(0, 0, 'turnBtn').setOrigin(0, 0).setInteractive();
+        this.startWaveButtonText = this.add.text(15, 15, 'Ход', {
+            fontSize: '35px',
+            fontFamily: 'Roboto',
+            fontWeight: 700,
+            textAlign: 'center',
+            fill: '#E8CA8F'
+        }).setOrigin(-0.98, 0.1);
+
+        this.startWaveButtonContainer.add([this.startWaveButton, this.startWaveButtonText]);
 
         this.add.sprite(146, 50, 'money');
         this.moneyText = this.add.text(100, 35, this.money.toString(), {
@@ -205,13 +222,23 @@ export default class PlayScene extends Scene {
 
         // Добавляем обработчик событий на кнопку
         this.startWaveButton.on('pointerdown', this.startWave, this);
-        this.startWaveButton.on('pointerover', () => {
-            this.startWaveButton.setTint(0xeeeeee)
-        });
-        this.startWaveButton.on('pointerout', () => {
-            this.startWaveButton.clearTint();
+
+
+        //создаю анимацию удара врагов по башне
+        this.anims.create({
+            key: 'attack',
+            frames: this.anims.generateFrameNumbers('enemyAttack', { start: 0, end: 10 }),
+            frameRate: 24,
+            repeat: 0
         });
 
+        const destroyFrames = this.anims.generateFrameNumbers('tower_destroy', { start: 0, end: 10 });
+        this.anims.create({
+            key: 'destroy',
+            frames: destroyFrames,
+            frameRate: 24,
+            repeat: 0
+        });
     }
 
 
@@ -315,7 +342,7 @@ export default class PlayScene extends Scene {
         });
 
         this.wave++;
-        this.startWaveButton.setVisible(false);
+        this.startWaveButtonContainer.setVisible(false);
         // this.clearShop(this.shop_towers, this.shop_plates)
         for (let i = 0; i < 5; i++) {
             this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 20, 'ghost', this.wave + 1, this.wave + 1)))
@@ -323,7 +350,7 @@ export default class PlayScene extends Scene {
     }
 
     endWave() {
-        this.startWaveButton.setVisible(true);
+        this.startWaveButtonContainer.setVisible(true);
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
             targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
@@ -356,13 +383,30 @@ export default class PlayScene extends Scene {
     }
 
     hitEnemy(tower, enemy) {
+        const attackAnim = this.add.sprite(enemy.x-100, enemy.y, 'enemyAttack');
+
+        attackAnim.play('attack');
+        attackAnim.on('animationcomplete', () => {
+            attackAnim.destroy();
+        });
         tower.hp -= enemy.dmg;
         enemy.hp -= tower.dmg;
 
         tower.updateHPText();
         enemy.updateHPText();
 
+
         if (tower.hp <= 0) {
+            const destroyAnim = this.add.sprite(tower.x,tower.y, 'tower_destroy');
+            try {
+                destroyAnim.play('destroy');
+            } catch (error) {
+                console.error('Error playing destroy animation:', error);
+            }
+            destroyAnim.on('animationcomplete', () => {
+                destroyAnim.destroy();
+            });
+
             if (tower.constructor.name === "MainTower") {
                 this.get_user_record().then(
                     r =>
