@@ -78,7 +78,7 @@ export default class PlayScene extends Scene {
         this.height = this.scale.height
 
         this.bgSky = this.add.image(this.width / 2, this.height / 2, 'bgSky')
-        this.bgCluds = this.add.tileSprite(0, 0, this.width, 645, 'bgClouds').setOrigin(0, 0).setScrollFactor(1, 1);
+        this.bgCluds = this.add.tileSprite(0, this.height / 2.5, this.width, 645, 'bgClouds').setOrigin(0, 0.5).setScrollFactor(1, 1);
         this.bg = this.add.sprite(this.width / 2, this.height / 2, 'bg')
         this.setBgScale(this.bg)
         this.setBgScale(this.bgSky)
@@ -90,7 +90,7 @@ export default class PlayScene extends Scene {
         this.count_tower_types = 5
 
         this.show_start = 225
-        this.platform_start = 585
+        this.platform_start = 558
         this.step_sprite = 130
 
         this.wave = 0
@@ -105,31 +105,31 @@ export default class PlayScene extends Scene {
 
 
         for (let i = 1; i < this.count_slots; ++i) {
-            this.slots.push(this.add.sprite(100 + this.step_sprite * (i), this.platform_start, 'slot').setInteractive().setAlpha(0))
+            this.slots.push(this.add.sprite(100 + this.step_sprite * i, this.platform_start, 'slot').setInteractive().setAlpha(0).setOrigin(0.5, 0))
             this.slots[i - 1].input.dropZone = true
             this.slots[i - 1].dropZoneIndex = i;
         }
 
-        this.shopLine = this.add.sprite(-1400, this.platform_start + 118, 'shopLine').setScale(0.8).setOrigin(0)
+        this.shopLine = this.add.sprite(0, this.platform_start + 200, 'shopLine').setScale(0.75).setOrigin(0)
 
         this.towers.push(this.add.existing(new MainTower(this)))
         this.generateShop(this.shop_towers, this.shop_plates)
-
-        this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.coinIcon),
-                ...this.shop_towers.map(el => el.descriptionIcon),
-                ...this.shop_towers.map(el => el.hpText),
-                ...this.shop_towers.map(el => el.dmgText),
-                ...this.shop_towers.map(el => el.coinText),
-                ...this.shop_towers.map(el => el.descriptionText),
-                ...this.shop_towers.map(el => el.nameText)],
-            x: '+=1400',
-            duration: 1000,
-            ease: 'Power2',
-        });
+        //
+        // this.tweens.add({
+        //     targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
+        //         ...this.shop_towers.map(el => el.dmgIcon),
+        //         ...this.shop_towers.map(el => el.dmgIcon),
+        //         ...this.shop_towers.map(el => el.coinIcon),
+        //         ...this.shop_towers.map(el => el.descriptionIcon),
+        //         ...this.shop_towers.map(el => el.hpText),
+        //         ...this.shop_towers.map(el => el.dmgText),
+        //         ...this.shop_towers.map(el => el.coinText),
+        //         ...this.shop_towers.map(el => el.descriptionText),
+        //         ...this.shop_towers.map(el => el.nameText)],
+        //     x: '+=1400',
+        //     duration: 1000,
+        //     ease: 'Power2',
+        // });
 
         this.towers[0].on('pointerover', (pointer, localX, localY, event) => {
             this.towers[0].showDescription(pointer.x, pointer.y)
@@ -240,25 +240,30 @@ export default class PlayScene extends Scene {
         });
 
 
-        this.startWaveButtonContainer = this.add.container(this.width - 250, this.height - 200);
 
-        this.startWaveButton = this.add.sprite(0, 0, 'turnBtn').setOrigin(0, 0).setInteractive();
-        this.startWaveButtonText = this.add.text(15, 15, 'Ход', {
-            fontSize: '35px',
+        this.roundsFlag = this.add.sprite(0, 0, 'roundsFlag').setOrigin(0.5, 0.5).setScale(1.2, 1.2);
+        this.roundsFlagText = this.add.text(0, 0, '1', {
+            fontSize: '36px',
+            fontFamily: 'Roboto',
+            fontWeight: 700,
+            textAlign: 'center',
+            fill: '#fff'
+        }).setOrigin(0.5, 0.5);
+
+
+        this.roundsFlagContainer = this.add.container(this.width - 200, this.height - 190);
+        this.roundsFlagContainer.add([this.roundsFlag, this.roundsFlagText]);
+
+        this.startWaveButtonContainer = this.add.container(this.width - 200, this.height - 250);
+
+        this.startWaveButton = this.add.sprite(0, 0, 'turnBtn').setOrigin(0.5, 0.5).setInteractive().setScale(1.3, 1.3);
+        this.startWaveButtonText = this.add.text(0, 0, 'Ход', {
+            fontSize: '40px',
             fontFamily: 'Roboto',
             fontWeight: 700,
             textAlign: 'center',
             fill: '#E8CA8F'
-        }).setOrigin(-0.98, 0.1);
-
-        this.roundsFlag = this.add.sprite(0, 0, 'roundsFlag').setOrigin(1, 1);
-        this.roundsFlagText = this.add.text(-this.roundsFlag.width / 2, -this.roundsFlag.height / 2, '1', {
-            fontSize: '30px',
-            fill: '#fff'
         }).setOrigin(0.5, 0.5);
-
-        this.roundsFlagContainer = this.add.container(this.width - 85, this.height - 85);
-        this.roundsFlagContainer.add([this.roundsFlag, this.roundsFlagText]);
 
         this.add.existing(this.roundsFlagContainer);
         this.startWaveButtonContainer.add([this.startWaveButton, this.startWaveButtonText])
@@ -272,11 +277,17 @@ export default class PlayScene extends Scene {
             this.startWaveButton.clearTint();
             this.startWaveButtonText.clearTint();
         });
-        this.add.sprite(146, 50, 'money');
-        this.moneyText = this.add.text(100, 35, this.money.toString(), {
-            fontSize: '32px',
+        this.moneyImage = this.add.sprite(0, 100, 'money').setOrigin(0, 0.5);
+        this.moneyText = this.add.text(80, 98, this.money.toString(), {
+             fontFamily: 'Roboto',
+            fontWeight: 700,
+            textAlign: 'center',
+            textJustify: 'center',
+            fontSize: '30px',
             fill: '#fff'
-        });
+        }).setOrigin(0, 0.5);
+        this.moneyContainer = this.add.container(0, 0);
+        this.moneyContainer.add([this.moneyImage, this.moneyText]);
 
         // Добавляем обработчик событий на кнопку
         this.startWaveButton.on('pointerdown', this.startWave, this);
@@ -323,29 +334,29 @@ export default class PlayScene extends Scene {
 
     generateShop(shop_towers, shop_plates) {
         for (let i = 0; i < this.count_shop_slots; ++i) {
-            let x_pos = (this.step_sprite + 40) * i + 120 - 1400
-            let y_pos = this.platform_start * 1.45
+            let x_pos = ((this.step_sprite + 40) * i + 100)
+            let y_pos = this.platform_start + 200
 
-            shop_plates.push(this.add.sprite(x_pos, y_pos, "shopPlate").setScale(1.1, 0.95));
+            shop_plates.push(this.add.sprite(x_pos, y_pos+5, "shopPlate").setScale(1.1).setOrigin(0.5, 0));
             let shop_tower;
             switch (getRandomNumber(this.count_tower_types)) {
                 case 0:
-                    shop_tower = new Chest(this, x_pos, y_pos + 15)
+                    shop_tower = new Chest(this, x_pos, y_pos + 100)
                     break
                 case 1:
-                    shop_tower = new Cat(this, x_pos, y_pos + 15)
+                    shop_tower = new Cat(this, x_pos, y_pos + 100)
                     break
                 case 2:
-                    shop_tower = new Milk(this, x_pos, y_pos + 15)
+                    shop_tower = new Milk(this, x_pos, y_pos + 100)
                     break
                 case 3:
-                    shop_tower = new Guard(this, x_pos, y_pos + 15)
+                    shop_tower = new Guard(this, x_pos, y_pos + 100)
                     break
                 case 4:
-                    shop_tower = new Thief(this, x_pos, y_pos + 15)
+                    shop_tower = new Thief(this, x_pos, y_pos + 100)
                     break
             }
-            shop_towers.push(this.add.existing(shop_tower))
+            shop_towers.push(this.add.existing(shop_tower).setScale(0.5, 0.5))
             for (let slot of this.slots) {
                 if (slot) {
                     shop_tower.on('pointerover', (pointer, localX, localY, event) => {
@@ -427,7 +438,7 @@ export default class PlayScene extends Scene {
         this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
         for (let i = 0; i < 5; i++) {
-            this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 20, 'ghost', this.wave + 1, this.wave + 1)))
+            this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 55, 'ghost', this.wave + 1, this.wave + 1).setOrigin(0.5, 0)))
         }
     }
 
@@ -468,7 +479,7 @@ export default class PlayScene extends Scene {
     }
 
     hitEnemy(tower, enemy) {
-        const attackAnim = this.add.sprite(enemy.x - 100, enemy.y, 'enemyAttack');
+        const attackAnim = this.add.sprite(enemy.x - 100, enemy.y, 'enemyAttack').setOrigin(0.5, 0);
 
         attackAnim.play('attack');
         attackAnim.on('animationcomplete', () => {
@@ -482,7 +493,7 @@ export default class PlayScene extends Scene {
 
 
         if (tower.hp <= 0) {
-            const destroyAnim = this.add.sprite(tower.x, tower.y, 'tower_destroy');
+            const destroyAnim = this.add.sprite(tower.x, tower.y - 20, 'tower_destroy').setOrigin(0.5, 0);
             try {
                 destroyAnim.play('destroy');
             } catch (error) {
@@ -497,7 +508,7 @@ export default class PlayScene extends Scene {
                 this.es = new EndScreen(
                     this,
                     900,
-                    500,
+                    this.platform_start,
                     "loseBackground",
                     this.wave,
                     response ? response.record : 0
@@ -535,7 +546,7 @@ export default class PlayScene extends Scene {
         }
 
         if (enemy.hp <= 0) {
-            const destroyAnim = this.add.sprite(enemy.x, enemy.y, 'ghost_destroy');
+            const destroyAnim = this.add.sprite(enemy.x, enemy.y, 'ghost_destroy').setOrigin(0.5, 0);
             try {
                 destroyAnim.play('ghostDies');
             } catch (error) {
@@ -598,6 +609,7 @@ class Tower extends Phaser.GameObjects.Sprite {
 
         this.setInteractive({draggable: draggable})
         this.setDisplaySize(150, 150)
+        this.setOrigin(0.5, 0)
 
         scene.physics.world.enable(this);
         this.body.setAllowGravity(false);
@@ -626,23 +638,39 @@ class Tower extends Phaser.GameObjects.Sprite {
 
         this.hpIcon = scene.add.sprite(x, y, 'hpIcon').setOrigin(2, -2.5);
         this.hpText = scene.add.text(x, y, hp.toString(), {
+            fontFamily: 'Roboto',
+            fontWeight: 700,
+            textAlign: 'center',
+            textJustify: 'center',
             fontSize: '25px',
             fill: '#fff'
         }).setOrigin(1.8, -3.5)
 
         this.dmgIcon = scene.add.sprite(x, y, 'dmgIcon').setOrigin(0, -2.5);
         this.dmgText = scene.add.text(x, y, dmg.toString(), {
+            fontFamily: 'Roboto',
+            fontWeight: 700,
+            textAlign: 'center',
+            textJustify: 'center',
             fontSize: '25px',
             fill: '#fff'
         }).setOrigin(-2, -3.5)
 
-        this.coinIcon = scene.add.sprite(x, y, 'coin').setDisplaySize(30, 30).setOrigin(2, 3.5);
-        this.coinText = scene.add.text(x, y, cost.toString(), {
+        this.coinIcon = scene.add.sprite(x - 60, y - 10, 'coin').setDisplaySize(30, 30).setOrigin(0.5, 0.5);
+        this.coinText = scene.add.text(x - 30, y - 10, cost.toString(), {
+            fontFamily: 'Roboto',
+            fontWeight: 700,
+            textAlign: 'center',
+            textJustify: 'center',
             fontSize: '25px',
             fill: '#fadb00'
-        }).setOrigin(1.8, 4.1)
+        }).setOrigin(0.5, 0.5)
 
         this.nameText = scene.add.text(x, y, '', {
+            fontFamily: 'Roboto',
+            fontWeight: 700,
+            textAlign: 'center',
+            textJustify: 'center',
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 6)
