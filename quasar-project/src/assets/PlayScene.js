@@ -84,6 +84,8 @@ export default class PlayScene extends Scene {
         // GAME CONFIG
         this.es = null
 
+        this.deleteMode = false
+
         this.width = this.scale.width
         this.height = this.scale.height
 
@@ -211,7 +213,7 @@ export default class PlayScene extends Scene {
                 this.shop_towers.splice(index, 1);
             } else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
                 dropZone.clearTint();
-                var index = this.shop_towers.indexOf(gameObject);
+                let index = this.shop_towers.indexOf(gameObject);
                 this.shop_towers[index].component_destroy()
                 this.shop_towers[index].destroy()
                 this.money -= gameObject.cost;
@@ -221,7 +223,7 @@ export default class PlayScene extends Scene {
                 this.shop_plates.splice(index, 1);
                 this.shop_towers.splice(index, 1);
 
-                var tower = this.towers[dropZone.dropZoneIndex]
+                let tower = this.towers[dropZone.dropZoneIndex]
                 tower.gainExp(5)
 
             } else {
@@ -261,6 +263,53 @@ export default class PlayScene extends Scene {
             textAlign: 'center',
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
+
+        this.towerDeleteButton = this.add.sprite(400, this.scale.height-150-800, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
+
+        this.towerDeleteButton.on("pointerdown", () => {
+            if (!this.deleteMode) {
+                console.log(1)
+
+                this.deleteMode = true
+                for (let i = 1; i < this.towers.length; i++) {
+                    console.log(i)
+
+                    this.towers[i]?.on("pointerdown", () => {
+                        console.log(this.towers[i])
+                        this.towers[i].component_destroy()
+                        this.towers[i].destroy()
+                        this.towers[i] = 0
+                        this.slots[i] = this.add.sprite(100 + this.step_sprite * (i), this.platform_start, 'slot').setInteractive().setAlpha(0.4)
+                        this.slots[i].input.dropZone = true
+                        this.slots[i].dropZoneIndex = i + 1
+
+                        this.generateAnimation()
+                        console.log("smth")
+                    })
+                }
+
+                // for (let slot of this.slots) {
+                //     this.tweens.add({
+                //         targets: slot,
+                //         alpha: 0, // Конечная прозрачность (полностью видимый)
+                //         duration: 500, // Длительность анимации в миллисекундах TODO
+                //         ease: 'Power2', // Тип easing
+                //         onComplete: () => {
+                //             console.log(1)
+                //         }
+                //     });
+                // }
+            }
+            else {
+                this.deleteMode = false
+                for (let i = 1; i < this.towers.length; i++) {
+                    this.towers[i]?.on("pointerdown", () => {
+
+                    })
+                }
+            }
+
+        })
 
         // Create the rerollButton
         this.rerollButton = this.add.sprite(55, this.scale.height-150-400, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
@@ -388,6 +437,44 @@ export default class PlayScene extends Scene {
                     break
             }
             shop_towers.push(this.add.existing(shop_tower))
+            for (let slot of this.slots) {
+                if (slot) {
+                    shop_tower.on('pointerover', (pointer, localX, localY, event) => {
+                        this.tweens.add({
+                            targets: slot,
+                            alpha: 0.4, // Конечная прозрачность (полностью видимый)
+                            duration: 500, // Длительность анимации в миллисекундах
+                            ease: 'Power2', // Тип easing
+                        });
+
+                        shop_tower.showDescription(pointer.x, pointer.y)
+
+
+                    });
+
+                    shop_tower.on('pointermove', (pointer, localX, localY, event) => {
+                        shop_tower.showDescription(pointer.x, pointer.y)
+                    })
+
+                    shop_tower.on('pointerout', () => {
+                        this.tweens.add({
+                            targets: slot,
+                            alpha: 0, // Конечная прозрачность (полностью видимый)
+                            duration: 500, // Длительность анимации в миллисекундах
+                            ease: 'Power2', // Тип easing
+                        });
+
+                        shop_tower.hideDescription()
+                    });
+                }
+            }
+            this.children.bringToTop(this.shopLine);
+        }
+    }
+
+    generateAnimation() {
+        for (let i = 0; i < this.shop_towers.length; ++i) {
+            let shop_tower = this.shop_towers[i]
             for (let slot of this.slots) {
                 if (slot) {
                     shop_tower.on('pointerover', (pointer, localX, localY, event) => {
@@ -805,6 +892,8 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.dmgText.destroy();
         this.dmgIcon.destroy();
         this.nameText.destroy();
+        this.descriptionText.destroy();
+        this.descriptionIcon.destroy()
         this.shop_info_destroy()
     }
 
