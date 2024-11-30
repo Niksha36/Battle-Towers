@@ -1,0 +1,93 @@
+<script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+function redirectToGame() {
+    router.push('/game');
+}
+function redirectToRating(){
+    router.push('/rating');
+}
+</script>
+
+<template>
+    <div class="background-wrapper">
+        <div class="game-menu">
+            <h1>Total Towers</h1>
+            <div class="button-wrapper">
+                <button class="play" @click="redirectToGame">
+                    Играть
+                </button>
+                <button class="rating" @click="redirectToRating">
+                    Рейтинг
+                </button>
+                <button class="quit">
+                    Выйти
+                </button>
+            </div>
+        </div>
+    </div>
+
+</template>
+
+<style scoped>
+html {
+    background-image: url('../assets/background/menu_backgrond.jpg') !important;
+}
+.background-wrapper{
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-image: url('../assets/background/menu_backgrond.jpg') !important;
+}
+.game-menu {
+    font-family: 'Roboto', sans-serif;
+    position: absolute;
+    bottom: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-menu .button-wrapper button {
+
+    border: 7px solid #c2b067;
+    border-radius: 30px;
+    padding: 10px 20px;
+    background: #1D7E7C;
+    color: #EDDDB8;
+    font-size: 50px;
+    width: 100%;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-top: 20px;
+    font-weight: 500;
+}
+
+.game-menu .button-wrapper button:hover {
+    background: #AA382C;
+
+}
+
+.button-wrapper {
+    padding: 0 15%
+}
+
+.game-menu h1 {
+    text-shadow:
+        -5px -5px 0 #c2b067,
+        5px -5px 0 #c2b067,
+        -5px 5px 0 #c2b067,
+        5px 5px 0 #c2b067;
+    font-family: 'Roboto', sans-serif !important;
+    font-weight: 700;
+    font-size: 200px;
+    margin: 0 0 100px 0;
+    color: #E1491A;
+    white-space: nowrap;
+}
+</style>
