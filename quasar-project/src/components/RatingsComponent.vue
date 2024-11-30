@@ -1,0 +1,118 @@
+<script setup>
+import { ref } from 'vue';
+
+const ratings = ref([
+    { name: 'Player 1', max_wave: 10 },
+    { name: 'Player 2', max_wave: 2 },
+    { name: 'Player 3', max_wave: 1 },
+    { name: 'Player 3', max_wave: 1 },
+    { name: 'Player 3', max_wave: 1 },
+    { name: 'Player 3', max_wave: 1 },
+    { name: 'Player 3', max_wave: 1 },
+    { name: 'Player 3', max_wave: 1 },
+    { name: 'Player 3', max_wave: 1 },
+
+]);
+</script>
+
+<template>
+    <div class="background-wrapper">
+        <div class="ratings-table">
+            <h1>Рейтинг</h1>
+            <table>
+                <thead>
+                <tr>
+                    <th>Место</th>
+                    <th>Игрок</th>
+                    <th>Волны</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(rating, index) in ratings" :key="index">
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ rating.name }}</td>
+                    <td>{{ rating.max_wave }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</template>
+
+<style scoped>
+.background-wrapper{
+    width: 100vw;
+    height: 100vh;
+    background: #6000C2;
+    background-size: cover;
+    overflow-y: auto;
+    max-height: 100%;
+
+}
+.ratings-table {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.ratings-table table {
+    width: 70%;
+    border-spacing: 40px 12px;
+    border: none;
+
+}
+
+.ratings-table th{
+    padding: 8px;
+    text-transform: uppercase;
+
+    background: #20E8C1;
+    text-align: center;
+    font-size: 40px;
+    border-bottom: 1px solid #ddd;
+    color: #42008E;
+}
+.ratings-table td{
+    background: white;
+    text-transform: uppercase;
+    font-size: 40px;
+    text-align: center;
+    padding: 20px;
+}
+
+h1{
+    color: white;
+    font-size: 130px;
+    text-transform: uppercase;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 600;
+    margin-bottom: 50px;
+    margin-top: 70px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.ratings-table tbody tr:nth-child(1) td,
+.ratings-table tbody tr:nth-child(2) td,
+.ratings-table tbody tr:nth-child(3) td {
+    font-size: 50px; /* Adjust the size as needed */
+}
+.ratings-table tbody tr:nth-child(1) td:nth-child(1) {
+    color: #FFD700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.ratings-table tbody tr:nth-child(2) td:nth-child(1) {
+    color: #c5c9c7;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.ratings-table tbody tr:nth-child(2) td:nth-child(1) {
+    color: #c5c9c7;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.ratings-table tbody tr:nth-child(3) td:nth-child(1) {
+    color: #cd7f32;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+</style>
