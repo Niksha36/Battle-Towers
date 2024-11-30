@@ -33,12 +33,12 @@ console.log(data)
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(rating, index) in data" :key="index">
-                    <td v-if="index>4">...</td>
-                    <td v-else>{{ index + 1 }}</td>
-                    <td>{{ rating.username }}</td>
-                    <td>{{ rating.record }}</td>
-                </tr>
+                    <tr v-for="(rating, index) in data" :key="index">
+                        <td v-if="index>4">...</td>
+                        <td v-else>{{ index + 1 }}</td>
+                        <td>{{ rating.username }}</td>
+                        <td>{{ rating.record }}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
