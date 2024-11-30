@@ -251,6 +251,21 @@ export default class PlayScene extends Scene {
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
 
+        this.rerollButton = this.add.sprite(200, 100, 'turnBtn').setOrigin(0, 0).setInteractive();
+        this.rerollButtonText = this.add.text(150, 110, 'реролл', {
+            fontSize: '35px',
+            fontFamily: 'Roboto',
+            fontWeight: 700,
+            textAlign: 'center',
+            fill: '#E8CA8F'
+        }).setOrigin(-0.98, 0.1);
+        this.rerollButton.on("pointerdown", () => {
+            if (this.money > 1) {
+                this.money -= 2
+                this.rerollShop()
+                this.moneyText.setText(this.money.toString());
+            }
+        })
         this.roundsFlag = this.add.sprite(0, 0, 'roundsFlag').setOrigin(1, 1);
         this.roundsFlagText = this.add.text(-this.roundsFlag.width / 2, -this.roundsFlag.height / 2, '1', {
             fontSize: '30px',
@@ -395,6 +410,36 @@ export default class PlayScene extends Scene {
 
         shop_towers.length = 0
         shop_plates.length = 0
+    }
+
+    rerollShop() {
+        this.clearShop(this.shop_towers, this.shop_plates)
+        this.generateShop(this.shop_towers, this.shop_plates)
+        this.tweens.add({
+            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
+                ...this.shop_towers.map(el => el.dmgIcon),
+                ...this.shop_towers.map(el => el.dmgIcon),
+                ...this.shop_towers.map(el => el.coinIcon),
+                ...this.shop_towers.map(el => el.descriptionIcon),
+                ...this.shop_towers.map(el => el.hpText),
+                ...this.shop_towers.map(el => el.dmgText),
+                ...this.shop_towers.map(el => el.coinText),
+                ...this.shop_towers.map(el => el.descriptionText),
+                ...this.shop_towers.map(el => el.nameText)],
+            x: '+=1400',
+            duration: 1000,
+            ease: 'Power2',
+            onStart: () => {
+              this.shop_towers.forEach((element) => {
+                  element.disableInteractive()
+              })
+            },
+            onComplete: () => {
+                this.shop_towers.forEach((element) => {
+                    element.setupInteractive();
+                });
+            },
+        });
     }
 
     startWave() {
