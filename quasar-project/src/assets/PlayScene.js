@@ -122,16 +122,7 @@ export default class PlayScene extends Scene {
         this.generateShop(this.shop_towers, this.shop_plates)
 
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.coinIcon),
-                ...this.shop_towers.map(el => el.descriptionIcon),
-                ...this.shop_towers.map(el => el.hpText),
-                ...this.shop_towers.map(el => el.dmgText),
-                ...this.shop_towers.map(el => el.coinText),
-                ...this.shop_towers.map(el => el.descriptionText),
-                ...this.shop_towers.map(el => el.nameText)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), ...this.shop_towers.map(el => el.nameText)],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -441,16 +432,7 @@ export default class PlayScene extends Scene {
         this.clearShop(this.shop_towers, this.shop_plates)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
-            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.coinIcon),
-                ...this.shop_towers.map(el => el.descriptionIcon),
-                ...this.shop_towers.map(el => el.hpText),
-                ...this.shop_towers.map(el => el.dmgText),
-                ...this.shop_towers.map(el => el.coinText),
-                ...this.shop_towers.map(el => el.descriptionText),
-                ...this.shop_towers.map(el => el.nameText)],
+            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon), ...this.shop_towers.map(el => el.nameText)],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -476,16 +458,7 @@ export default class PlayScene extends Scene {
         }
 
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.coinIcon),
-                ...this.shop_towers.map(el => el.descriptionIcon),
-                ...this.shop_towers.map(el => el.hpText),
-                ...this.shop_towers.map(el => el.dmgText),
-                ...this.shop_towers.map(el => el.coinText),
-                ...this.shop_towers.map(el => el.descriptionText),
-                ...this.shop_towers.map(el => el.nameText)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), ...this.shop_towers.map(el => el.nameText)],
             x: '-=1400',
             duration: 1000,
             ease: 'Power2',
@@ -518,16 +491,7 @@ export default class PlayScene extends Scene {
         this.roundsFlagContainer.setVisible(true)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.coinIcon),
-                ...this.shop_towers.map(el => el.descriptionIcon),
-                ...this.shop_towers.map(el => el.hpText),
-                ...this.shop_towers.map(el => el.dmgText),
-                ...this.shop_towers.map(el => el.coinText),
-                ...this.shop_towers.map(el => el.descriptionText),
-                ...this.shop_towers.map(el => el.nameText)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), ...this.shop_towers.map(el => el.nameText)],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -759,8 +723,6 @@ class Tower extends Phaser.GameObjects.Sprite {
             fill: '#f1ff9b'
         }).setOrigin(0.5, 6);
         this.container.add([this.hpIcon, this.hpText, this.dmgIcon, this.dmgText, this.coinIcon, this.coinText, this.nameText]);
-
-
         this.is_die = false
         this.scene.add.existing(this);
     }
@@ -790,12 +752,12 @@ class Tower extends Phaser.GameObjects.Sprite {
         if (!this.canShowDescription) {
             return;
         }
-        this.descriptionIcon.x = x - this.container.x;
-        this.descriptionText.x = x - this.container.x;
-        this.descriptionIcon.y = y - this.container.y;
-        this.descriptionText.y = y - this.container.y;
-        this.descriptionIcon.visible = true;
-        this.descriptionText.visible = true;
+        this.descriptionIcon.x = x
+        this.descriptionText.x = x
+        this.descriptionIcon.y = y
+        this.descriptionText.y = y
+        this.descriptionIcon.visible = true
+        this.descriptionText.visible = true
 
         this.scene.children.bringToTop(this.descriptionIcon);
         this.scene.children.bringToTop(this.descriptionText);
@@ -831,7 +793,7 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.hpIcon.destroy();
         this.dmgText.destroy();
         this.dmgIcon.destroy();
-        this.nameText.destroy()
+        this.nameText.destroy();
         this.shop_info_destroy()
     }
 
@@ -844,25 +806,30 @@ class Tower extends Phaser.GameObjects.Sprite {
 
     updatePosition(dragX, dragY) {
         this.container.setPosition(dragX, dragY);
+        this.nameText.setPosition(dragX, dragY);
     }
 
     hide() {
         this.setAlpha(0);
         this.container.setAlpha(0);
+        this.nameText.setAlpha(0);
         this.descriptionIcon.setAlpha(0);
         this.descriptionText.setAlpha(0);
     }
 
     show() {
         this.container.setAlpha(1);
+        this.nameText.setAlpha(1);
         this.descriptionIcon.setAlpha(1);
         this.descriptionText.setAlpha(1);
+        this.setAlpha(1)
     }
 
     bringToTop() {
         this.scene.children.bringToTop(this.container);
         this.scene.children.bringToTop(this.descriptionIcon);
         this.scene.children.bringToTop(this.descriptionText);
+        this.scene.children.bringToTop(this);
     }
 
     setupInteractive() {
