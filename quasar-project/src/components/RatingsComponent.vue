@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 
-const ratings = ref([
+let ratings = ref([
     { name: 'Player 1', max_wave: 10 },
     { name: 'Player 2', max_wave: 2 },
     { name: 'Player 3', max_wave: 1 },
@@ -11,14 +11,13 @@ const ratings = ref([
     { name: 'Player 3', max_wave: 1 },
     { name: 'Player 3', max_wave: 1 },
     { name: 'Player 3', max_wave: 1 },
-
 ]);
 </script>
 
 <template>
     <div class="background-wrapper">
         <div class="ratings-table">
-            <h1>Рейтинг</h1>
+            <h1>{{ this }}</h1>
             <table>
                 <thead>
                 <tr>
