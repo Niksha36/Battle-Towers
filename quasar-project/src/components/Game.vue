@@ -1,6 +1,9 @@
 <template>
     <div>
         <div id="game-container" class="game-container"></div>
+        <button @click="get_top">get_top</button>
+        <button @click="get_user_record">get_user_record</button>
+        <button @click="update_user_record">update_user_record</button>
     </div>
 </template>
 
