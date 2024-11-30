@@ -700,8 +700,8 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.descriptionIcon = scene.add.sprite(x, y, 'description').setOrigin(0, 1)
         this.descriptionText = scene.add.text(x, y, this.description, {
             fontSize: '25px',
-            fill: '#ffffff'
-        }).setOrigin(-0.5, 3)
+             fill: '#ffffff',
+        })
 
         this.canShowDescription = true
 
@@ -764,9 +764,9 @@ class Tower extends Phaser.GameObjects.Sprite {
             return;
         }
         this.descriptionIcon.x = x
-        this.descriptionText.x = x
+        this.descriptionText.x = x + 20
         this.descriptionIcon.y = y
-        this.descriptionText.y = y
+        this.descriptionText.y = y - 110 + 20 * (3 - this.description.split("\n").length)
         this.descriptionIcon.visible = true
         this.descriptionText.visible = true
 
@@ -885,13 +885,6 @@ class Chest extends Tower {
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 6)
-
-        this.descriptionText = scene.add.text(100, scene.platform_start, this.description, {
-            fontSize: '25px',
-            fill: '#ffffff'
-        }).setOrigin(-0.2, 3)
-
-        this.descriptionText.visible = false
 
     }
 
@@ -1025,11 +1018,13 @@ class Thief extends Tower {
 class Glass extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "glass", 1, 2, 3,
-            "Если ломается во время волны, передает 40% своего урона Главной Башне После волны увеличивает свой урон на 1"
+            "Если ломается\nпередает урон ГБ\nПосле волны увеличивает\n свой урон на 1"
         );
-        this.nameText = scene.add.text(x, y, "Стеклянная башня", {
+        this.nameText = scene.add.text(x, y, "Стеклянная\nбашня", {
             fontSize: '25px',
-            fill: '#f1ff9b'
+            fill: '#f1ff9b',
+            textAlign: 'center',
+            justifyItems: 'center'
         }).setOrigin(0.5, 6)
     }
 
@@ -1042,7 +1037,7 @@ class Glass extends Tower {
 class Stairs extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "stairs", 1, 2, 3,
-            "Нужна только одна лестница для улучшения"
+            "Нужна только одна\n    для улучшения"
         );
         this.neededExp = 5
         this.neededExpScale = 0
@@ -1057,9 +1052,9 @@ class Stairs extends Tower {
 class Obsidian extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "obsidian", 1, 2, 5,
-            "Сохраняет временные бонусы"
+            "Сохраняет временные \n   бонусы"
         );
-        this.nameText = scene.add.text(x, y, "Обсидиановая башня", {
+        this.nameText = scene.add.text(x, y, "Обсидиановая\nбашня", {
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 6)
