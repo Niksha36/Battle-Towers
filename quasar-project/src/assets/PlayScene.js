@@ -114,7 +114,7 @@ export default class PlayScene extends Scene {
 
         this.towers.push(this.add.existing(new MainTower(this)))
         this.generateShop(this.shop_towers, this.shop_plates)
-        console.log(this.shop_towers)
+
         this.tweens.add({
             targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
                 ...this.shop_towers.map(el => el.dmgIcon),
@@ -129,19 +129,7 @@ export default class PlayScene extends Scene {
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
-            onStart: () => {
-              this.shop_towers.forEach((element) => {
-                  element.disableInteractive()
-              })
-            },
-            onComplete: () => {
-                this.shop_towers.forEach((element) => {
-                    element.setupInteractive();
-                });
-            },
         });
-
-
 
         this.towers[0].on('pointerover', (pointer, localX, localY, event) => {
             this.towers[0].showDescription(pointer.x, pointer.y)
@@ -262,23 +250,6 @@ export default class PlayScene extends Scene {
             textAlign: 'center',
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
-
-        this.rerollButton = this.add.sprite(200, 100, 'turnBtn').setOrigin(0, 0).setInteractive();
-        this.rerollButtonText = this.add.text(150, 110, 'реролл', {
-            fontSize: '35px',
-            fontFamily: 'Roboto',
-            fontWeight: 700,
-            textAlign: 'center',
-            fill: '#E8CA8F'
-        }).setOrigin(-0.98, 0.1);
-
-        this.rerollButton.on("pointerdown", () => {
-            if (this.money > 1) {
-                this.money -= 2
-                this.rerollShop()
-                this.moneyText.setText(this.money.toString());
-            }
-        })
 
         this.roundsFlag = this.add.sprite(0, 0, 'roundsFlag').setOrigin(1, 1);
         this.roundsFlagText = this.add.text(-this.roundsFlag.width / 2, -this.roundsFlag.height / 2, '1', {
@@ -426,36 +397,6 @@ export default class PlayScene extends Scene {
         shop_plates.length = 0
     }
 
-    rerollShop() {
-        this.clearShop(this.shop_towers, this.shop_plates)
-        this.generateShop(this.shop_towers, this.shop_plates)
-        this.tweens.add({
-            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.dmgIcon),
-                ...this.shop_towers.map(el => el.coinIcon),
-                ...this.shop_towers.map(el => el.descriptionIcon),
-                ...this.shop_towers.map(el => el.hpText),
-                ...this.shop_towers.map(el => el.dmgText),
-                ...this.shop_towers.map(el => el.coinText),
-                ...this.shop_towers.map(el => el.descriptionText),
-                ...this.shop_towers.map(el => el.nameText)],
-            x: '+=1400',
-            duration: 1000,
-            ease: 'Power2',
-            onStart: () => {
-              this.shop_towers.forEach((element) => {
-                  element.disableInteractive()
-              })
-            },
-            onComplete: () => {
-                this.shop_towers.forEach((element) => {
-                    element.setupInteractive();
-                });
-            },
-        });
-    }
-
     startWave() {
         this.roundsFlagText.text = (parseInt(this.roundsFlagText.text) + 1).toString();
         for (let i = 0; i < this.towers.length; i++) {
@@ -478,17 +419,7 @@ export default class PlayScene extends Scene {
             x: '-=1400',
             duration: 1000,
             ease: 'Power2',
-            onStart: () => {
-              this.shop_towers.forEach((element) => {
-                  element.disableInteractive()
-              })
-            },
-            onComplete: () => {
-                this.shop_towers.forEach((element) => {
-                    element.setupInteractive();
-                    this.clearShop(this.shop_towers, this.shop_plates)
-                });
-            },
+            onComplete: () => this.clearShop(this.shop_towers, this.shop_plates)
         });
 
         this.wave++;
@@ -518,16 +449,6 @@ export default class PlayScene extends Scene {
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
-            onStart: () => {
-              this.shop_towers.forEach((element) => {
-                  element.disableInteractive()
-              })
-            },
-            onComplete: () => {
-                this.shop_towers.forEach((element) => {
-                    element.setupInteractive();
-                });
-            },
         });
 
         for (let tower of this.towers) {
@@ -675,6 +596,7 @@ class Tower extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, texture, hp, dmg, cost, description, draggable = true) {
         super(scene, x, y, texture);
 
+        this.setInteractive({draggable: draggable})
         this.setDisplaySize(150, 150)
 
         scene.physics.world.enable(this);
@@ -690,7 +612,6 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.dmg = dmg
         this.cost = cost
         this.description = description
-        this.draggable = draggable
 
         this.descriptionIcon = scene.add.sprite(x, y, 'description').setOrigin(0, 1)
         this.descriptionText = scene.add.text(x, y, this.description, {
@@ -744,10 +665,6 @@ class Tower extends Phaser.GameObjects.Sprite {
             this.exp += exp
         }
 
-    }
-
-    setupInteractive() {
-        this.setInteractive({draggable: this.draggable})
     }
 
     showDescription(x, y) {
