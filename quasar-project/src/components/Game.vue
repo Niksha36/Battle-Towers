@@ -1,5 +1,10 @@
 <template>
+    <div>
         <div id="game-container" class="game-container"></div>
+        <button @click="get_top">get_top</button>
+        <button @click="get_user_record">get_user_record</button>
+        <button @click="update_user_record">update_user_record</button>
+    </div>
 </template>
 
 <script>
@@ -12,8 +17,8 @@ export default {
     mounted() {
         const config = {
             type: Phaser.AUTO,
-            width: 1920,
-            height: 1080,
+            width: window.innerWidth,
+            height: window.innerHeight,
             antialias: false,
             pixelArt: true,
             physics: {
@@ -26,7 +31,6 @@ export default {
             scene: [PlayScene],
             parent: 'game-container'
         };
-        console.log(window.innerHeight)
         this.game = new Phaser.Game(config);
 
 
@@ -70,16 +74,7 @@ export default {
 </script>
 
 <style>
-.game-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh; /* Высота на весь экран */
-}
-
 body {
-    display: flex;
     overflow: hidden;
-    background-color: black;
 }
 </style>
