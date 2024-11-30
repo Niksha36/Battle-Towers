@@ -7,6 +7,12 @@ function redirectToGame() {
 function redirectToRating(){
     router.push('/rating');
 }
+
+function logout() {
+    this.$store.dispatch("logout")
+    console.log(this.$store.state)
+}
+
 </script>
 <template>
     <div class="background-wrapper">
@@ -19,7 +25,7 @@ function redirectToRating(){
                 <button class="rating" @click="redirectToRating">
                     Рейтинг
                 </button>
-                <button class="quit">
+                <button class="quit" @click="logout">
                     Выйти
                 </button>
             </div>

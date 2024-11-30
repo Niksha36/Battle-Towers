@@ -45,22 +45,29 @@ def get_top_user(request):
     print(request.user)
     username = request.GET.get('username', None)
     if not username:
-        return Response({"message": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
+        response_body = [
+            {
+                "place": i + 1,
+                "username": usr.username,
+                "record": usr.record
+            }
+            for i, usr in enumerate(users)
+        ]
+    else:
+        user = User.objects.get(username=username)
 
-    user = User.objects.get(username=username)
+        if user not in users:
+            users += user
+        response_body = [
+            {
+                "place": i + 1,
+                "username": usr.username,
+                "record": usr.record
+            }
+            for i, usr in enumerate(users)
+        ]
 
-    if user not in users:
-        users += user
-    response_body = [
-        {
-            "place": i + 1,
-            "username": usr.username,
-            "record": usr.record
-        }
-        for i, usr in enumerate(users)
-    ]
-
-    return Response(response_body, status=status.HTTP_200_OK)
+    return Response(data=response_body, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_user_record(request):
