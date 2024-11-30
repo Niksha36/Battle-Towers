@@ -26,7 +26,7 @@ import tower_destroy_sprite from "../assets/sprites/tower_destroy_sprite.png"
 import ghost_destroy_sprite from "../assets/sprites/ghoust_defeated_sprite.png"
 import roundsFlag from "../assets/sprites/flag_with_rounds.png"
 import description from "../assets/sprites/description.png"
-
+import reroll_sprite from "../assets/sprites/reroll_sprite.png"
 import stor from "../store.js"
 import axios from "axios";
 
@@ -73,6 +73,10 @@ export default class PlayScene extends Scene {
         this.load.spritesheet('ghost_destroy', ghost_destroy_sprite, {
             frameWidth: 179,
             frameHeight: 217,
+        });
+        this.load.spritesheet('reroll_button', reroll_sprite, {
+            frameWidth: 96,
+            frameHeight: 101
         });
     }
 
@@ -258,14 +262,21 @@ export default class PlayScene extends Scene {
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
 
-        this.rerollButton = this.add.sprite(200, 100, 'turnBtn').setOrigin(0, 0).setInteractive();
-        this.rerollButtonText = this.add.text(150, 110, 'реролл', {
-            fontSize: '35px',
-            fontFamily: 'Roboto',
-            fontWeight: 700,
-            textAlign: 'center',
-            fill: '#E8CA8F'
-        }).setOrigin(-0.98, 0.1);
+        // Create the rerollButton
+        this.rerollButton = this.add.sprite(55, this.scale.height-150-400, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
+
+// Add the rerollButton to the scene
+        this.add.existing(this.rerollButton);
+
+// Bring the rerollButton to the top
+        this.children.bringToTop(this.rerollButton);
+        this.rerollButton.on('pointerover', () => {
+            this.rerollButton.setFrame(1);
+        });
+
+        this.rerollButton.on('pointerout', () => {
+            this.rerollButton.setFrame(0);
+        });
         this.rerollButton.on("pointerdown", () => {
             if (this.money > 1) {
                 this.money -= 2
