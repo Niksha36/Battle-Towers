@@ -270,6 +270,9 @@ export default class PlayScene extends Scene {
             if (!this.deleteMode) {
                 console.log(1)
 
+                this.towerDeleteButton.setFrame(1);
+
+
                 this.deleteMode = true
                 for (let i = 1; i < this.towers.length; i++) {
                     console.log(i)
@@ -302,6 +305,9 @@ export default class PlayScene extends Scene {
             }
             else {
                 this.deleteMode = false
+
+                this.towerDeleteButton.setFrame(0);
+
                 for (let i = 1; i < this.towers.length; i++) {
                     this.towers[i]?.on("pointerdown", () => {
 
