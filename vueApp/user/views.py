@@ -41,8 +41,7 @@ def get_top_user(request):
     if request.method != 'GET':
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    users = list(User.objects.all().order_by('-record'))[:10]
-    print(request.user)
+    users = list(User.objects.all().order_by('-record'))[:5]
     username = request.GET.get('username', None)
     if not username:
         response_body = [
