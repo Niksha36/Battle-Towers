@@ -702,29 +702,33 @@ class Tower extends Phaser.GameObjects.Sprite {
 
         this.descriptionIcon.visible = false
         this.descriptionText.visible = false
+// Add elements to the container
+        this.container = scene.add.container(x, y);
 
-        this.hpIcon = scene.add.sprite(x, y, 'hpIcon').setOrigin(2, -2.5);
-        this.hpText = scene.add.text(x, y, hp.toString(), {
+
+        this.hpIcon = scene.add.sprite(0, 0, 'hpIcon').setOrigin(2, -2.5);
+        this.hpText = scene.add.text(0, 0, hp.toString(), {
             fontSize: '25px',
             fill: '#fff'
-        }).setOrigin(1.8, -3.5)
+        }).setOrigin(1.8, -3.5);
 
-        this.dmgIcon = scene.add.sprite(x, y, 'dmgIcon').setOrigin(0, -2.5);
-        this.dmgText = scene.add.text(x, y, dmg.toString(), {
+        this.dmgIcon = scene.add.sprite(0, 0, 'dmgIcon').setOrigin(0, -2.5);
+        this.dmgText = scene.add.text(0, 0, dmg.toString(), {
             fontSize: '25px',
             fill: '#fff'
-        }).setOrigin(-2, -3.5)
+        }).setOrigin(-2, -3.5);
 
-        this.coinIcon = scene.add.sprite(x, y, 'coin').setDisplaySize(30, 30).setOrigin(2, 3.5);
-        this.coinText = scene.add.text(x, y, cost.toString(), {
+        this.coinIcon = scene.add.sprite(0, 0, 'coin').setDisplaySize(30, 30).setOrigin(2, 3.5);
+        this.coinText = scene.add.text(0, 0, cost.toString(), {
             fontSize: '25px',
             fill: '#fadb00'
-        }).setOrigin(1.8, 4.1)
+        }).setOrigin(1.8, 4.1);
 
-        this.nameText = scene.add.text(x, y, '', {
+        this.nameText = scene.add.text(0, 0, '', {
             fontSize: '25px',
             fill: '#f1ff9b'
-        }).setOrigin(0.5, 6)
+        }).setOrigin(0.5, 6);
+        this.container.add([this.hpIcon, this.hpText, this.dmgIcon, this.dmgText, this.coinIcon, this.coinText, this.nameText]);
 
 
         this.is_die = false
@@ -752,17 +756,17 @@ class Tower extends Phaser.GameObjects.Sprite {
 
     showDescription(x, y) {
         if (!this.canShowDescription) {
-            return
+            return;
         }
-        this.descriptionIcon.x = x
-        this.descriptionText.x = x
-        this.descriptionIcon.y = y
-        this.descriptionText.y = y
-        this.descriptionIcon.visible = true
-        this.descriptionText.visible = true
+        this.descriptionIcon.x = x - this.container.x;
+        this.descriptionText.x = x - this.container.x;
+        this.descriptionIcon.y = y - this.container.y;
+        this.descriptionText.y = y - this.container.y;
+        this.descriptionIcon.visible = true;
+        this.descriptionText.visible = true;
 
-        this.scene.children.bringToTop(this.descriptionIcon)
-        this.scene.children.bringToTop(this.descriptionText)
+        this.scene.children.bringToTop(this.descriptionIcon);
+        this.scene.children.bringToTop(this.descriptionText);
     }
 
     hideDescription() {
@@ -807,48 +811,26 @@ class Tower extends Phaser.GameObjects.Sprite {
     }
 
     updatePosition(dragX, dragY) {
-        this.hpIcon.setPosition(dragX, dragY);
-        this.hpText.setPosition(dragX, dragY)
-
-        this.dmgIcon.setPosition(dragX, dragY)
-        this.dmgText.setPosition(dragX, dragY);
-
-        this.coinIcon.setPosition(dragX, dragY);
-        this.coinText.setPosition(dragX, dragY);
-
+        this.container.setPosition(dragX, dragY);
     }
 
     hide() {
         this.setAlpha(0);
-        this.nameText.setAlpha(0);
-        this.hpText.setAlpha(0);
-        this.hpIcon.setAlpha(0);
-        this.dmgText.setAlpha(0);
-        this.dmgIcon.setAlpha(0);
+        this.container.setAlpha(0);
         this.descriptionIcon.setAlpha(0);
         this.descriptionText.setAlpha(0);
     }
 
     show() {
-        this.setAlpha(1);
-        this.hpText.setAlpha(1);
-        this.hpIcon.setAlpha(1);
-        this.dmgText.setAlpha(1);
-        this.dmgIcon.setAlpha(1);
+        this.container.setAlpha(1);
         this.descriptionIcon.setAlpha(1);
         this.descriptionText.setAlpha(1);
     }
 
     bringToTop() {
-        this.scene.children.bringToTop(this.hpIcon);
-        this.scene.children.bringToTop(this.hpText);
-        this.scene.children.bringToTop(this.dmgIcon);
-        this.scene.children.bringToTop(this.hpText);
-        this.scene.children.bringToTop(this.coinIcon);
-        this.scene.children.bringToTop(this.coinText);
-        this.scene.children.bringToTop(this);
-        this.scene.children.bringToTop(this.descriptionIcon)
-        this.scene.children.bringToTop(this.descriptionText)
+        this.scene.children.bringToTop(this.container);
+        this.scene.children.bringToTop(this.descriptionIcon);
+        this.scene.children.bringToTop(this.descriptionText);
     }
 
 

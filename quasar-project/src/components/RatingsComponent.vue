@@ -43,7 +43,7 @@ const ratings = ref([
 .background-wrapper{
     width: 100vw;
     height: 100vh;
-    background: #6000C2;
+    background: #1D7E7C;
     background-size: cover;
     overflow-y: auto;
     max-height: 100%;
@@ -69,11 +69,11 @@ const ratings = ref([
     padding: 8px;
     text-transform: uppercase;
 
-    background: #20E8C1;
+    background: #AA382C;
     text-align: center;
     font-size: 40px;
-    border-bottom: 1px solid #ddd;
-    color: #42008E;
+    color: #EDDDB8;
+
 }
 .ratings-table td{
     background: white;
