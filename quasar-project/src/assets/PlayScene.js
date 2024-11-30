@@ -136,9 +136,9 @@ export default class PlayScene extends Scene {
             duration: 1000,
             ease: 'Power2',
             onStart: () => {
-              this.shop_towers.forEach((element) => {
-                  element.disableInteractive()
-              })
+                this.shop_towers.forEach((element) => {
+                    element.disableInteractive()
+                })
             },
             onComplete: () => {
                 this.shop_towers.forEach((element) => {
@@ -455,9 +455,9 @@ export default class PlayScene extends Scene {
             duration: 1000,
             ease: 'Power2',
             onStart: () => {
-              this.shop_towers.forEach((element) => {
-                  element.disableInteractive()
-              })
+                this.shop_towers.forEach((element) => {
+                    element.disableInteractive()
+                })
             },
             onComplete: () => {
                 this.shop_towers.forEach((element) => {
@@ -491,9 +491,9 @@ export default class PlayScene extends Scene {
             ease: 'Power2',
             onStart: () => {
 
-              this.shop_towers.forEach((element) => {
-                  element.disableInteractive()
-              })
+                this.shop_towers.forEach((element) => {
+                    element.disableInteractive()
+                })
             },
             onComplete: () => {
                 this.clearShop(this.shop_towers, this.shop_plates)
@@ -510,6 +510,7 @@ export default class PlayScene extends Scene {
         for (let i = 0; i < 5; i++) {
             this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 20, 'ghost', this.wave + 1, this.wave + 1)))
         }
+
     }
 
     endWave() {
@@ -532,7 +533,7 @@ export default class PlayScene extends Scene {
             ease: 'Power2',
             onStart: () => {
                 this.shop_towers.forEach((element) => {
-                  element.disableInteractive()
+                    element.disableInteractive()
                 })
             },
             onComplete: () => {
@@ -567,6 +568,13 @@ export default class PlayScene extends Scene {
         });
         tower.hp -= enemy.dmg;
         enemy.hp -= tower.dmg;
+
+        this.tweens.add({
+            targets: this.enemies[0],
+            angle: 20, // Конечная прозрачность (полностью видимый)
+            duration: 500, // Длительность анимации в миллисекундах
+            ease: 'Power2', // Тип easing
+        });
 
         tower.updateHPText();
         enemy.updateHPText();
@@ -629,21 +637,25 @@ export default class PlayScene extends Scene {
         }
 
         if (enemy.hp <= 0) {
-            const destroyAnim = this.add.sprite(enemy.x, enemy.y, 'ghost_destroy');
-            try {
-                destroyAnim.play('ghostDies');
-            } catch (error) {
-                console.error('Error playing destroy animation:', error);
-            }
-            destroyAnim.on('animationcomplete', () => {
-                destroyAnim.destroy('ghostDies');
+            this.time.delayedCall(150, () => {
+                const destroyAnim = this.add.sprite(enemy.x, enemy.y, 'ghost_destroy').setAngle(enemy.angle);
+                this.physics.world.enable(destroyAnim);
+                destroyAnim.body.velocity.x = enemy.body.velocity.x
+                try {
+                    destroyAnim.play('ghostDies');
+                } catch (error) {
+                    console.error('Error playing destroy animation:', error);
+                }
+                destroyAnim.on('animationcomplete', () => {
+                    destroyAnim.destroy('ghostDies');
+                });
+                this.enemies.shift()
+                enemy.destroy()
+                enemy.component_destroy();
+                if (this.enemies.length === 0) {
+                    this.endWave()
+                }
             });
-            this.enemies.shift()
-            enemy.destroy()
-            enemy.component_destroy();
-            if (this.enemies.length === 0) {
-                this.endWave()
-            }
         }
     }
 
@@ -993,14 +1005,13 @@ class Guard extends Tower {
             for (let tower of this.scene.towers) {
                 if (tower && tower.constructor.name === "Obsidian") {
                     tower.default_hp += this.default_hp;
-                    tower.default_dmg+= this.default_dmg;
+                    tower.default_dmg += this.default_dmg;
                     tower.hp += this.default_hp;
                     tower.dmg += this.default_dmg;
                     tower.updateDMGText();
                     tower.updateHPText();
 
-                }
-                else if (tower) {
+                } else if (tower) {
                     tower.hp += this.default_hp;
                     tower.dmg += this.default_dmg;
                     tower.updateDMGText();
@@ -1105,7 +1116,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
         scene.physics.world.enable(this);
         this.body.velocity.x = 0
         this.body.setAllowGravity(false);
-        this.body.bounce.set(1, 0)
+        this.body.bounce.set(1.5, 0)
 
         this.hp = hp
         this.dmg = dmg
@@ -1148,6 +1159,14 @@ class Enemy extends Phaser.GameObjects.Sprite {
         this.dmgIcon.setPosition(this.x, this.y + 100)
         this.dmgText.setPosition(this.dmgIcon.x + 20, this.dmgIcon.y - 13);
 
+        if (this.body.velocity.x === 0) {
+            this.scene.tweens.add({
+                targets: this,
+                angle: -20,
+                duration: 800,
+                ease: 'Power2',
+            });
+        }
         if (this.body.velocity.x > -800) {
             this.body.velocity.x -= 50;
         }
