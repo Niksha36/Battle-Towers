@@ -443,7 +443,7 @@ export default class PlayScene extends Scene {
         this.clearShop(this.shop_towers, this.shop_plates)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
-            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.hpIcon), ...this.shop_towers.map(el => el.nameText)],
+            targets: [...this.shop_towers, ...this.shop_plates,...this.shop_towers.map(el => el.container), ...this.shop_towers.map(el => el.nameText)],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
