@@ -6,6 +6,9 @@ import mainTower from "../assets/towers/towerS_0.png"
 import milk from "../assets/towers/towerS_1.png"
 import cat from "../assets/towers/towerS_2.png"
 import guard from "../assets/towers/towerS_3.png"
+import glass from "../assets/towers/towerS_5.png"
+import obsidian from "../assets/towers/towerS_20.png"
+import stairs from "../assets/towers/towerS_14.png"
 import chest from "../assets/towers/towerS_4.png"
 import thief from "../assets/towers/towerS_8.png"
 import ghost from "../assets/towers/diss_ghost_0.png"
@@ -45,7 +48,10 @@ export default class PlayScene extends Scene {
         this.load.image('chest', chest)
         this.load.image('thief', thief)
         this.load.image('ghost', ghost)
+        this.load.image('stairs', stairs)
+        this.load.image('obsidian', obsidian)
         this.load.image('hpIcon', hp)
+        this.load.image('glass', glass)
         this.load.image('dmgIcon', dmg)
         this.load.image('coin', coin)
         this.load.image('money', money)
@@ -87,7 +93,7 @@ export default class PlayScene extends Scene {
 
         this.count_slots = 10
         this.count_shop_slots = 7
-        this.count_tower_types = 5
+        this.count_tower_types = 8
 
         this.show_start = 225
         this.platform_start = 585
@@ -344,6 +350,15 @@ export default class PlayScene extends Scene {
                 case 4:
                     shop_tower = new Thief(this, x_pos, y_pos + 15)
                     break
+                case 5:
+                    shop_tower = new Glass(this, x_pos, y_pos + 15)
+                    break
+                case 6:
+                    shop_tower = new Stairs(this, x_pos, y_pos + 15)
+                    break
+                case 7:
+                    shop_tower = new Obsidian(this, x_pos, y_pos + 15)
+                    break
             }
             shop_towers.push(this.add.existing(shop_tower))
             for (let slot of this.slots) {
@@ -491,7 +506,10 @@ export default class PlayScene extends Scene {
             destroyAnim.on('animationcomplete', () => {
                 destroyAnim.destroy();
             });
-
+            if (tower.constructor.name === "Glass") {
+                this.towers[0].dmg += Math.ceil(tower.dmg * 0.2 * tower.level)
+                this.towers[0].updateDMGText()
+            }
             if (tower.constructor.name === "MainTower") {
                 const response = this.get_user_record();
                 this.es = new EndScreen(
@@ -606,10 +624,13 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.level = 1
         this.exp = 0
         this.neededExp = 10
+        this.neededExpScale = 5
+        this.dmgScale = dmg
+        this.hpScale = hp
         this.default_hp = hp
         this.default_dmg = dmg
-        this.hp = hp
-        this.dmg = dmg
+        this.hp = hp * this.level
+        this.dmg = dmg * this.level
         this.cost = cost
         this.description = description
 
@@ -660,7 +681,13 @@ class Tower extends Phaser.GameObjects.Sprite {
         if (this.exp + exp >= this.neededExp) {
             this.level += 1
             this.exp += exp - this.neededExp
-            this.neededExp += 5
+            this.neededExp += this.neededExpScale
+            this.default_dmg += this.dmgScale
+            this.default_hp += this.hpScale
+            this.dmg += this.dmgScale
+            this.hp += this.hpScale
+            this.updateHPText()
+            this.updateDMGText()
         } else {
             this.exp += exp
         }
@@ -775,7 +802,7 @@ class MainTower extends Tower {
     constructor(scene) {
         super(scene, 100, scene.platform_start, "mainTower", 5, 1, 0,
             "это главная башня.",
-        false
+            false
         );
         this.shop_info_destroy()
         this.nameText = scene.add.text(scene, 100, scene.platform_start, "Королевская Башня", {
@@ -800,7 +827,7 @@ class MainTower extends Tower {
 class Chest extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "chest", 2, 1, 5,
-                "это сундук."
+            "это сундук."
         );
         this.nameText = scene.add.text(x, y, "Сундук", {
             fontSize: '25px',
@@ -832,7 +859,7 @@ class Chest extends Tower {
 class Cat extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "cat", 3, 2, 3,
-                "это кот."
+            "это кот."
         );
         this.nameText = scene.add.text(x, y, "Кот", {
             fontSize: '25px',
@@ -873,7 +900,7 @@ class Milk extends Tower {
 class Guard extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "guard", 2, 1, 3,
-               " это гуард."
+            " это гуард."
         );
         this.nameText = scene.add.text(x, y, "Страж", {
             fontSize: '25px',
@@ -884,7 +911,16 @@ class Guard extends Tower {
     buff() {
         if (this.is_die) {
             for (let tower of this.scene.towers) {
-                if (tower) {
+                if (tower && tower.constructor.name === "Obsidian") {
+                    tower.default_hp += this.default_hp;
+                    tower.default_dmg+= this.default_dmg;
+                    tower.hp += this.default_hp;
+                    tower.dmg += this.default_dmg;
+                    tower.updateDMGText();
+                    tower.updateHPText();
+
+                }
+                else if (tower) {
                     tower.hp += this.default_hp;
                     tower.dmg += this.default_dmg;
                     tower.updateDMGText();
@@ -905,7 +941,7 @@ class Guard extends Tower {
 class Thief extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "thief", 1, 2, 3,
-                "это вор."
+            "это вор."
         );
         this.nameText = scene.add.text(x, y, "Вор", {
             fontSize: '25px',
@@ -933,8 +969,53 @@ class Thief extends Tower {
         }
     }
 
+}
+
+class Glass extends Tower {
+    constructor(scene, x, y) {
+        super(scene, x, y, "glass", 1, 2, 3,
+            "Если ломается во время волны, передает 40% своего урона Главной Башне После волны увеличивает свой урон на 1"
+        );
+        this.nameText = scene.add.text(x, y, "Стеклянная башня", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
+    }
+
+    buff() {
+        this.default_dmg += this.level
+        this.updateDMGText();
+    }
+}
+
+class Stairs extends Tower {
+    constructor(scene, x, y) {
+        super(scene, x, y, "stairs", 1, 2, 3,
+            "Нужна только одна лестница для улучшения"
+        );
+        this.neededExp = 5
+        this.neededExpScale = 0
+        this.nameText = scene.add.text(x, y, "Башня Лестница", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
+    }
 
 }
+
+class Obsidian extends Tower {
+    constructor(scene, x, y) {
+        super(scene, x, y, "obsidian", 1, 2, 5,
+            "Сохраняет временные бонусы"
+        );
+        this.nameText = scene.add.text(x, y, "Обсидиановая башня", {
+            fontSize: '25px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 6)
+    }
+
+}
+
 
 class Enemy extends Phaser.GameObjects.Sprite {
 
