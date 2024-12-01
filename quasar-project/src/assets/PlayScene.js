@@ -126,7 +126,7 @@ export default class PlayScene extends Scene {
 
 
         for (let i = 1; i < this.count_slots; ++i) {
-            this.slots.push(this.add.sprite(100 + this.step_sprite * (i), this.platform_start, 'slot').setInteractive().setAlpha(0))
+            this.slots.push(this.add.sprite(140 + this.step_sprite * i, this.platform_start, 'slot').setInteractive().setAlpha(0))
             this.slots[i - 1].input.dropZone = true
             this.slots[i - 1].dropZoneIndex = i;
         }
@@ -137,7 +137,7 @@ export default class PlayScene extends Scene {
         this.generateShop(this.shop_towers, this.shop_plates)
 
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), ...this.shop_towers.map(el => el.nameText)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -277,8 +277,7 @@ export default class PlayScene extends Scene {
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
 
-        this.towerDeleteButton = this.add.sprite(400, this.scale.height - 150 - 800, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
-
+        this.towerDeleteButton = this.add.sprite(250, -10, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
         this.towerDeleteButton.on("pointerdown", () => {
             if (!this.deleteMode) {
                 console.log(1)
@@ -330,7 +329,7 @@ export default class PlayScene extends Scene {
         })
 
         // Create the rerollButton
-        this.rerollButton = this.add.sprite(55, this.scale.height - 150 - 400, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
+        this.rerollButton = this.add.sprite(this.towers[0].x, this.towers[0].y - 200, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
 
 // Add the rerollButton to the scene
         this.add.existing(this.rerollButton);
@@ -433,7 +432,7 @@ export default class PlayScene extends Scene {
 
     generateShop(shop_towers, shop_plates) {
         for (let i = 0; i < this.count_shop_slots; ++i) {
-            let x_pos = (this.step_sprite + 40) * i + 120 - 1400
+            let x_pos = (this.step_sprite + 40) * i + 90 - 1400
             let y_pos = this.platform_start + 295
 
             shop_plates.push(this.add.sprite(x_pos, y_pos, "shopPlate").setScale(1.1, 0.95));
@@ -558,7 +557,7 @@ export default class PlayScene extends Scene {
         this.clearShop(this.shop_towers, this.shop_plates)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
-            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.container), ...this.shop_towers.map(el => el.nameText)],
+            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -584,7 +583,7 @@ export default class PlayScene extends Scene {
         }
 
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), ...this.shop_towers.map(el => el.nameText)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
             x: '-=1400',
             duration: 1000,
             ease: 'Power2',
@@ -607,7 +606,7 @@ export default class PlayScene extends Scene {
         this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
         for (let i = 0; i < 5; i++) {
-            this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 20, 'ghost', this.wave + 1, this.wave + 1)))
+            this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 30, 'ghost', this.wave + 1, this.wave + 1)))
         }
 
     }
@@ -617,7 +616,7 @@ export default class PlayScene extends Scene {
         this.roundsFlagContainer.setVisible(true)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), ...this.shop_towers.map(el => el.nameText)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -858,10 +857,10 @@ class Tower extends Phaser.GameObjects.Sprite {
             fill: '#fadb00'
         }).setOrigin(1.8, 4.1);
 
-        this.nameText = scene.add.text(0, 0, '', {
+        this.nameText = scene.add.text(0, -140, '', {
             fontSize: '25px',
             fill: '#f1ff9b'
-        }).setOrigin(0.5, 6);
+        }).setOrigin(0.5, 0.5);
         this.container.add([this.hpIcon, this.hpText, this.dmgIcon, this.dmgText, this.coinIcon, this.coinText, this.nameText]);
         this.is_die = false
         this.scene.add.existing(this);
@@ -948,13 +947,11 @@ class Tower extends Phaser.GameObjects.Sprite {
     shop_info_destroy() {
         this.coinIcon.destroy();
         this.coinText.destroy();
-        this.nameText.setOrigin(0.5, 4)
-        this.nameText.setPosition(this.x, this.y);
+
     }
 
     updatePosition(dragX, dragY) {
         this.container.setPosition(dragX, dragY);
-        this.nameText.setPosition(dragX, dragY);
     }
 
     hide() {
@@ -989,15 +986,12 @@ class Tower extends Phaser.GameObjects.Sprite {
 
 class MainTower extends Tower {
     constructor(scene) {
-        super(scene, 100, scene.platform_start, "mainTower", 5, 1, 0,
+        super(scene, 140, scene.platform_start, "mainTower", 5, 1, 0,
             "это главная башня.",
             false
         );
         this.shop_info_destroy()
-        this.nameText = scene.add.text(scene, 100, scene.platform_start, "Королевская Башня", {
-            fontSize: '25px',
-            fill: '#f1ff9b'
-        }).setOrigin(0.5, 6)
+        this.nameText.text = "Королевская"
 
         this.descriptionText = scene.add.text(100, scene.platform_start, this.description, {
             fontSize: '25px',
@@ -1018,10 +1012,7 @@ class Chest extends Tower {
         super(scene, x, y, "chest", 2, 1, 5,
             "это сундук."
         );
-        this.nameText = scene.add.text(x, y, "Сундук", {
-            fontSize: '25px',
-            fill: '#f1ff9b'
-        }).setOrigin(0.5, 6)
+        this.nameText.text = "Сундук"
 
     }
 
@@ -1043,10 +1034,7 @@ class Cat extends Tower {
         super(scene, x, y, "cat", 3, 2, 3,
             "это кот."
         );
-        this.nameText = scene.add.text(x, y, "Кот", {
-            fontSize: '25px',
-            fill: '#f1ff9b'
-        }).setOrigin(0.5, 6)
+        this.nameText.text = "Кот"
 
     }
 }
@@ -1056,10 +1044,7 @@ class Milk extends Tower {
         super(scene, x, y, "milk", 2, 1, 3,
             "это молоко."
         );
-        this.nameText = scene.add.text(x, y, "Молоко", {
-            fontSize: '25px',
-            fill: '#f1ff9b'
-        }).setOrigin(0.5, 6)
+       this.nameText.text = "Молоко"
     }
 
     buff(index) {
@@ -1084,10 +1069,7 @@ class Guard extends Tower {
         super(scene, x, y, "guard", 2, 1, 3,
             " это гуард."
         );
-        this.nameText = scene.add.text(x, y, "Страж", {
-            fontSize: '25px',
-            fill: '#f1ff9b'
-        }).setOrigin(0.5, 6)
+        this.nameText.text = "Страж"
     }
 
     buff() {
@@ -1124,10 +1106,7 @@ class Thief extends Tower {
         super(scene, x, y, "thief", 1, 2, 3,
             "это вор."
         );
-        this.nameText = scene.add.text(x, y, "Вор", {
-            fontSize: '25px',
-            fill: '#f1ff9b'
-        }).setOrigin(0.5, 6)
+        this.nameText.text = "Вор"
     }
 
     buff(index) {
@@ -1157,12 +1136,7 @@ class Glass extends Tower {
         super(scene, x, y, "glass", 1, 2, 3,
             "Если ломается\nпередает урон ГБ\nПосле волны увеличивает\n свой урон на 1"
         );
-        this.nameText = scene.add.text(x, y, "Стеклянная\nбашня", {
-            fontSize: '25px',
-            fill: '#f1ff9b',
-            textAlign: 'center',
-            justifyItems: 'center'
-        }).setOrigin(0.5, 6)
+        this.nameText.text = "Стекло"
     }
 
     buff() {
@@ -1178,10 +1152,7 @@ class Stairs extends Tower {
         );
         this.neededExp = 5
         this.neededExpScale = 0
-        this.nameText = scene.add.text(x, y, "Башня Лестница", {
-            fontSize: '25px',
-            fill: '#f1ff9b'
-        }).setOrigin(0.5, 6)
+        this.nameText.text = "Лестница"
     }
 
 }
@@ -1191,12 +1162,8 @@ class Obsidian extends Tower {
         super(scene, x, y, "obsidian", 1, 2, 5,
             "Сохраняет временные \n   бонусы"
         );
-        this.nameText = scene.add.text(x, y - 140, "Обсидиановая", {
-            fontSize: '15px',
-            fontWeight: 700,
-            textAlign: 'center',
-            fill: '#f1ff9b'
-        }).setOrigin(0.5, 0.5)
+        this.nameText.text = "Обсидиан"
+        this.nameText.setFontSize('24px')
     }
 
 }
