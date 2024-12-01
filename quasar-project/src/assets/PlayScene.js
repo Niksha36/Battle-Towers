@@ -27,6 +27,7 @@ import ghost_destroy_sprite from "../assets/sprites/ghoust_defeated_sprite.png"
 import roundsFlag from "../assets/sprites/flag_with_rounds.png"
 import description from "../assets/sprites/description.png"
 import reroll_sprite from "../assets/sprites/reroll_sprite.png"
+import explosion_sprite from "../assets/sprites/explosion_sprite_v1.png"
 import stor from "../store.js"
 import axios from "axios";
 
@@ -78,6 +79,10 @@ export default class PlayScene extends Scene {
             frameWidth: 96,
             frameHeight: 101
         });
+        this.load.spritesheet('explosion', explosion_sprite, {
+            frameWidth:100,
+            frameHeight:100
+        })
     }
 
     create(child) {
@@ -339,6 +344,13 @@ export default class PlayScene extends Scene {
             frameRate: 30,
             repeat: 0
         });
+        const explosionFrames = this.anims.generateFrameNumbers("explosion", {start: 0, end: 41});
+        this.anims.create({
+            key: 'towerExplosion',
+            frames: explosionFrames,
+            frameRate: 60,
+            repeat: 0
+        });
     }
 
 
@@ -556,20 +568,31 @@ export default class PlayScene extends Scene {
 
 
         if (tower.hp <= 0) {
-            const destroyAnim = this.add.sprite(tower.x, tower.y, 'tower_destroy');
-            try {
-                destroyAnim.play('destroy');
-            } catch (error) {
-                console.error('Error playing destroy animation:', error);
+            if (tower.constructor.name !== "MainTower") {
+                const destroyAnim = this.add.sprite(tower.x, tower.y, 'tower_destroy');
+                try {
+                    destroyAnim.play('destroy');
+                } catch (error) {
+                    console.error('Error playing destroy animation:', error);
+                }
+                destroyAnim.on('animationcomplete', () => {
+                    destroyAnim.destroy();
+                });
             }
-            destroyAnim.on('animationcomplete', () => {
-                destroyAnim.destroy();
-            });
             if (tower.constructor.name === "Glass") {
                 this.towers[0].dmg += Math.ceil(tower.dmg * 0.2 * tower.level)
                 this.towers[0].updateDMGText()
             }
             if (tower.constructor.name === "MainTower") {
+                const mainTowerAnim = this.add.sprite(tower.x, tower.y , 'explosion');
+                mainTowerAnim.setScale(4);
+                mainTowerAnim.on('animationcomplete', () => {
+                    mainTowerAnim.destroy();
+                });
+                mainTowerAnim.play('towerExplosion');
+                attackAnim.on('animationcomplete', () => {
+                    attackAnim.destroy();
+                });
                 const response = this.get_user_record();
                 this.es = new EndScreen(
                     this,
