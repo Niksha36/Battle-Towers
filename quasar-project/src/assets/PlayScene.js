@@ -31,12 +31,16 @@ import reroll_sprite from "../assets/sprites/reroll_sprite.png"
 import explosion_sprite from "../assets/sprites/explosion_sprite_v1.png"
 import stor from "../store.js"
 import axios from "axios";
-
+import setting_button from "../assets/sprites/spr_settings.png"
+import { useRouter } from 'vue-router';
+import router from "src/router/index.js";
 
 export default class PlayScene extends Scene {
 
     constructor() {
         super({key: 'PlayScene'})
+        this.router = router;
+        console.log('Router initialized:', this.router);
     }
 
     preload() {
@@ -64,6 +68,7 @@ export default class PlayScene extends Scene {
         this.load.image('loseBackground', loseBackground)
         this.load.image('roundsFlag', roundsFlag)
         this.load.image('description', description)
+        this.load.image('setting_button', setting_button)
         this.load.spritesheet('enemyAttack', enemies_attack_sprite, {
             frameWidth: 192,
             frameHeight: 192,
@@ -332,14 +337,31 @@ export default class PlayScene extends Scene {
             }
 
         })
+        //setting button
+        const settingButton = this.add.image(this.width-20, 0, 'setting_button').setOrigin(1, 0).setInteractive();
+
+
+        settingButton.on('pointerover', () => {
+            settingButton.setTint(0xA5A5A5);
+        });
+
+
+        settingButton.on('pointerout', () => {
+            settingButton.clearTint();
+        });
+
+
+        settingButton.on('pointerdown', () => {
+            this.router.push('/menu');
+        });
+
+
 
         // Create the rerollButton
         this.rerollButton = this.add.sprite(this.towers[0].x, this.towers[0].y - 200, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
 
-// Add the rerollButton to the scene
         this.add.existing(this.rerollButton);
 
-// Bring the rerollButton to the top
         this.children.bringToTop(this.rerollButton);
         this.rerollButton.on('pointerover', () => {
             this.rerollButton.setFrame(1);

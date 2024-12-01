@@ -25,12 +25,10 @@ export default {
                     debug: false
                 }
             },
-            scene: [PlayScene],
+            scene: [new PlayScene(this.$router)],
             parent: 'game-container',
         };
         this.game = new Phaser.Game(config);
-
-
     },
 
     methods: {
