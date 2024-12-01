@@ -24,6 +24,7 @@ import loseBackground from "../assets/background/lose_background.png"
 import enemies_attack_sprite from "../assets/sprites/enemies_attack_sprite.png"
 import tower_destroy_sprite from "../assets/sprites/tower_destroy_sprite.png"
 import ghost_destroy_sprite from "../assets/sprites/ghoust_defeated_sprite.png"
+import dustSpritesheet from "../assets/sprites/dust_spritesheet.png"
 import roundsFlag from "../assets/sprites/flag_with_rounds.png"
 import description from "../assets/sprites/description.png"
 import reroll_sprite from "../assets/sprites/reroll_sprite.png"
@@ -70,6 +71,10 @@ export default class PlayScene extends Scene {
             frameWidth: 224,
             frameHeight: 224,
         });
+        this.load.spritesheet('towerFall', dustSpritesheet, {
+            frameWidth: 324,
+            frameHeight: 124,
+        });
         this.load.spritesheet('ghost_destroy', ghost_destroy_sprite, {
             frameWidth: 179,
             frameHeight: 217,
@@ -113,6 +118,10 @@ export default class PlayScene extends Scene {
         this.enemies = []
         this.shop_plates = []
 
+        this.platform = this.physics.add.staticGroup();
+        this.platform.create(0, this.platform_start + 80, null).setScale(800, 0.01).setOrigin(0, 0).refreshBody();
+
+        this.physics.add.collider(this.towers, this.platform, this.collidePlatform, null, this);
         this.physics.add.collider(this.towers, this.enemies, this.hitEnemy, null, this);
 
 
@@ -199,15 +208,19 @@ export default class PlayScene extends Scene {
                 gameObject.updatePosition(gameObject.x, gameObject.y)
                 dropZone.setTint(0x00ff00)
                 dropZone.destroy();
-                this.towers[dropZone.dropZoneIndex] = gameObject
-                this.towers[dropZone.dropZoneIndex].input.draggable = false
-                this.towers[dropZone.dropZoneIndex].input.dropZone = true
-                this.towers[dropZone.dropZoneIndex].dropZoneIndex = dropZone.dropZoneIndex
-                this.slots[dropZone.dropZoneIndex] = 0
+                let index = dropZone.dropZoneIndex
+                this.towers[index] = gameObject
+                this.towers[index].body.setAllowGravity(true)
+                this.towers[index].body.setImmovable(false)
+                this.towers[index].y -= 800
+                this.towers[index].input.draggable = false
+                this.towers[index].input.dropZone = true
+                this.towers[index].dropZoneIndex = dropZone.dropZoneIndex
+                this.slots[index] = 0
                 this.money -= gameObject.cost;
                 this.moneyText.setText(this.money.toString());
                 gameObject.shop_info_destroy()
-                const index = this.shop_towers.indexOf(gameObject);
+                index = this.shop_towers.indexOf(gameObject);
                 this.shop_plates[index].destroy()
                 this.shop_plates.splice(index, 1);
                 this.shop_towers.splice(index, 1);
@@ -264,7 +277,7 @@ export default class PlayScene extends Scene {
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
 
-        this.towerDeleteButton = this.add.sprite(400, this.scale.height-150-800, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
+        this.towerDeleteButton = this.add.sprite(400, this.scale.height - 150 - 800, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
 
         this.towerDeleteButton.on("pointerdown", () => {
             if (!this.deleteMode) {
@@ -302,8 +315,7 @@ export default class PlayScene extends Scene {
                 //         }
                 //     });
                 // }
-            }
-            else {
+            } else {
                 this.deleteMode = false
 
                 this.towerDeleteButton.setFrame(0);
@@ -318,7 +330,7 @@ export default class PlayScene extends Scene {
         })
 
         // Create the rerollButton
-        this.rerollButton = this.add.sprite(55, this.scale.height-150-400, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
+        this.rerollButton = this.add.sprite(55, this.scale.height - 150 - 400, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
 
 // Add the rerollButton to the scene
         this.add.existing(this.rerollButton);
@@ -374,6 +386,14 @@ export default class PlayScene extends Scene {
         this.anims.create({
             key: 'attack',
             frames: this.anims.generateFrameNumbers('enemyAttack', {start: 0, end: 10}),
+            frameRate: 24,
+            repeat: 0
+        });
+
+        //создаю анимацию удара врагов по башне
+        this.anims.create({
+            key: 'dust',
+            frames: this.anims.generateFrameNumbers('towerFall', {start: 0, end: 10}),
             frameRate: 24,
             repeat: 0
         });
@@ -536,7 +556,7 @@ export default class PlayScene extends Scene {
         this.clearShop(this.shop_towers, this.shop_plates)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
-            targets: [...this.shop_towers, ...this.shop_plates,...this.shop_towers.map(el => el.container), ...this.shop_towers.map(el => el.nameText)],
+            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.container), ...this.shop_towers.map(el => el.nameText)],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -625,6 +645,19 @@ export default class PlayScene extends Scene {
         }
 
         this.moneyText.setText(this.money.toString());
+    }
+
+    collidePlatform(tower, platform) {
+        if (!tower.collided) {
+            tower.collided = true
+            tower.body.setAllowGravity(false)
+            tower.body.setImmovable(true)
+            const dustAnim = this.add.sprite(tower.x, platform.y, 'towerFall').setOrigin(0.5, 1);
+            dustAnim.play('dust');
+            dustAnim.on('animationcomplete', () => {
+                dustAnim.destroy();
+            });
+        }
     }
 
     hitEnemy(tower, enemy) {
@@ -776,6 +809,7 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.body.setAllowGravity(false);
         this.body.immovable = true
 
+        this.collided = false
         this.level = 1
         this.exp = 0
         this.neededExp = 10
@@ -793,7 +827,7 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.descriptionIcon = scene.add.sprite(x, y, 'description').setOrigin(0, 1)
         this.descriptionText = scene.add.text(x, y, this.description, {
             fontSize: '25px',
-             fill: '#ffffff',
+            fill: '#ffffff',
         })
 
         this.canShowDescription = true
@@ -877,6 +911,12 @@ class Tower extends Phaser.GameObjects.Sprite {
     }
 
     set_default_stats() {
+        if (this.is_die) {
+            this.collided = false
+            this.body.setAllowGravity(true)
+            this.body.setImmovable(false)
+            this.y -= 800
+        }
         this.hp = this.default_hp
         this.dmg = this.default_dmg
         this.is_die = false
