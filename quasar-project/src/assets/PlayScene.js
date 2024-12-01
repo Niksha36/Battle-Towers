@@ -499,7 +499,7 @@ export default class PlayScene extends Scene {
                         this.tweens.add({
                             targets: slot,
                             alpha: 0, // Конечная прозрачность (полностью видимый)
-                            duration: 500, // Длительность анимации в миллисекундах
+                            duration: 300, // Длительность анимации в миллисекундах
                             ease: 'Power2', // Тип easing
                         });
 
@@ -537,7 +537,7 @@ export default class PlayScene extends Scene {
                         this.tweens.add({
                             targets: slot,
                             alpha: 0, // Конечная прозрачность (полностью видимый)
-                            duration: 500, // Длительность анимации в миллисекундах
+                            duration: 300, // Длительность анимации в миллисекундах
                             ease: 'Power2', // Тип easing
                         });
 
@@ -840,6 +840,7 @@ class Tower extends Phaser.GameObjects.Sprite {
 
         scene.physics.world.enable(this);
         this.body.setAllowGravity(false);
+        this.body.setGravityY(7000)
         this.body.immovable = true
 
         this.collided = false
@@ -871,20 +872,23 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.container = scene.add.container(x, y);
 
 
-        this.hpIcon = scene.add.sprite(0, 0, 'hpIcon').setOrigin(2, -2.5);
-        this.hpText = scene.add.text(0, 0, hp.toString(), {
+        this.hpIcon = scene.add.sprite(0, 0, 'hpIcon').setOrigin(2, -2.49);
+        this.hpText = scene.add.text(-33, 88, hp.toString(), {
+            textAlign: 'center',
             fontSize: '25px',
             fill: '#fff'
-        }).setOrigin(1.8, -3.5);
+        });
 
         this.dmgIcon = scene.add.sprite(0, 0, 'dmgIcon').setOrigin(0, -2.5);
-        this.dmgText = scene.add.text(0, 0, dmg.toString(), {
+        this.dmgText = scene.add.text(33, 88, dmg.toString(), {
+            textAlign: 'center',
             fontSize: '25px',
             fill: '#fff'
-        }).setOrigin(-2, -3.5);
+        });
 
         this.coinIcon = scene.add.sprite(0, 0, 'coin').setDisplaySize(30, 30).setOrigin(2, 3.5);
         this.coinText = scene.add.text(0, 0, cost.toString(), {
+            textAlign: 'center',
             fontSize: '25px',
             fill: '#fadb00'
         }).setOrigin(1.8, 4.1);
@@ -1214,14 +1218,16 @@ class Enemy extends Phaser.GameObjects.Sprite {
         this.hp = hp
         this.dmg = dmg
 
-        this.hpIcon = scene.add.sprite(x - 50, y + 100, 'hpIcon');
-        this.hpText = scene.add.text(this.hpIcon.x + 20, this.hpIcon.y - 13, hp.toString(), {
+        this.hpIcon = scene.add.sprite(x - 60, y + 115, 'hpIcon');
+        this.hpText = scene.add.text(this.hpIcon.x + 20, this.hpIcon.y - 15, hp.toString(), {
+            textAlign: 'center',
             fontSize: '30px',
             fill: '#fff'
         })
 
-        this.dmgIcon = scene.add.sprite(x + 15, y + 100, 'dmgIcon');
+        this.dmgIcon = scene.add.sprite(x + 15, y + 115, 'dmgIcon');
         this.dmgText = scene.add.text(this.dmgIcon.x + 20, this.dmgIcon.y - 13, dmg.toString(), {
+            textAlign: 'center',
             fontSize: '30px',
             fill: '#fff'
         })
@@ -1246,10 +1252,10 @@ class Enemy extends Phaser.GameObjects.Sprite {
     }
 
     updatePosition() {
-        this.hpIcon.setPosition(this.x - 50, this.y + 100);
+        this.hpIcon.setPosition(this.x - 60, this.y + 115);
         this.hpText.setPosition(this.hpIcon.x + 20, this.hpIcon.y - 13)
 
-        this.dmgIcon.setPosition(this.x, this.y + 100)
+        this.dmgIcon.setPosition(this.x, this.y + 115)
         this.dmgText.setPosition(this.dmgIcon.x + 20, this.dmgIcon.y - 13);
 
         if (this.body.velocity.x === 0) {
