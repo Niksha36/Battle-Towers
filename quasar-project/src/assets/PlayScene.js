@@ -299,7 +299,7 @@ export default class PlayScene extends Scene {
                         this.towers[i].component_destroy()
                         this.towers[i].destroy()
                         this.towers[i] = 0
-                        this.slots[i] = this.add.sprite(100 + this.step_sprite * (i), this.platform_start, 'slot').setInteractive().setAlpha(0.4)
+                        this.slots[i] = this.add.sprite(140 + this.step_sprite * (i), this.platform_start, 'slot').setInteractive().setAlpha(0.4)
                         this.slots[i].input.dropZone = true
                         this.slots[i].dropZoneIndex = i + 1
 
