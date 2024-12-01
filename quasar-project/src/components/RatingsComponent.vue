@@ -1,18 +1,23 @@
 <script setup>
 import { ref } from 'vue';
+import axios from "axios";
+import stor from "../store.js"
 
-const ratings = ref([
-    { name: 'Player 1', max_wave: 10 },
-    { name: 'Player 2', max_wave: 2 },
-    { name: 'Player 3', max_wave: 1 },
-    { name: 'Player 3', max_wave: 1 },
-    { name: 'Player 3', max_wave: 1 },
-    { name: 'Player 3', max_wave: 1 },
-    { name: 'Player 3', max_wave: 1 },
-    { name: 'Player 3', max_wave: 1 },
-    { name: 'Player 3', max_wave: 1 },
+let data = ref([])
+let response = axios.get("http://localhost:8000/get_top", {
+    withCredentials: true,
+    params: {
+        "username": stor.state.username
+        }
+    }
+).then((r) => {
+    data.value = r.data
+    }
+)
 
-]);
+console.log(data)
+// console.log(response.status)
+
 </script>
 
 <template>
@@ -28,11 +33,12 @@ const ratings = ref([
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(rating, index) in ratings" :key="index">
-                    <td>{{ index + 1 }}</td>
-                    <td>{{ rating.name }}</td>
-                    <td>{{ rating.max_wave }}</td>
-                </tr>
+                    <tr v-for="(rating, index) in data" :key="index">
+                        <td v-if="index>4">...</td>
+                        <td v-else>{{ index + 1 }}</td>
+                        <td>{{ rating.username }}</td>
+                        <td>{{ rating.record }}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>

@@ -14,6 +14,11 @@ const store = createStore({
 
         setRecord(state, record) {
             state.record = Math.max(state.record, record)
+        },
+
+        setDefault() {
+            this.username = ""
+            this.record = 0
         }
     },
 
@@ -24,6 +29,10 @@ const store = createStore({
 
         updateRecord({ commit }, record) {
             commit("setRecord", record)
+        },
+
+        logout({commit}) {
+            commit("setDefault")
         }
     },
 
