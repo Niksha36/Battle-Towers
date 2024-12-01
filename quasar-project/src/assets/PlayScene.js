@@ -649,8 +649,23 @@ export default class PlayScene extends Scene {
         this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
         for (let i = 0; i < 5; i++) {
-            this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 30, 'ghost', this.wave + 1, this.wave + 1)))
+            this.enemies.push(this.add.existing(new Enemy(this, this.width + 50 * i, this.platform_start - 30, 'ghost', this.wave * 2, this.wave * 2)))
         }
+        this.tweens.add({
+            targets: [...this.enemies, ...this.enemies.map(el => el.hpText)
+            , ...this.enemies.map(el => el.hpIcon)
+            , ...this.enemies.map(el => el.dmgText)
+            , ...this.enemies.map(el => el.dmgIcon)],
+            x: '-=300',
+            duration: 800,
+            ease: 'Power2',
+            onComplete: () => {
+                this.enemies.forEach((enemy) => {
+                    enemy.arrived = true
+                })
+            },
+        });
+
 
     }
 
@@ -1239,6 +1254,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
 
         this.hp = hp
         this.dmg = dmg
+        this.arrived = false
 
         this.hpIcon = scene.add.sprite(x - 60, y + 115, 'hpIcon');
         this.hpText = scene.add.text(this.hpIcon.x + 20, this.hpIcon.y - 15, hp.toString(), {
@@ -1280,7 +1296,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
         this.dmgIcon.setPosition(this.x, this.y + 115)
         this.dmgText.setPosition(this.dmgIcon.x + 20, this.dmgIcon.y - 13);
 
-        if (this.body.velocity.x === 0) {
+        if (this.body.velocity.x === 0 && this.arrived) {
             this.scene.tweens.add({
                 targets: this,
                 angle: -20,
@@ -1288,7 +1304,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
                 ease: 'Power2',
             });
         }
-        if (this.body.velocity.x > -800) {
+        if (this.body.velocity.x > -800 && this.arrived) {
             this.body.velocity.x -= 50;
         }
     }
