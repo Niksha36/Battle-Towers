@@ -26,7 +26,7 @@ export default {
                 }
             },
             scene: [PlayScene],
-            parent: 'game-container'
+            parent: 'game-container',
         };
         this.game = new Phaser.Game(config);
 
