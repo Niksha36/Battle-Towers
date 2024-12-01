@@ -569,6 +569,15 @@ export default class PlayScene extends Scene {
             onComplete: () => {
                 this.shop_towers.forEach((element) => {
                     element.setupInteractive();
+                    for (let tower of this.shop_towers) {
+                        console.log(this.shop_towers)
+                        if (tower.input !== null) {
+                            if (tower.cost > this.money) {
+                                tower.input.enabled = false
+                                tower.setTint(0x6c6c6c)
+                            }
+                        }
+                    }
                 });
             },
         });
