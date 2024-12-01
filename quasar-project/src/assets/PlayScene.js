@@ -107,7 +107,7 @@ export default class PlayScene extends Scene {
         this.count_tower_types = 8
 
         this.show_start = 225
-        this.platform_start = 585
+        this.platform_start = 640
         this.step_sprite = 130
 
         this.wave = 0
@@ -119,7 +119,7 @@ export default class PlayScene extends Scene {
         this.shop_plates = []
 
         this.platform = this.physics.add.staticGroup();
-        this.platform.create(0, this.platform_start + 80, null).setScale(800, 0.01).setOrigin(0, 0).refreshBody();
+        this.platform.create(0, this.platform_start + 75, null).setScale(800, 0.01).setOrigin(0, 0).refreshBody();
 
         this.physics.add.collider(this.towers, this.platform, this.collidePlatform, null, this);
         this.physics.add.collider(this.towers, this.enemies, this.hitEnemy, null, this);
@@ -131,7 +131,7 @@ export default class PlayScene extends Scene {
             this.slots[i - 1].dropZoneIndex = i;
         }
 
-        this.shopLine = this.add.sprite(-1400, this.platform_start + 118, 'shopLine').setScale(0.8).setOrigin(0)
+        this.shopLine = this.add.sprite(0 - 1400, this.platform_start + 150, 'shopLine').setScale(0.8).setOrigin(0, 0)
 
         this.towers.push(this.add.existing(new MainTower(this)))
         this.generateShop(this.shop_towers, this.shop_plates)
@@ -372,11 +372,13 @@ export default class PlayScene extends Scene {
             this.startWaveButton.clearTint();
             this.startWaveButtonText.clearTint();
         });
-        this.add.sprite(146, 50, 'money');
-        this.moneyText = this.add.text(100, 35, this.money.toString(), {
-            fontSize: '32px',
-            fill: '#fff'
-        });
+        this.moneyIcon = this.add.sprite(0, 0, 'money').setOrigin(0, 0);
+        this.moneyText = this.add.text(55, 27, this.money.toString(), {
+            fontSize: '35px',
+            fill: '#f1ff9b',
+            textAlign: 'center',
+            justifyItems: 'center'
+        }).setOrigin(0, 0);
 
         // Добавляем обработчик событий на кнопку
         this.startWaveButton.on('pointerdown', this.startWave, this);
@@ -432,7 +434,7 @@ export default class PlayScene extends Scene {
     generateShop(shop_towers, shop_plates) {
         for (let i = 0; i < this.count_shop_slots; ++i) {
             let x_pos = (this.step_sprite + 40) * i + 120 - 1400
-            let y_pos = this.platform_start * 1.45
+            let y_pos = this.platform_start + 295
 
             shop_plates.push(this.add.sprite(x_pos, y_pos, "shopPlate").setScale(1.1, 0.95));
             let shop_tower;
@@ -1189,10 +1191,12 @@ class Obsidian extends Tower {
         super(scene, x, y, "obsidian", 1, 2, 5,
             "Сохраняет временные \n   бонусы"
         );
-        this.nameText = scene.add.text(x, y, "Обсидиановая\nбашня", {
-            fontSize: '25px',
+        this.nameText = scene.add.text(x, y - 140, "Обсидиановая", {
+            fontSize: '15px',
+            fontWeight: 700,
+            textAlign: 'center',
             fill: '#f1ff9b'
-        }).setOrigin(0.5, 6)
+        }).setOrigin(0.5, 0.5)
     }
 
 }

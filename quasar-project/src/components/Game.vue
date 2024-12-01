@@ -14,8 +14,8 @@ export default {
     mounted() {
         const config = {
             type: Phaser.AUTO,
-            width: window.innerWidth,
-            height: window.innerHeight,
+            width: 1920,
+            height: 1080,
             antialias: false,
             pixelArt: true,
             physics: {
@@ -71,7 +71,17 @@ export default {
 </script>
 
 <style>
+
+.game-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
 body {
+    display: flex;
     overflow: hidden;
+    background-color: black;
 }
 </style>
