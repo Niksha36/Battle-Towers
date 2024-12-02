@@ -27,6 +27,7 @@ import ghost_destroy_sprite from "../assets/sprites/ghoust_defeated_sprite.png"
 import dustSpritesheet from "../assets/sprites/dust_spritesheet.png"
 import roundsFlag from "../assets/sprites/flag_with_rounds.png"
 import description from "../assets/sprites/description.png"
+import towerInfoBg from "../assets/sprites/progressbar_green_bg_1.png"
 import reroll_sprite from "../assets/sprites/reroll_sprite.png"
 import explosion_sprite from "../assets/sprites/explosion_sprite_v1.png"
 import setting_button from "../assets/sprites/spr_settings.png"
@@ -55,6 +56,7 @@ export default class PlayScene extends Scene {
         this.load.image('thief', thief)
         this.load.image('ghost', ghost)
         this.load.image('stairs', stairs)
+        this.load.image('towerInfoBg', towerInfoBg)
         this.load.image('obsidian', obsidian)
         this.load.image('hpIcon', hp)
         this.load.image('glass', glass)
@@ -91,8 +93,8 @@ export default class PlayScene extends Scene {
             frameHeight: 101
         });
         this.load.spritesheet('explosion', explosion_sprite, {
-            frameWidth:100,
-            frameHeight:100
+            frameWidth: 100,
+            frameHeight: 100
         })
     }
 
@@ -130,7 +132,7 @@ export default class PlayScene extends Scene {
         this.shop_plates = []
 
         this.platform = this.physics.add.staticGroup();
-        this.platform.create(0, this.platform_start + 75, null).setScale(800, 0.01).setOrigin(0, 0).refreshBody();
+        this.platform.create(0, this.platform_start + 75, null).setScale(800, 0.01).setOrigin(0, 0).refreshBody().setAlpha(0);
 
         this.physics.add.collider(this.towers, this.platform, this.collidePlatform, null, this);
         this.physics.add.collider(this.towers, this.enemies, this.hitEnemy, null, this);
@@ -139,7 +141,7 @@ export default class PlayScene extends Scene {
         for (let i = 1; i < this.count_slots; ++i) {
             this.slots.push(this.add.sprite(140 + this.step_sprite * i, this.platform_start, 'slot').setInteractive().setAlpha(0))
             this.slots[i - 1].input.dropZone = true
-            this.slots[i - 1].dropZoneIndex = i - 1;
+            this.slots[i - 1].dropZoneIndex = i;
         }
 
         this.shopLine = this.add.sprite(0 - 1400, this.platform_start + 150, 'shopLine').setScale(0.8).setOrigin(0, 0)
@@ -220,6 +222,10 @@ export default class PlayScene extends Scene {
                 dropZone.destroy();
                 let index = dropZone.dropZoneIndex
                 this.towers[index] = gameObject
+                this.towers[index].nameText.y -= 15
+                this.towers[index].levelText.setAlpha(1)
+                this.towers[index].expText.setAlpha(1)
+                this.towers[index].infoBg.setAlpha(1)
                 this.towers[index].body.setAllowGravity(true)
                 this.towers[index].body.setImmovable(false)
                 this.towers[index].y -= 800
@@ -300,7 +306,8 @@ export default class PlayScene extends Scene {
                 for (let i = 1; i < this.towers.length; i++) {
                     console.log(i)
 
-                    this.towers[i]?.on("pointerdown", () => {
+                    if (this.towers[i]){
+                         this.towers[i].on("pointerdown", () => {
                         console.log(this.towers[i])
                         this.towers[i].component_destroy()
                         this.towers[i].destroy()
@@ -312,6 +319,9 @@ export default class PlayScene extends Scene {
                         this.generateAnimation()
                         console.log("smth")
                     })
+                    }
+
+
                 }
 
                 // for (let slot of this.slots) {
@@ -341,7 +351,7 @@ export default class PlayScene extends Scene {
 
         })
         //setting button
-        const settingButton = this.add.image(this.width-20, 0, 'setting_button').setOrigin(1, 0).setInteractive();
+        const settingButton = this.add.image(this.width - 20, 0, 'setting_button').setOrigin(1, 0).setInteractive();
 
 
         settingButton.on('pointerover', () => {
@@ -357,7 +367,6 @@ export default class PlayScene extends Scene {
         settingButton.on('pointerdown', () => {
             this.router.push('/menu');
         });
-
 
 
         // Create the rerollButton
@@ -656,9 +665,9 @@ export default class PlayScene extends Scene {
         }
         this.tweens.add({
             targets: [...this.enemies, ...this.enemies.map(el => el.hpText)
-            , ...this.enemies.map(el => el.hpIcon)
-            , ...this.enemies.map(el => el.dmgText)
-            , ...this.enemies.map(el => el.dmgIcon)],
+                , ...this.enemies.map(el => el.hpIcon)
+                , ...this.enemies.map(el => el.dmgText)
+                , ...this.enemies.map(el => el.dmgIcon)],
             x: '-=300',
             duration: 800,
             ease: 'Power2',
@@ -760,7 +769,7 @@ export default class PlayScene extends Scene {
                 this.towers[0].updateDMGText()
             }
             if (tower.constructor.name === "MainTower") {
-                const mainTowerAnim = this.add.sprite(tower.x, tower.y , 'explosion');
+                const mainTowerAnim = this.add.sprite(tower.x, tower.y, 'explosion');
                 mainTowerAnim.setScale(4);
                 mainTowerAnim.on('animationcomplete', () => {
                     mainTowerAnim.destroy();
@@ -770,7 +779,7 @@ export default class PlayScene extends Scene {
                     attackAnim.destroy();
                 });
                 if (stor.state.username) {
-                    try{
+                    try {
                         const response = this.get_user_record();
                         this.es = new EndScreen(
                             this,
@@ -780,8 +789,7 @@ export default class PlayScene extends Scene {
                             this.wave,
                             response.record,
                         )
-                    }
-                    catch (e) {
+                    } catch (e) {
                         console.log(e)
                         this.es = new EndScreen(
                             this,
@@ -793,8 +801,7 @@ export default class PlayScene extends Scene {
                         )
                     }
 
-                }
-                else {
+                } else {
                     this.es = new EndScreen(
                         this,
                         900,
@@ -925,6 +932,7 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.description = description
         this.draggable = draggable
 
+
         this.descriptionIcon = scene.add.sprite(x, y, 'description').setOrigin(0, 1)
         this.descriptionText = scene.add.text(x, y, this.description, {
             fontSize: '25px',
@@ -937,7 +945,6 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.descriptionText.visible = false
 // Add elements to the container
         this.container = scene.add.container(x, y);
-
 
         this.hpIcon = scene.add.sprite(0, 0, 'hpIcon').setOrigin(2, -2.49);
         this.hpText = scene.add.text(-33, 88, hp.toString(), {
@@ -961,10 +968,24 @@ class Tower extends Phaser.GameObjects.Sprite {
         }).setOrigin(1.8, 4.1);
 
         this.nameText = scene.add.text(0, -140, '', {
-            fontSize: '25px',
-            fill: '#f1ff9b'
+            fontFamily: 'Roboto',
+            fontSize: '24px',
+            fill: '#f1ff9b',
         }).setOrigin(0.5, 0.5);
-        this.container.add([this.hpIcon, this.hpText, this.dmgIcon, this.dmgText, this.coinIcon, this.coinText, this.nameText]);
+
+
+        this.infoBg = scene.add.sprite(0, -130, 'towerInfoBg').setScale(1.2, 1.5).setAlpha(0)
+        this.levelText = scene.add.text(0, -135, `Уровень ${this.level}`, {
+            fontSize: '18px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 0.5).setAlpha(0);
+
+        this.expText = scene.add.text(0, -120, `Опыт ${this.exp}/${this.neededExp}`, {
+            fontSize: '18px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 0.5).setAlpha(0);
+
+        this.container.add([this.infoBg, this.hpIcon, this.hpText, this.dmgIcon, this.dmgText, this.coinIcon, this.coinText, this.nameText, this.levelText, this.expText]);
         this.is_die = false
         this.scene.add.existing(this);
     }
@@ -987,6 +1008,8 @@ class Tower extends Phaser.GameObjects.Sprite {
         } else {
             this.exp += exp
         }
+        this.levelText.text = `Уровень ${this.level}`
+        this.expText.text = `Опыт ${this.exp}/${this.neededExp}`
 
     }
 
@@ -1037,6 +1060,9 @@ class Tower extends Phaser.GameObjects.Sprite {
     }
 
     component_destroy() {
+        this.levelText.destroy()
+        this.expText.destroy()
+        this.infoBg.destroy()
         this.hpText.destroy();
         this.hpIcon.destroy();
         this.dmgText.destroy();
@@ -1094,12 +1120,17 @@ class MainTower extends Tower {
             false
         );
         this.shop_info_destroy()
-        this.nameText.text = "Королевская"
+        this.nameText.text = "Ратуша"
+        this.nameText.y -= 15
 
         this.descriptionText = scene.add.text(100, scene.platform_start, this.description, {
             fontSize: '25px',
             fill: '#ffffff'
         }).setOrigin(-0.23, 3)
+
+        this.infoBg.setAlpha(1)
+        this.levelText.setAlpha(1)
+        this.expText.setAlpha(1)
 
         this.descriptionText.visible = false
     }
@@ -1147,7 +1178,7 @@ class Milk extends Tower {
         super(scene, x, y, "milk", 2, 1, 3,
             "это молоко."
         );
-       this.nameText.text = "Молоко"
+        this.nameText.text = "Молоко"
     }
 
     buff(index) {
@@ -1256,6 +1287,7 @@ class Stairs extends Tower {
         this.neededExp = 5
         this.neededExpScale = 0
         this.nameText.text = "Лестница"
+        this.nameText.setFontSize('23px')
     }
 
 }
@@ -1266,7 +1298,7 @@ class Obsidian extends Tower {
             "Сохраняет временные \n   бонусы"
         );
         this.nameText.text = "Обсидиан"
-        this.nameText.setFontSize('24px')
+        this.nameText.setFontSize('23px')
     }
 
 }
