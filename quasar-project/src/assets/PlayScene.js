@@ -222,6 +222,10 @@ export default class PlayScene extends Scene {
                 dropZone.destroy();
                 let index = dropZone.dropZoneIndex
                 this.towers[index] = gameObject
+                this.towers[index].nameText.y -= 15
+                this.towers[index].levelText.setAlpha(1)
+                this.towers[index].expText.setAlpha(1)
+                this.towers[index].infoBg.setAlpha(1)
                 this.towers[index].body.setAllowGravity(true)
                 this.towers[index].body.setImmovable(false)
                 this.towers[index].y -= 800
@@ -938,7 +942,6 @@ class Tower extends Phaser.GameObjects.Sprite {
 // Add elements to the container
         this.container = scene.add.container(x, y);
 
-        this.infoBg = scene.add.sprite(0, 0, 'towerInfoBg')
         this.hpIcon = scene.add.sprite(0, 0, 'hpIcon').setOrigin(2, -2.49);
         this.hpText = scene.add.text(-33, 88, hp.toString(), {
             textAlign: 'center',
@@ -964,7 +967,20 @@ class Tower extends Phaser.GameObjects.Sprite {
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 0.5);
-        this.container.add([this.hpIcon, this.hpText, this.dmgIcon, this.dmgText, this.coinIcon, this.coinText, this.nameText, this.infoBg]);
+
+
+        this.infoBg = scene.add.sprite(0, -130, 'towerInfoBg').setScale(1.3, 1.5).setAlpha(0)
+        this.levelText = scene.add.text(0, -135, `Уровень ${this.level}`, {
+            fontSize: '18px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 0.5).setAlpha(0);
+
+        this.expText = scene.add.text(0, -120, `Опыт ${this.exp}/${this.neededExp}`, {
+            fontSize: '18px',
+            fill: '#f1ff9b'
+        }).setOrigin(0.5, 0.5).setAlpha(0);
+
+        this.container.add([this.infoBg, this.hpIcon, this.hpText, this.dmgIcon, this.dmgText, this.coinIcon, this.coinText, this.nameText, this.levelText, this.expText]);
         this.is_die = false
         this.scene.add.existing(this);
     }
@@ -987,6 +1003,8 @@ class Tower extends Phaser.GameObjects.Sprite {
         } else {
             this.exp += exp
         }
+        this.levelText.text = `Уровень ${this.level}`
+        this.expText.text = `Опыт ${this.exp}/${this.neededExp}`
 
     }
 
@@ -1037,6 +1055,9 @@ class Tower extends Phaser.GameObjects.Sprite {
     }
 
     component_destroy() {
+        this.levelText.destroy()
+        this.expText.destroy()
+        this.infoBg.destroy()
         this.hpText.destroy();
         this.hpIcon.destroy();
         this.dmgText.destroy();
@@ -1094,7 +1115,7 @@ class MainTower extends Tower {
             false
         );
         this.shop_info_destroy()
-        this.nameText.text = "Королевская"
+        this.nameText.text = "Ратуша"
 
         this.descriptionText = scene.add.text(100, scene.platform_start, this.description, {
             fontSize: '25px',
@@ -1256,6 +1277,7 @@ class Stairs extends Tower {
         this.neededExp = 5
         this.neededExpScale = 0
         this.nameText.text = "Лестница"
+        this.nameText.setFontSize('23px')
     }
 
 }
@@ -1266,7 +1288,7 @@ class Obsidian extends Tower {
             "Сохраняет временные \n   бонусы"
         );
         this.nameText.text = "Обсидиан"
-        this.nameText.setFontSize('24px')
+        this.nameText.setFontSize('23px')
     }
 
 }
