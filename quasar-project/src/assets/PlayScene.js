@@ -27,6 +27,7 @@ import ghost_destroy_sprite from "../assets/sprites/ghoust_defeated_sprite.png"
 import dustSpritesheet from "../assets/sprites/dust_spritesheet.png"
 import roundsFlag from "../assets/sprites/flag_with_rounds.png"
 import description from "../assets/sprites/description.png"
+import towerInfoBg from "../assets/sprites/progressbar_green_bg_1.png"
 import reroll_sprite from "../assets/sprites/reroll_sprite.png"
 import explosion_sprite from "../assets/sprites/explosion_sprite_v1.png"
 import setting_button from "../assets/sprites/spr_settings.png"
@@ -55,6 +56,7 @@ export default class PlayScene extends Scene {
         this.load.image('thief', thief)
         this.load.image('ghost', ghost)
         this.load.image('stairs', stairs)
+        this.load.image('towerInfoBg', towerInfoBg)
         this.load.image('obsidian', obsidian)
         this.load.image('hpIcon', hp)
         this.load.image('glass', glass)
@@ -91,8 +93,8 @@ export default class PlayScene extends Scene {
             frameHeight: 101
         });
         this.load.spritesheet('explosion', explosion_sprite, {
-            frameWidth:100,
-            frameHeight:100
+            frameWidth: 100,
+            frameHeight: 100
         })
     }
 
@@ -345,7 +347,7 @@ export default class PlayScene extends Scene {
 
         })
         //setting button
-        const settingButton = this.add.image(this.width-20, 0, 'setting_button').setOrigin(1, 0).setInteractive();
+        const settingButton = this.add.image(this.width - 20, 0, 'setting_button').setOrigin(1, 0).setInteractive();
 
 
         settingButton.on('pointerover', () => {
@@ -361,7 +363,6 @@ export default class PlayScene extends Scene {
         settingButton.on('pointerdown', () => {
             this.router.push('/menu');
         });
-
 
 
         // Create the rerollButton
@@ -660,9 +661,9 @@ export default class PlayScene extends Scene {
         }
         this.tweens.add({
             targets: [...this.enemies, ...this.enemies.map(el => el.hpText)
-            , ...this.enemies.map(el => el.hpIcon)
-            , ...this.enemies.map(el => el.dmgText)
-            , ...this.enemies.map(el => el.dmgIcon)],
+                , ...this.enemies.map(el => el.hpIcon)
+                , ...this.enemies.map(el => el.dmgText)
+                , ...this.enemies.map(el => el.dmgIcon)],
             x: '-=300',
             duration: 800,
             ease: 'Power2',
@@ -764,7 +765,7 @@ export default class PlayScene extends Scene {
                 this.towers[0].updateDMGText()
             }
             if (tower.constructor.name === "MainTower") {
-                const mainTowerAnim = this.add.sprite(tower.x, tower.y , 'explosion');
+                const mainTowerAnim = this.add.sprite(tower.x, tower.y, 'explosion');
                 mainTowerAnim.setScale(4);
                 mainTowerAnim.on('animationcomplete', () => {
                     mainTowerAnim.destroy();
@@ -774,7 +775,7 @@ export default class PlayScene extends Scene {
                     attackAnim.destroy();
                 });
                 if (stor.state.username) {
-                    try{
+                    try {
                         const response = this.get_user_record();
                         this.es = new EndScreen(
                             this,
@@ -784,8 +785,7 @@ export default class PlayScene extends Scene {
                             this.wave,
                             response.record,
                         )
-                    }
-                    catch (e) {
+                    } catch (e) {
                         console.log(e)
                         this.es = new EndScreen(
                             this,
@@ -797,8 +797,7 @@ export default class PlayScene extends Scene {
                         )
                     }
 
-                }
-                else {
+                } else {
                     this.es = new EndScreen(
                         this,
                         900,
@@ -929,6 +928,7 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.description = description
         this.draggable = draggable
 
+
         this.descriptionIcon = scene.add.sprite(x, y, 'description').setOrigin(0, 1)
         this.descriptionText = scene.add.text(x, y, this.description, {
             fontSize: '25px',
@@ -942,7 +942,7 @@ class Tower extends Phaser.GameObjects.Sprite {
 // Add elements to the container
         this.container = scene.add.container(x, y);
 
-
+        this.infoBg = scene.add.sprite(0, 0, 'towerInfoBg')
         this.hpIcon = scene.add.sprite(0, 0, 'hpIcon').setOrigin(2, -2.49);
         this.hpText = scene.add.text(-33, 88, hp.toString(), {
             textAlign: 'center',
@@ -968,7 +968,7 @@ class Tower extends Phaser.GameObjects.Sprite {
             fontSize: '25px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 0.5);
-        this.container.add([this.hpIcon, this.hpText, this.dmgIcon, this.dmgText, this.coinIcon, this.coinText, this.nameText]);
+        this.container.add([this.hpIcon, this.hpText, this.dmgIcon, this.dmgText, this.coinIcon, this.coinText, this.nameText, this.infoBg]);
         this.is_die = false
         this.scene.add.existing(this);
     }
@@ -1151,7 +1151,7 @@ class Milk extends Tower {
         super(scene, x, y, "milk", 2, 1, 3,
             "это молоко."
         );
-       this.nameText.text = "Молоко"
+        this.nameText.text = "Молоко"
     }
 
     buff(index) {
