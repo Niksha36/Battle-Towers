@@ -230,6 +230,7 @@ export default class PlayScene extends Scene {
                 this.towers[index].body.setAllowGravity(true)
                 this.towers[index].body.setImmovable(false)
                 this.towers[index].y -= 800
+                this.towers[index].gainExp(0)
                 this.towers[index].input.draggable = false
                 this.towers[index].input.dropZone = true
                 this.towers[index].dropZoneIndex = dropZone.dropZoneIndex
