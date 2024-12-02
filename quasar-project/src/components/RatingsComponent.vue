@@ -50,6 +50,7 @@ console.log(data)
     width: 100vw;
     height: 100vh;
     background: #1D7E7C;
+    background-image: url("../assets/background/rating_background.jpg");
     background-size: cover;
     overflow-y: auto;
     max-height: 100%;
@@ -91,6 +92,10 @@ console.log(data)
 
 h1{
     color: white;
+    background: #AA382C;
+    padding: 50px 20px 30px 20px;
+    border: 5px solid gold;
+    border-radius: 10px;
     font-size: 130px;
     text-transform: uppercase;
     font-family: 'Roboto', sans-serif;
