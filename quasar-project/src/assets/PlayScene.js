@@ -132,7 +132,7 @@ export default class PlayScene extends Scene {
         this.shop_plates = []
 
         this.platform = this.physics.add.staticGroup();
-        this.platform.create(0, this.platform_start + 75, null).setScale(800, 0.01).setOrigin(0, 0).refreshBody();
+        this.platform.create(0, this.platform_start + 75, null).setScale(800, 0.01).setOrigin(0, 0).refreshBody().setAlpha(0);
 
         this.physics.add.collider(this.towers, this.platform, this.collidePlatform, null, this);
         this.physics.add.collider(this.towers, this.enemies, this.hitEnemy, null, this);
@@ -968,12 +968,13 @@ class Tower extends Phaser.GameObjects.Sprite {
         }).setOrigin(1.8, 4.1);
 
         this.nameText = scene.add.text(0, -140, '', {
-            fontSize: '25px',
-            fill: '#f1ff9b'
+            fontFamily: 'Roboto',
+            fontSize: '24px',
+            fill: '#f1ff9b',
         }).setOrigin(0.5, 0.5);
 
 
-        this.infoBg = scene.add.sprite(0, -130, 'towerInfoBg').setScale(1.3, 1.5).setAlpha(0)
+        this.infoBg = scene.add.sprite(0, -130, 'towerInfoBg').setScale(1.2, 1.5).setAlpha(0)
         this.levelText = scene.add.text(0, -135, `Уровень ${this.level}`, {
             fontSize: '18px',
             fill: '#f1ff9b'
@@ -1120,11 +1121,16 @@ class MainTower extends Tower {
         );
         this.shop_info_destroy()
         this.nameText.text = "Ратуша"
+        this.nameText.y -= 15
 
         this.descriptionText = scene.add.text(100, scene.platform_start, this.description, {
             fontSize: '25px',
             fill: '#ffffff'
         }).setOrigin(-0.23, 3)
+
+        this.infoBg.setAlpha(1)
+        this.levelText.setAlpha(1)
+        this.expText.setAlpha(1)
 
         this.descriptionText.visible = false
     }
