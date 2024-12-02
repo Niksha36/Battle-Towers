@@ -192,7 +192,8 @@ export default class PlayScene extends Scene {
         });
 
         this.input.on('dragenter', (pointer, gameObject, dropZone) => {
-            if (this.slots[dropZone.dropZoneIndex] !== 0) {
+            if (this.slots[dropZone.dropZoneIndex - 1] !== 0) {
+                console.log(dropZone.dropZoneIndex)
                 dropZone.setTexture(gameObject.texture)
                 dropZone.setTint(0x00ff00);
                 dropZone.setScale(0.5)
@@ -203,7 +204,7 @@ export default class PlayScene extends Scene {
         });
 
         this.input.on('dragleave', (pointer, gameObject, dropZone) => {
-            if (this.slots[dropZone.dropZoneIndex] !== 0) {
+            if (this.slots[dropZone.dropZoneIndex - 1] !== 0) {
                 dropZone.setScale(1)
                 dropZone.setTexture('slot')
             }
@@ -211,7 +212,7 @@ export default class PlayScene extends Scene {
         });
         this.input.on('drop', (pointer, gameObject, dropZone) => {
             console.log(this.towers[dropZone.dropZoneIndex])
-            if (this.slots[dropZone.dropZoneIndex] !== 0) {
+            if (this.slots[dropZone.dropZoneIndex - 1] !== 0) {
                 dropZone.setScale(1)
                 dropZone.setTexture('slot')
                 dropZone.clearTint();
@@ -232,7 +233,7 @@ export default class PlayScene extends Scene {
                 this.towers[index].input.draggable = false
                 this.towers[index].input.dropZone = true
                 this.towers[index].dropZoneIndex = dropZone.dropZoneIndex
-                this.slots[index] = 0
+                this.slots[index - 1] = 0
                 this.money -= gameObject.cost;
                 this.moneyText.setText(this.money.toString());
                 gameObject.shop_info_destroy()
