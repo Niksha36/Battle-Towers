@@ -1363,7 +1363,7 @@ class EndScreen extends Phaser.GameObjects.Sprite {
                 }
             },
             you_died: {
-                text: "Поражение(скрытопулые вруинили)",
+                text: "Поражение",
                 style: {
                     fontSize: "30px",
                     fill: "#600000"
