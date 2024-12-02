@@ -1,6 +1,11 @@
 <script setup>
 import { useRouter } from 'vue-router';
+import stor from "../store.js"
 const router = useRouter();
+
+function getUser() {
+    return stor.state.username
+}
 function redirectToGame() {
     router.push('/game');
 }
@@ -11,6 +16,10 @@ function redirectToRating(){
 function logout() {
     this.$store.dispatch("logout")
     console.log(this.$store.state)
+}
+
+function login() {
+    router.push("/login")
 }
 
 </script>
@@ -25,7 +34,10 @@ function logout() {
                 <button class="rating" @click="redirectToRating">
                     Рейтинг
                 </button>
-                <button class="quit" @click="logout">
+                <button v-if="!getUser()" class="quit" @click="login">
+                    Войти
+                </button>
+                <button v-else class="quit" @click="logout">
                     Выйти
                 </button>
             </div>

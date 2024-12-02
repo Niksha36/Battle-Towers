@@ -32,9 +32,10 @@ def login_user(request):
     if not serializer.is_valid():
         return Response({"message": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
+    user_l = User.objects.get(username=serializer.data['username'])
     user = serializer.validated_data
     login(request, user)
-    return Response({"message": "Login successful"}, status=status.HTTP_202_ACCEPTED)
+    return Response({"message": "Login successful", "record": user_l.record}, status=status.HTTP_202_ACCEPTED)
 
 @api_view(['GET'])
 def get_top_user(request):

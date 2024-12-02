@@ -29,10 +29,10 @@ import roundsFlag from "../assets/sprites/flag_with_rounds.png"
 import description from "../assets/sprites/description.png"
 import reroll_sprite from "../assets/sprites/reroll_sprite.png"
 import explosion_sprite from "../assets/sprites/explosion_sprite_v1.png"
+import setting_button from "../assets/sprites/spr_settings.png"
+import shovel from "../assets/sprites/shovel.png"
 import stor from "../store.js"
 import axios from "axios";
-import setting_button from "../assets/sprites/spr_settings.png"
-import { useRouter } from 'vue-router';
 import router from "src/router/index.js";
 
 export default class PlayScene extends Scene {
@@ -69,6 +69,7 @@ export default class PlayScene extends Scene {
         this.load.image('roundsFlag', roundsFlag)
         this.load.image('description', description)
         this.load.image('setting_button', setting_button)
+        this.load.image('shovel', shovel)
         this.load.spritesheet('enemyAttack', enemies_attack_sprite, {
             frameWidth: 192,
             frameHeight: 192,
@@ -203,7 +204,6 @@ export default class PlayScene extends Scene {
             if (this.slots[dropZone.dropZoneIndex] !== 0) {
                 dropZone.setScale(1)
                 dropZone.setTexture('slot')
-                dropZone.clearTint();
             }
             dropZone.clearTint();
         });
@@ -287,9 +287,10 @@ export default class PlayScene extends Scene {
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
 
-        this.towerDeleteButton = this.add.sprite(250, -10, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
+        this.towerDeleteButton = this.add.sprite(250, 20, 'shovel', 0).setOrigin(0, 0).setScale(0.7, 0.7).setInteractive();
         this.towerDeleteButton.on("pointerdown", () => {
             if (!this.deleteMode) {
+                this.towerDeleteButton.setTint(0xc1c1c1)
                 console.log(1)
 
                 this.towerDeleteButton.setFrame(1);
@@ -306,7 +307,7 @@ export default class PlayScene extends Scene {
                         this.towers[i] = 0
                         this.slots[i] = this.add.sprite(140 + this.step_sprite * (i), this.platform_start, 'slot').setInteractive().setAlpha(0.4)
                         this.slots[i].input.dropZone = true
-                        this.slots[i].dropZoneIndex = i + 1
+                        this.slots[i].dropZoneIndex = i
 
                         this.generateAnimation()
                         console.log("smth")
@@ -326,6 +327,8 @@ export default class PlayScene extends Scene {
                 // }
             } else {
                 this.deleteMode = false
+                this.towerDeleteButton.clearTint()
+
 
                 this.towerDeleteButton.setFrame(0);
 
@@ -358,7 +361,7 @@ export default class PlayScene extends Scene {
 
 
         // Create the rerollButton
-        this.rerollButton = this.add.sprite(this.towers[0].x, this.towers[0].y - 200, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
+        this.rerollButton = this.add.sprite(1270, 850, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
 
         this.add.existing(this.rerollButton);
 
@@ -521,7 +524,7 @@ export default class PlayScene extends Scene {
                         this.tweens.add({
                             targets: slot,
                             alpha: 0, // Конечная прозрачность (полностью видимый)
-                            duration: 500, // Длительность анимации в миллисекундах
+                            duration: 300, // Длительность анимации в миллисекундах
                             ease: 'Power2', // Тип easing
                         });
 
@@ -559,7 +562,7 @@ export default class PlayScene extends Scene {
                         this.tweens.add({
                             targets: slot,
                             alpha: 0, // Конечная прозрачность (полностью видимый)
-                            duration: 500, // Длительность анимации в миллисекундах
+                            duration: 300, // Длительность анимации в миллисекундах
                             ease: 'Power2', // Тип easing
                         });
 
@@ -649,8 +652,23 @@ export default class PlayScene extends Scene {
         this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
         for (let i = 0; i < 5; i++) {
-            this.enemies.push(this.add.existing(new Enemy(this, this.width - 300 + 30 * i, this.platform_start - 30, 'ghost', this.wave + 1, this.wave + 1)))
+            this.enemies.push(this.add.existing(new Enemy(this, this.width + 50 * i, this.platform_start - 30, 'ghost', this.wave * 2, this.wave * 2)))
         }
+        this.tweens.add({
+            targets: [...this.enemies, ...this.enemies.map(el => el.hpText)
+            , ...this.enemies.map(el => el.hpIcon)
+            , ...this.enemies.map(el => el.dmgText)
+            , ...this.enemies.map(el => el.dmgIcon)],
+            x: '-=300',
+            duration: 800,
+            ease: 'Power2',
+            onComplete: () => {
+                this.enemies.forEach((enemy) => {
+                    enemy.arrived = true
+                })
+            },
+        });
+
 
     }
 
@@ -751,15 +769,42 @@ export default class PlayScene extends Scene {
                 attackAnim.on('animationcomplete', () => {
                     attackAnim.destroy();
                 });
-                const response = this.get_user_record();
-                this.es = new EndScreen(
-                    this,
-                    900,
-                    500,
-                    "loseBackground",
-                    this.wave,
-                    response ? response.record : 0
-                )
+                if (stor.state.username) {
+                    try{
+                        const response = this.get_user_record();
+                        this.es = new EndScreen(
+                            this,
+                            900,
+                            500,
+                            "loseBackground",
+                            this.wave,
+                            response.record,
+                        )
+                    }
+                    catch (e) {
+                        console.log(e)
+                        this.es = new EndScreen(
+                            this,
+                            900,
+                            500,
+                            "loseBackground",
+                            this.wave,
+                            0,
+                        )
+                    }
+
+                }
+                else {
+                    this.es = new EndScreen(
+                        this,
+                        900,
+                        500,
+                        "loseBackground",
+                        this.wave,
+                        0,
+                    )
+                }
+
 
                 console.log(this.es)
 
@@ -776,7 +821,7 @@ export default class PlayScene extends Scene {
                 )
 
                 this.tweens.add({
-                    targets: [this.es, this.es.died_text],
+                    targets: this.es.animation_targets,
                     alpha: 1,
                     duration: 2000,
                     ease: "Power2",
@@ -862,6 +907,7 @@ class Tower extends Phaser.GameObjects.Sprite {
 
         scene.physics.world.enable(this);
         this.body.setAllowGravity(false);
+        this.body.setGravityY(7000)
         this.body.immovable = true
 
         this.collided = false
@@ -893,20 +939,23 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.container = scene.add.container(x, y);
 
 
-        this.hpIcon = scene.add.sprite(0, 0, 'hpIcon').setOrigin(2, -2.5);
-        this.hpText = scene.add.text(0, 0, hp.toString(), {
+        this.hpIcon = scene.add.sprite(0, 0, 'hpIcon').setOrigin(2, -2.49);
+        this.hpText = scene.add.text(-33, 88, hp.toString(), {
+            textAlign: 'center',
             fontSize: '25px',
             fill: '#fff'
-        }).setOrigin(1.8, -3.5);
+        });
 
         this.dmgIcon = scene.add.sprite(0, 0, 'dmgIcon').setOrigin(0, -2.5);
-        this.dmgText = scene.add.text(0, 0, dmg.toString(), {
+        this.dmgText = scene.add.text(33, 88, dmg.toString(), {
+            textAlign: 'center',
             fontSize: '25px',
             fill: '#fff'
-        }).setOrigin(-2, -3.5);
+        });
 
         this.coinIcon = scene.add.sprite(0, 0, 'coin').setDisplaySize(30, 30).setOrigin(2, 3.5);
         this.coinText = scene.add.text(0, 0, cost.toString(), {
+            textAlign: 'center',
             fontSize: '25px',
             fill: '#fadb00'
         }).setOrigin(1.8, 4.1);
@@ -1235,15 +1284,18 @@ class Enemy extends Phaser.GameObjects.Sprite {
 
         this.hp = hp
         this.dmg = dmg
+        this.arrived = false
 
-        this.hpIcon = scene.add.sprite(x - 50, y + 100, 'hpIcon');
-        this.hpText = scene.add.text(this.hpIcon.x + 20, this.hpIcon.y - 13, hp.toString(), {
+        this.hpIcon = scene.add.sprite(x - 60, y + 115, 'hpIcon');
+        this.hpText = scene.add.text(this.hpIcon.x + 20, this.hpIcon.y - 15, hp.toString(), {
+            textAlign: 'center',
             fontSize: '30px',
             fill: '#fff'
         })
 
-        this.dmgIcon = scene.add.sprite(x + 15, y + 100, 'dmgIcon');
+        this.dmgIcon = scene.add.sprite(x + 15, y + 115, 'dmgIcon');
         this.dmgText = scene.add.text(this.dmgIcon.x + 20, this.dmgIcon.y - 13, dmg.toString(), {
+            textAlign: 'center',
             fontSize: '30px',
             fill: '#fff'
         })
@@ -1268,13 +1320,13 @@ class Enemy extends Phaser.GameObjects.Sprite {
     }
 
     updatePosition() {
-        this.hpIcon.setPosition(this.x - 50, this.y + 100);
+        this.hpIcon.setPosition(this.x - 60, this.y + 115);
         this.hpText.setPosition(this.hpIcon.x + 20, this.hpIcon.y - 13)
 
-        this.dmgIcon.setPosition(this.x, this.y + 100)
+        this.dmgIcon.setPosition(this.x, this.y + 115)
         this.dmgText.setPosition(this.dmgIcon.x + 20, this.dmgIcon.y - 13);
 
-        if (this.body.velocity.x === 0) {
+        if (this.body.velocity.x === 0 && this.arrived) {
             this.scene.tweens.add({
                 targets: this,
                 angle: -20,
@@ -1282,7 +1334,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
                 ease: 'Power2',
             });
         }
-        if (this.body.velocity.x > -800) {
+        if (this.body.velocity.x > -800 && this.arrived) {
             this.body.velocity.x -= 50;
         }
     }
@@ -1301,20 +1353,42 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         this.playerRecord = playerRecord
         this.setInteractive()
 
-        this.record_text = null
-
+        this.animation_targets = [this]
 
         this.TEXTS = {
-            new_record:
-                {
-                    text: "Это ваш новый рекорд",
-                    style: {
-                        fontSize: "20px",
-                        fill: "#000000"
-                    }
-                },
+            not_authorised: {
+                text: "Вы не авторизованы",
+                style: {
+                    fontSize: "30px",
+                    fill: "#ffffff"
+                }
+            },
+
+            waves_text: {
+                text: "количество пройденных волн: " + (this.waves).toString(),
+                style: {
+                    fontSize: "30px",
+                    fill: "#ffffff"
+                }
+            },
+
+            record_text: {
+                text: "ваш рекорд: " + stor.state.record.toString(),
+                style: {
+                    fontSize: "30px",
+                    fill: "#ffffff"
+                }
+            },
+
+            new_record: {
+                text: "Это ваш новый рекорд",
+                style: {
+                    fontSize: "30px",
+                    fill: "#ffffff"
+                }
+            },
             you_died: {
-                text: "Вы умерли",
+                text: "Поражение(скрытопулые вруинили)",
                 style: {
                     fontSize: "30px",
                     fill: "#600000"
@@ -1322,37 +1396,66 @@ class EndScreen extends Phaser.GameObjects.Sprite {
             }
 
         }
+        // if (stor.state.username)
+        this.record_text = scene.add.text(
+            this.x - 350,
+            this.y,
+            this.TEXTS.record_text.text,
+            this.TEXTS.record_text.style
+        )
 
-        if (this.isUserRecord()) {
-            this.record_text = scene.add.text(
-                this.x + this.width,
-                this.y + this.height,
+        this.animation_targets.push(this.record_text)
+
+        if (!stor.state.username) {
+            this.not_authorised_text = scene.add.text(
+                this.x - 150,
+                this.y - 55,
+                this.TEXTS.not_authorised.text,
+                this.TEXTS.not_authorised.style
+            )
+            this.animation_targets.push(this.not_authorised_text)
+        }
+
+        if (this.isUserRecord() && stor.state.username) {
+            this.new_record_text = scene.add.text(
+                this.x + 60,
+                this.y + 80,
                 this.TEXTS.new_record.text,
                 this.TEXTS.new_record.style
             );
+            this.animation_targets.push(this.new_record_text)
         }
 
+        this.waves_text = scene.add.text(
+            this.x - 350,
+            this.y + 30,
+            this.TEXTS.waves_text.text,
+            this.TEXTS.waves_text.style
+        )
+        this.animation_targets.push(this.waves_text)
+
         this.died_text = scene.add.text(
-            this.x - 80,
+            this.x - 100,
             this.y - 150,
             this.TEXTS.you_died.text,
             this.TEXTS.you_died.style
         )
+        this.animation_targets.push(this.died_text)
+
 
         scene.add.existing(this);
         this.bringToTop()
 
         this.setAlpha(0)
+        this.not_authorised_text?.setAlpha(0)
         this.died_text.setAlpha(0)
         this.record_text?.setAlpha(0)
+        this.new_record_text?.setAlpha(0)
+        this.waves_text.setAlpha(0)
     }
 
     isUserRecord() {
         return this.waves >= this.playerRecord
-    }
-
-    show() {
-
     }
 
     destroyComponents() {
@@ -1361,6 +1464,11 @@ class EndScreen extends Phaser.GameObjects.Sprite {
     }
 
     bringToTop() {
+        this.scene.children.bringToTop(this);
         this.scene.children.bringToTop(this.died_text);
+        this.scene.children.bringToTop(this.record_text);
+        this.scene.children.bringToTop(this.new_record_text);
+        this.scene.children.bringToTop(this.not_authorised_text);
+        this.scene.children.bringToTop(this.waves_text);
     }
 }
