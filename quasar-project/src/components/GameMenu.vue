@@ -17,7 +17,7 @@ function logout() {
 <template>
     <div class="background-wrapper">
         <div class="game-menu">
-            <h1>Total Towers</h1>
+            <h1>Battle Towers</h1>
             <div class="button-wrapper">
                 <button class="play" @click="redirectToGame">
                     Играть
@@ -40,7 +40,7 @@ html {
     width: 100vw;
     height: 100vh;
     background-size: cover;
-    background-image: url('../assets/background/menu_backgrond.jpg') !important;
+    background-image: url('../assets/background/background.png') !important;
 }
 .game-menu {
     font-family: 'Roboto', sans-serif;

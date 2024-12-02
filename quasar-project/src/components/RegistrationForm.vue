@@ -1,159 +1,214 @@
 <template>
-  <div class="register-form">
-    <h2>Регистрация</h2>
-    <form @submit.prevent="register">
-      <div class="form-group">
-        <label for="username">Никнейм:</label>
-        <div class="input-wrapper">
-          <input type="text" v-model="username" placeholder="Введите никнейм" required/>
+    <div class="background-wrapper">
+        <div class="left-decoration">
+            <img src="../assets/towers/towerS_2.png" alt="left-decoration" width="500">
         </div>
-      </div>
-      <div class="form-group">
-        <label for="password">Пароль:</label>
-        <div class="input-wrapper">
-          <input :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="Введите пароль" required/>
-          <i :class="showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'" @click="togglePassword"></i>
+        <div class="right-decoration">
+            <img src="../assets/towers/towerS_3.png" alt="right-decoration" width="500">
         </div>
-      </div>
-      <div class="form-group">
-        <div class="input-wrapper">
-          <input :type="showPassword ? 'text' : 'password'" v-model="repeatPassword" placeholder="Повторите пароль"
-                 required/>
+        <div class="register-form">
+            <h2>Регистрация</h2>
+            <form @submit.prevent="register">
+                <div class="form-group">
+                    <label for="username">Никнейм:</label>
+                    <div class="input-wrapper">
+                        <input type="text" v-model="username" placeholder="Введите никнейм" required/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <div class="input-wrapper">
+                        <input :type="showPassword ? 'text' : 'password'" v-model="password"
+                               placeholder="Введите пароль" required/>
+                        <img :src="showPassword ? showPasswordIcon : hidePasswordIcon" @click="togglePassword" class="password-toggle-icon" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input :type="showPassword ? 'text' : 'password'" v-model="repeatPassword"
+                               placeholder="Повторите пароль"
+                               required/>
+                    </div>
+                </div>
+                <button type="submit" class="submit-button">Зарегистрироваться</button>
+                <p class="signin-link">
+                    Уже есть аккаунт?
+                    <router-link to="/login">Войти</router-link>
+                </p>
+            </form>
         </div>
-      </div>
-      <button type="submit" class="submit-button">Зарегистрироваться</button>
-      <p class="signin-link">
-        Уже есть аккаунт? <router-link to="/login">Войти</router-link>
-      </p>
-    </form>
-  </div>
+    </div>
+
 </template>
 
 <script>
 import axios from 'axios';
 import router from "../router/index.js";
-
+import showPasswordIcon from '../assets/sprites/show-password.svg';
+import hidePasswordIcon from '../assets/sprites/hide-password.svg';
 import stor from "../store.js"
 
 export default {
-  data() {
-    return {
-      username: '',
-      password: '',
-      repeatPassword: '',
-      showPassword: false
-    };
-  },
-  methods: {
-    togglePassword() {
-      this.showPassword = !this.showPassword;
+    data() {
+        return {
+            username: '',
+            password: '',
+            repeatPassword: '',
+            showPassword: false,
+            showPasswordIcon, // Add this line
+            hidePasswordIcon
+        };
     },
-    async register() {
-      if (this.password !== this.repeatPassword) {
-        alert('Passwords do not match');
-        return;
-      }
-      try {
-        const response = await axios.post('http://localhost:8000/create_user', {
-          withCredentials: true,
-          username: this.username,
-          password: this.password
-        });
-        console.log('Registered:', response.data);
-        await stor.dispatch("updateUsername", this.username)
-        await this.$router.push("/game");
-      } catch (error) {
-        console.error('Registration failed:', error);
-        alert('Registration failed. Please try again.');
-      }
+    methods: {
+        togglePassword() {
+            this.showPassword = !this.showPassword;
+        },
+        async register() {
+            if (this.password !== this.repeatPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            try {
+                const response = await axios.post('http://localhost:8000/create_user', {
+                    withCredentials: true,
+                    username: this.username,
+                    password: this.password
+                });
+                console.log('Registered:', response.data);
+                await stor.dispatch("updateUsername", this.username)
+                await this.$router.push("/game");
+            } catch (error) {
+                console.error('Registration failed:', error);
+                alert('Registration failed. Please try again.');
+            }
+        }
     }
-  }
 };
 </script>
 
 <style scoped>
-.register-form, .register-form *:not(i) {
-  font-family: 'Roboto', sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+.left-decoration{
+    position: absolute;
+    left: 0;
+    bottom: -10px;
 }
+.right-decoration{
+    position: absolute;
+    right: 0;
+    bottom: -10px;
+    transform: scaleX(-1);
+}
+.background-wrapper {
+    position: relative;
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-image: url("../assets/background/special_background.png");
+    background-size: cover;
+    justify-content: center;
+    align-items: center;
+
+}
+
 .register-form {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+    font-family: 'Roboto', sans-serif !important;
+}
+
+.register-form {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+    padding-bottom: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
 }
 
 h2 {
-  font-family: 'Roboto', sans-serif;
-  text-align: center;
-  font-weight: 700;
-  margin-bottom: 1rem;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 50px;
 }
 
 .form-group {
-  margin-bottom: 1rem;
-  position: relative;
+    margin-bottom: 1rem;
+    position: relative;
 }
+
 .input-wrapper:focus-within {
-  border-color: #007bff;
+    border-color: #007bff;
 }
+
 label {
-  display: block;
-  font-weight: 500;
-  font-size: 16px;
-  margin-bottom: 0.5rem;
+    display: block;
+    font-weight: 500;
+    font-size: 20px;
+    margin-bottom: 0.5rem;
 }
 
 input {
-  width: 100%;
-  border: none;
-  outline: none;
-  font-size: 16px;
-  border-radius: 4px;
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 20px;
+    border-radius: 4px;
 }
 
-.input-wrapper{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  border: 1.5px solid #ccc;
-  border-radius: 5px;
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border: 1.5px solid #ccc;
+    border-radius: 5px;
 }
 
 i {
-  padding-left: 10px;
-  cursor: pointer;
-  color: gray;
+    padding-left: 10px;
+    cursor: pointer;
+    color: gray;
 }
 
 i:hover {
-  color: #222222;
+    color: #222222;
 }
 
 .submit-button {
-  font-size: 16px;
-  width: 100%;
-  padding: 0.75rem;
-  border: none;
-  background-color: #28a745;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
+    margin-top: 15px;
+    font-size: 25px;
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 .submit-button:hover {
-  background-color: #218838;
+    background-color: #218838;
 }
-.signin-link{font-size:16px;display:flex; justify-content: center; margin-top: 1rem ; margin-bottom: 0}
+
+.signin-link {
+    font-size: 25px;
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    margin-bottom: 0
+}
+
 .signin-link > *:first-child {
-  margin-left: 0.2rem;
-  font-weight: 700;
+    margin-left: 0.2rem;
+    font-weight: 700;
 }
+
 .signin-link a {
-  text-decoration: none;
-  color: dodgerblue;
+    text-decoration: none;
+    color: dodgerblue;
 }
+.password-toggle-icon{height: 35px; width: 35px}
 </style>
