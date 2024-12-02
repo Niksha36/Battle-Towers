@@ -46,12 +46,13 @@ export default {
     async login() {
       try {
         const response = await axios.post('http://localhost:8000/login_user', {
-          withCredentials: true,
-          username: this.username,
-          password: this.password
+            withCredentials: true,
+            username: this.username,
+            password: this.password,
         });
-        await this.$router.push({path: "game"});
+        await stor.dispatch("updateRecord", response.data.record)
         await stor.dispatch("updateUsername", this.username)
+        await this.$router.push({path: "game"});
       } catch (error) {
         console.error('Login failed:', error);
         alert('Ошибка входа: неверный никнейм или пароль');
