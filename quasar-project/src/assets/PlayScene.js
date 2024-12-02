@@ -306,7 +306,7 @@ export default class PlayScene extends Scene {
                         this.towers[i] = 0
                         this.slots[i] = this.add.sprite(140 + this.step_sprite * (i), this.platform_start, 'slot').setInteractive().setAlpha(0.4)
                         this.slots[i].input.dropZone = true
-                        this.slots[i].dropZoneIndex = i + 1
+                        this.slots[i].dropZoneIndex = i
 
                         this.generateAnimation()
                         console.log("smth")
