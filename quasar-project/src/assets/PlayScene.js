@@ -29,10 +29,10 @@ import roundsFlag from "../assets/sprites/flag_with_rounds.png"
 import description from "../assets/sprites/description.png"
 import reroll_sprite from "../assets/sprites/reroll_sprite.png"
 import explosion_sprite from "../assets/sprites/explosion_sprite_v1.png"
+import setting_button from "../assets/sprites/spr_settings.png"
+import shovel from "../assets/sprites/shovel.png"
 import stor from "../store.js"
 import axios from "axios";
-import setting_button from "../assets/sprites/spr_settings.png"
-import { useRouter } from 'vue-router';
 import router from "src/router/index.js";
 
 export default class PlayScene extends Scene {
@@ -69,6 +69,7 @@ export default class PlayScene extends Scene {
         this.load.image('roundsFlag', roundsFlag)
         this.load.image('description', description)
         this.load.image('setting_button', setting_button)
+        this.load.image('shovel', shovel)
         this.load.spritesheet('enemyAttack', enemies_attack_sprite, {
             frameWidth: 192,
             frameHeight: 192,
@@ -286,9 +287,10 @@ export default class PlayScene extends Scene {
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
 
-        this.towerDeleteButton = this.add.sprite(250, -10, 'reroll_button', 0).setOrigin(0, 0).setInteractive();
+        this.towerDeleteButton = this.add.sprite(250, 20, 'shovel', 0).setOrigin(0, 0).setScale(0.7, 0.7).setInteractive();
         this.towerDeleteButton.on("pointerdown", () => {
             if (!this.deleteMode) {
+                this.towerDeleteButton.setTint(0xc1c1c1)
                 console.log(1)
 
                 this.towerDeleteButton.setFrame(1);
@@ -325,6 +327,8 @@ export default class PlayScene extends Scene {
                 // }
             } else {
                 this.deleteMode = false
+                this.towerDeleteButton.clearTint()
+
 
                 this.towerDeleteButton.setFrame(0);
 
@@ -357,7 +361,7 @@ export default class PlayScene extends Scene {
 
 
         // Create the rerollButton
-        this.rerollButton = this.add.sprite(this.towers[0].x, this.towers[0].y - 200, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
+        this.rerollButton = this.add.sprite(1270, 850, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
 
         this.add.existing(this.rerollButton);
 
