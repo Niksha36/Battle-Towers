@@ -45,9 +45,6 @@ function login() {
     </div>
 </template>
 <style scoped>
-html {
-    background-image: url('../assets/background/menu_backgrond.jpg') !important;
-}
 .background-wrapper{
     width: 100vw;
     height: 100vh;
