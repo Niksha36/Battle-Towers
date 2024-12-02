@@ -203,7 +203,6 @@ export default class PlayScene extends Scene {
             if (this.slots[dropZone.dropZoneIndex] !== 0) {
                 dropZone.setScale(1)
                 dropZone.setTexture('slot')
-                dropZone.clearTint();
             }
             dropZone.clearTint();
         });
@@ -766,15 +765,42 @@ export default class PlayScene extends Scene {
                 attackAnim.on('animationcomplete', () => {
                     attackAnim.destroy();
                 });
-                const response = this.get_user_record();
-                this.es = new EndScreen(
-                    this,
-                    900,
-                    500,
-                    "loseBackground",
-                    this.wave,
-                    response ? response.record : 0
-                )
+                if (stor.state.username) {
+                    try{
+                        const response = this.get_user_record();
+                        this.es = new EndScreen(
+                            this,
+                            900,
+                            500,
+                            "loseBackground",
+                            this.wave,
+                            response.record,
+                        )
+                    }
+                    catch (e) {
+                        console.log(e)
+                        this.es = new EndScreen(
+                            this,
+                            900,
+                            500,
+                            "loseBackground",
+                            this.wave,
+                            0,
+                        )
+                    }
+
+                }
+                else {
+                    this.es = new EndScreen(
+                        this,
+                        900,
+                        500,
+                        "loseBackground",
+                        this.wave,
+                        0,
+                    )
+                }
+
 
                 console.log(this.es)
 
@@ -791,7 +817,7 @@ export default class PlayScene extends Scene {
                 )
 
                 this.tweens.add({
-                    targets: [this.es, this.es.died_text],
+                    targets: this.es.animation_targets,
                     alpha: 1,
                     duration: 2000,
                     ease: "Power2",
@@ -1323,20 +1349,42 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         this.playerRecord = playerRecord
         this.setInteractive()
 
-        this.record_text = null
-
+        this.animation_targets = [this]
 
         this.TEXTS = {
-            new_record:
-                {
-                    text: "Это ваш новый рекорд",
-                    style: {
-                        fontSize: "20px",
-                        fill: "#000000"
-                    }
-                },
+            not_authorised: {
+                text: "Вы не авторизованы",
+                style: {
+                    fontSize: "30px",
+                    fill: "#ffffff"
+                }
+            },
+
+            waves_text: {
+                text: "количество пройденных волн: " + (this.waves).toString(),
+                style: {
+                    fontSize: "30px",
+                    fill: "#ffffff"
+                }
+            },
+
+            record_text: {
+                text: "ваш рекорд: " + stor.state.record.toString(),
+                style: {
+                    fontSize: "30px",
+                    fill: "#ffffff"
+                }
+            },
+
+            new_record: {
+                text: "Это ваш новый рекорд",
+                style: {
+                    fontSize: "30px",
+                    fill: "#ffffff"
+                }
+            },
             you_died: {
-                text: "Вы умерли",
+                text: "Поражение(скрытопулые вруинили)",
                 style: {
                     fontSize: "30px",
                     fill: "#600000"
@@ -1344,37 +1392,66 @@ class EndScreen extends Phaser.GameObjects.Sprite {
             }
 
         }
+        // if (stor.state.username)
+        this.record_text = scene.add.text(
+            this.x - 350,
+            this.y,
+            this.TEXTS.record_text.text,
+            this.TEXTS.record_text.style
+        )
 
-        if (this.isUserRecord()) {
-            this.record_text = scene.add.text(
-                this.x + this.width,
-                this.y + this.height,
+        this.animation_targets.push(this.record_text)
+
+        if (!stor.state.username) {
+            this.not_authorised_text = scene.add.text(
+                this.x - 150,
+                this.y - 55,
+                this.TEXTS.not_authorised.text,
+                this.TEXTS.not_authorised.style
+            )
+            this.animation_targets.push(this.not_authorised_text)
+        }
+
+        if (this.isUserRecord() && stor.state.username) {
+            this.new_record_text = scene.add.text(
+                this.x + 60,
+                this.y + 80,
                 this.TEXTS.new_record.text,
                 this.TEXTS.new_record.style
             );
+            this.animation_targets.push(this.new_record_text)
         }
 
+        this.waves_text = scene.add.text(
+            this.x - 350,
+            this.y + 30,
+            this.TEXTS.waves_text.text,
+            this.TEXTS.waves_text.style
+        )
+        this.animation_targets.push(this.waves_text)
+
         this.died_text = scene.add.text(
-            this.x - 80,
+            this.x - 100,
             this.y - 150,
             this.TEXTS.you_died.text,
             this.TEXTS.you_died.style
         )
+        this.animation_targets.push(this.died_text)
+
 
         scene.add.existing(this);
         this.bringToTop()
 
         this.setAlpha(0)
+        this.not_authorised_text?.setAlpha(0)
         this.died_text.setAlpha(0)
         this.record_text?.setAlpha(0)
+        this.new_record_text?.setAlpha(0)
+        this.waves_text.setAlpha(0)
     }
 
     isUserRecord() {
         return this.waves >= this.playerRecord
-    }
-
-    show() {
-
     }
 
     destroyComponents() {
@@ -1383,6 +1460,11 @@ class EndScreen extends Phaser.GameObjects.Sprite {
     }
 
     bringToTop() {
+        this.scene.children.bringToTop(this);
         this.scene.children.bringToTop(this.died_text);
+        this.scene.children.bringToTop(this.record_text);
+        this.scene.children.bringToTop(this.new_record_text);
+        this.scene.children.bringToTop(this.not_authorised_text);
+        this.scene.children.bringToTop(this.waves_text);
     }
 }
