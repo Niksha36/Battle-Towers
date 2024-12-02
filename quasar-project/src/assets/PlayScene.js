@@ -229,6 +229,7 @@ export default class PlayScene extends Scene {
                 this.towers[index].body.setAllowGravity(true)
                 this.towers[index].body.setImmovable(false)
                 this.towers[index].y -= 800
+                this.towers[index].gainExp(0)
                 this.towers[index].input.draggable = false
                 this.towers[index].input.dropZone = true
                 this.towers[index].dropZoneIndex = dropZone.dropZoneIndex
@@ -321,11 +322,14 @@ export default class PlayScene extends Scene {
                 this.towerDeleteButton.clearTint()
                 this.towerDeleteButton.setFrame(0);
 
-        for (let i = 1; i < this.towers.length; i++) {
-            this.towers[i]?.off("pointerdown");
-        }
-    }
-});
+                for (let i = 1; i < this.towers.length; i++) {
+                    this.towers[i]?.on("pointerdown", () => {
+
+                    })
+                }
+            }
+
+        })
         //setting button
         const settingButton = this.add.image(this.width - 20, 0, 'setting_button').setOrigin(1, 0).setInteractive();
 
@@ -923,9 +927,9 @@ class Tower extends Phaser.GameObjects.Sprite {
             fontSize: '18px',
             fill: '#f1ff9b'
         }).setOrigin(0.5, 0.5).setAlpha(0);
-
         this.container.add([this.infoBg, this.hpIcon, this.hpText, this.dmgIcon, this.dmgText, this.coinIcon, this.coinText, this.nameText, this.levelText, this.expText]);
         this.is_die = false
+
         this.scene.add.existing(this);
     }
 
@@ -1055,7 +1059,7 @@ class Tower extends Phaser.GameObjects.Sprite {
 class MainTower extends Tower {
     constructor(scene) {
         super(scene, 140, scene.platform_start, "mainTower", 5, 1, 0,
-            "это главная башня.",
+            "С разрушением этого здания нить вашей судьбы обрывается.\nЗагрузите сохраненную игру, чтобы восстановить течение судьбы, или же живите дальше в проклятом мире, который сами и создали",
             false
         );
         this.shop_info_destroy()
@@ -1083,7 +1087,7 @@ class MainTower extends Tower {
 class Chest extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "chest", 2, 1, 5,
-            "это сундук."
+            "Даёт 1 монету после\nкаждой волны. Eсли стоит\nрядом с ратушей, дает\nещё одну"
         );
         this.nameText.text = "Сундук"
 
@@ -1105,7 +1109,7 @@ class Chest extends Tower {
 class Cat extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "cat", 3, 2, 3,
-            "это кот."
+            "Получает дополнительное\nздоровье и 2 урона от\nмолока"
         );
         this.nameText.text = "Кот"
 
@@ -1115,7 +1119,7 @@ class Cat extends Tower {
 class Milk extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "milk", 2, 1, 3,
-            "это молоко."
+            "Дает здоровье соседней\nсправа башне в начале\nкаждой волны"
         );
         this.nameText.text = "Молоко"
     }
@@ -1140,7 +1144,7 @@ class Milk extends Tower {
 class Guard extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "guard", 2, 1, 3,
-            " это гуард."
+            "При разрушении передаёт\nсвои характеристики\nвсем башням в виде\nвременного бонуса"
         );
         this.nameText.text = "Страж"
     }
@@ -1177,7 +1181,7 @@ class Guard extends Tower {
 class Thief extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "thief", 1, 2, 3,
-            "это вор."
+            "Дает 1 монету в конце\nволны, за каждый сундук,\nстоящий рядом. Добавляет\nэтим сундукам 5 урона"
         );
         this.nameText.text = "Вор"
     }
@@ -1207,7 +1211,7 @@ class Thief extends Tower {
 class Glass extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "glass", 1, 2, 3,
-            "Если ломается\nпередает урон ГБ\nПосле волны увеличивает\n свой урон на 1"
+            "Если ломается, передает\nчасть урона ратуше.\nПосле волны увеличивает\nсвой урон на 1"
         );
         this.nameText.text = "Стекло"
     }
@@ -1220,8 +1224,8 @@ class Glass extends Tower {
 
 class Stairs extends Tower {
     constructor(scene, x, y) {
-        super(scene, x, y, "stairs", 1, 2, 3,
-            "Нужна только одна\n    для улучшения"
+        super(scene, x, y, "stairs", 2, 2, 3,
+            "Нужна только одна для\nулучшения"
         );
         this.neededExp = 5
         this.neededExpScale = 0
@@ -1234,7 +1238,7 @@ class Stairs extends Tower {
 class Obsidian extends Tower {
     constructor(scene, x, y) {
         super(scene, x, y, "obsidian", 1, 2, 5,
-            "Сохраняет временные \n   бонусы"
+            "Сохраняет временные\nбонусы"
         );
         this.nameText.text = "Обсидиан"
         this.nameText.setFontSize('23px')
