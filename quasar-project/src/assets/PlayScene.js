@@ -139,7 +139,7 @@ export default class PlayScene extends Scene {
         for (let i = 1; i < this.count_slots; ++i) {
             this.slots.push(this.add.sprite(140 + this.step_sprite * i, this.platform_start, 'slot').setInteractive().setAlpha(0))
             this.slots[i - 1].input.dropZone = true
-            this.slots[i - 1].dropZoneIndex = i;
+            this.slots[i - 1].dropZoneIndex = i - 1;
         }
 
         this.shopLine = this.add.sprite(0 - 1400, this.platform_start + 150, 'shopLine').setScale(0.8).setOrigin(0, 0)
