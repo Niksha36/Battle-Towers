@@ -139,7 +139,7 @@ export default class PlayScene extends Scene {
 
 
         for (let i = 1; i < this.count_slots; ++i) {
-            this.slots.push(this.add.sprite(140 + this.step_sprite * i, this.platform_start, 'slot').setInteractive().setAlpha(0))
+            this.slots.push(this.add.sprite(140 + this.step_sprite * i, this.platform_start, 'slot').setInteractive().setAlpha(0.4))
             this.slots[i - 1].input.dropZone = true
             this.slots[i - 1].dropZoneIndex = i;
         }
@@ -297,17 +297,12 @@ export default class PlayScene extends Scene {
         this.towerDeleteButton.on("pointerdown", () => {
             if (!this.deleteMode) {
                 this.towerDeleteButton.setTint(0xc1c1c1)
-                console.log(1)
-
-                this.towerDeleteButton.setFrame(1);
-
-
                 this.deleteMode = true
                 for (let i = 1; i < this.towers.length; i++) {
-                    console.log(i)
 
-                    if (this.towers[i]) {
-                        this.towers[i].on("pointerdown", () => {
+                    if (this.towers[i] !== 0) {
+                        this.towers[i]?.on("pointerdown", () => {
+                            if (!this.deleteMode) return
                             console.log(this.towers[i])
                             this.towers[i].component_destroy()
                             this.towers[i].destroy()
@@ -316,30 +311,14 @@ export default class PlayScene extends Scene {
                             this.slots[i].input.dropZone = true
                             this.slots[i].dropZoneIndex = i
 
-                            this.generateAnimation()
-                            console.log("smth")
+                            this.deleteMode = false
+                            this.towerDeleteButton.clearTint()
                         })
                     }
-
-
                 }
-
-                // for (let slot of this.slots) {
-                //     this.tweens.add({
-                //         targets: slot,
-                //         alpha: 0, // Конечная прозрачность (полностью видимый)
-                //         duration: 500, // Длительность анимации в миллисекундах TODO
-                //         ease: 'Power2', // Тип easing
-                //         onComplete: () => {
-                //             console.log(1)
-                //         }
-                //     });
-                // }
             } else {
                 this.deleteMode = false
                 this.towerDeleteButton.clearTint()
-
-
                 this.towerDeleteButton.setFrame(0);
 
         for (let i = 1; i < this.towers.length; i++) {
@@ -350,11 +329,9 @@ export default class PlayScene extends Scene {
         //setting button
         const settingButton = this.add.image(this.width - 20, 0, 'setting_button').setOrigin(1, 0).setInteractive();
 
-
         settingButton.on('pointerover', () => {
             settingButton.setTint(0xA5A5A5);
         });
-
 
         settingButton.on('pointerout', () => {
             settingButton.clearTint();
@@ -365,8 +342,6 @@ export default class PlayScene extends Scene {
             this.router.push('/menu');
         });
 
-
-        // Create the rerollButton
         this.rerollButton = this.add.sprite(1270, 850, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
 
         this.add.existing(this.rerollButton);
@@ -510,16 +485,7 @@ export default class PlayScene extends Scene {
             for (let slot of this.slots) {
                 if (slot) {
                     shop_tower.on('pointerover', (pointer, localX, localY, event) => {
-                        this.tweens.add({
-                            targets: slot,
-                            alpha: 0.4, // Конечная прозрачность (полностью видимый)
-                            duration: 500, // Длительность анимации в миллисекундах
-                            ease: 'Power2', // Тип easing
-                        });
-
                         shop_tower.showDescription(pointer.x, pointer.y)
-
-
                     });
 
                     shop_tower.on('pointermove', (pointer, localX, localY, event) => {
@@ -527,51 +493,6 @@ export default class PlayScene extends Scene {
                     })
 
                     shop_tower.on('pointerout', () => {
-                        this.tweens.add({
-                            targets: slot,
-                            alpha: 0, // Конечная прозрачность (полностью видимый)
-                            duration: 300, // Длительность анимации в миллисекундах
-                            ease: 'Power2', // Тип easing
-                        });
-
-                        shop_tower.hideDescription()
-                    });
-                }
-            }
-            this.children.bringToTop(this.shopLine);
-        }
-    }
-
-    generateAnimation() {
-        for (let i = 0; i < this.shop_towers.length; ++i) {
-            let shop_tower = this.shop_towers[i]
-            for (let slot of this.slots) {
-                if (slot) {
-                    shop_tower.on('pointerover', (pointer, localX, localY, event) => {
-                        this.tweens.add({
-                            targets: slot,
-                            alpha: 0.4, // Конечная прозрачность (полностью видимый)
-                            duration: 500, // Длительность анимации в миллисекундах
-                            ease: 'Power2', // Тип easing
-                        });
-
-                        shop_tower.showDescription(pointer.x, pointer.y)
-
-
-                    });
-
-                    shop_tower.on('pointermove', (pointer, localX, localY, event) => {
-                        shop_tower.showDescription(pointer.x, pointer.y)
-                    })
-
-                    shop_tower.on('pointerout', () => {
-                        this.tweens.add({
-                            targets: slot,
-                            alpha: 0, // Конечная прозрачность (полностью видимый)
-                            duration: 300, // Длительность анимации в миллисекундах
-                            ease: 'Power2', // Тип easing
-                        });
-
                         shop_tower.hideDescription()
                     });
                 }
@@ -634,6 +555,8 @@ export default class PlayScene extends Scene {
             }
         }
 
+        this.hideSlots()
+
         this.tweens.add({
             targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
             x: '-=1400',
@@ -678,10 +601,29 @@ export default class PlayScene extends Scene {
 
     }
 
+    hideSlots() {
+        this.tweens.add({
+            targets: this.slots,
+            alpha: 0, // Конечная прозрачность (полностью видимый)
+            duration: 300, // Длительность анимации в миллисекундах
+            ease: 'Power2', // Тип easing
+        });
+    }
+
+    showSlots() {
+        this.tweens.add({
+            targets: this.slots,
+            alpha: 0.4, // Конечная прозрачность (полностью видимый)
+            duration: 500, // Длительность анимации в миллисекундах
+            ease: 'Power2', // Тип easing
+        });
+    }
+
     endWave() {
         this.startWaveButtonContainer.setVisible(true);
         this.roundsFlagContainer.setVisible(true)
         this.generateShop(this.shop_towers, this.shop_plates)
+        this.showSlots()
         this.tweens.add({
             targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
             x: '+=1400',
