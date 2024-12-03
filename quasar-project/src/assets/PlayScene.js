@@ -35,12 +35,13 @@ import shovel from "../assets/sprites/shovel.png"
 import stor from "../store.js"
 import axios from "axios";
 import router from "src/router/index.js";
+import {useRouter} from "vue-router";
 
 export default class PlayScene extends Scene {
 
     constructor(vueInstance) {
         super({key: 'PlayScene'})
-        this.router = router;
+        this.router = useRouter();
         this.vueInstance = vueInstance;
         console.log('Router initialized:', this.router);
     }
@@ -1421,7 +1422,7 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         }).setOrigin(0.5, 0.5).setInteractive();
         this.ratingButtonContaner.add([this.ratingButtonBackground, this.ratingButtonText]);
         this.ratingButtonText.on('pointerdown', () => {
-            router.push('/rating');
+            this.scene.router.push('/rating');
         });
 // Create quit button container
         this.quitButtonContainer = scene.add.container(this.x + 220, this.y + 125).setInteractive();
@@ -1434,7 +1435,7 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         }).setOrigin(0.5, 0.5).setInteractive();
         this.quitButtonContainer.add([this.quitButtonBackground, this.quitButtonText]);
         this.quitButtonText.on('pointerdown', () => {
-            router.push('/menu');
+            this.scene.router.push('/menu');
         });
         this.quitButtonContainer.on('pointerover', () => {
             //ТУТ НАДО КАК-ТО МЕНЯТЬ ФОН КНОПКИ
