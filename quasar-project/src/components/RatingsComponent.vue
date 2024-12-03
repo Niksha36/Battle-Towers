@@ -2,7 +2,10 @@
 import { ref } from 'vue';
 import axios from "axios";
 import stor from "../store.js"
-
+import router from "src/router/index.js";
+function backToMenu(){
+    router.push('/menu')
+}
 let data = ref([])
 let response = axios.get("http://localhost:8000/get_top", {
     withCredentials: true,
@@ -22,6 +25,7 @@ console.log(data)
 
 <template>
     <div class="background-wrapper">
+        <img @click="backToMenu" src="../assets/sprites/ic_go_back.svg" alt="" class="back-button" width="150">
         <div class="ratings-table">
             <h1>Рейтинг</h1>
             <table>
@@ -46,6 +50,16 @@ console.log(data)
 </template>
 
 <style scoped>
+.back-button{
+    position: absolute;
+    top: 10px;
+    left: 20px
+}
+.back-button:hover {
+    cursor: pointer;
+    content: url('../assets/sprites/ic_go_back_hover.svg');
+}
+
 .background-wrapper{
     width: 100vw;
     height: 100vh;

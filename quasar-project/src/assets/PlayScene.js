@@ -156,7 +156,6 @@ export default class PlayScene extends Scene {
         this.add.existing(this.rerollButton);
 
 
-
         this.tweens.add({
             targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
             x: '+=1400',
@@ -753,6 +752,7 @@ export default class PlayScene extends Scene {
                             "loseBackground",
                             this.wave,
                             response.record,
+                            this.router
                         )
                     } catch (e) {
                         console.log(e)
@@ -763,6 +763,7 @@ export default class PlayScene extends Scene {
                             "loseBackground",
                             this.wave,
                             0,
+                            this.router
                         )
                     }
 
@@ -774,23 +775,13 @@ export default class PlayScene extends Scene {
                         "loseBackground",
                         this.wave,
                         0,
+                        this.router
                     )
                 }
 
 
                 console.log(this.es)
 
-                this.es?.on(
-                    'pointerdown',
-                    () => {
-                        this.es.destroyComponents()
-                        this.es.destroy()
-                        this.removeScreen()
-
-                        this.scene.restart()
-                        console.log("data")
-                    }
-                )
 
                 this.tweens.add({
                     targets: this.es.animation_targets,
@@ -1341,16 +1332,15 @@ function getRandomNumber(max) {
 }
 
 class EndScreen extends Phaser.GameObjects.Sprite {
-        constructor(scene, x, y, texture, waves, playerRecord) {
+    constructor(scene, x, y, texture, waves, playerRecord, router) {
         super(scene, x, y, texture);
         this.height = this.texture.height
         this.width = this.texture.width
         this.waves = waves
         this.playerRecord = playerRecord
         this.setInteractive()
-
         this.animation_targets = [this]
-
+        this.router = router;
         this.TEXTS = {
             not_authorised: {
                 text: "Вы не авторизованы",
@@ -1392,6 +1382,69 @@ class EndScreen extends Phaser.GameObjects.Sprite {
             }
 
         }
+        this.graphics = scene.add.graphics();
+        const radius = 10;
+        const paddingX = 25;
+        const paddingY = 10
+        const textWidth = 100; // Adjust based on your text width
+        const textHeight = 40; // Adjust based on your text height
+
+// Create retry button container
+        const textRetryWidth = 170;
+        this.retryButtonContainer = scene.add.container(this.x - 250, this.y + 125);
+        this.retryButtonContainer
+        this.retryButtonBackground = scene.add.graphics().setInteractive();
+        this.retryButtonBackground.fillStyle(0x1D7E7C, 1);
+        const buttonBackgroundX = -60
+        const buttonBackgroundY = -30
+        this.retryButtonBackground.fillRoundedRect(buttonBackgroundX, buttonBackgroundY, textRetryWidth + 2 * paddingX, textHeight + 2 * paddingY, radius).setInteractive();
+        const textX = buttonBackgroundX + (textRetryWidth + 2 * paddingX) / 2;
+        const textY = buttonBackgroundY + (textHeight + 2 * paddingY) / 2;
+        this.retryButtonText = scene.add.text(textX, textY, 'Новая игра', {
+            fontSize: '30px',
+            fill: '#ffffff'
+        }).setOrigin(0.5, 0.5).setInteractive();
+        this.retryButtonContainer.add([this.retryButtonBackground, this.retryButtonText]);
+        this.retryButtonText.setInteractive().on('pointerdown', () => {
+            this.scene.scene.restart();
+            this.destroyComponents()
+            this.destroy();
+            console.log("data");
+        });
+        //rating container
+        this.ratingButtonContaner = scene.add.container(this.x+10, this.y + 125);
+        this.ratingButtonContaner.setInteractive()
+        this.ratingButtonBackground = scene.add.graphics();
+        this.ratingButtonBackground.fillStyle(0x1D7E7C, 1);
+        this.ratingButtonBackground.fillRoundedRect(buttonBackgroundX, buttonBackgroundY, textWidth+20 + 2 * paddingX, textHeight + 2 * paddingY, radius);
+        this.ratingButtonText = scene.add.text(buttonBackgroundX + (textWidth+20 + 2 * paddingX) / 2, buttonBackgroundY + (textHeight + 2 * paddingY) / 2, 'Рейтинги', {
+            fontSize: '30px',
+            fill: '#ffffff'
+        }).setOrigin(0.5, 0.5).setInteractive();
+        this.ratingButtonContaner.add([this.ratingButtonBackground, this.ratingButtonText]);
+        this.ratingButtonText.on('pointerdown', () => {
+            this.router.push('/rating');
+        });
+// Create quit button container
+        this.quitButtonContainer = scene.add.container(this.x + 220, this.y + 125).setInteractive();
+        this.quitButtonBackground = scene.add.graphics();
+        this.quitButtonBackground.fillStyle(0x1D7E7C, 1);
+        this.quitButtonBackground.fillRoundedRect(buttonBackgroundX, buttonBackgroundY, textWidth + 2 * paddingX, textHeight + 2 * paddingY, radius).setInteractive();
+        this.quitButtonText = scene.add.text(buttonBackgroundX + (textWidth + 2 * paddingX) / 2, buttonBackgroundY + (textHeight + 2 * paddingY) / 2, 'Меню', {
+            fontSize: '30px',
+            fill: '#ffffff'
+        }).setOrigin(0.5, 0.5).setInteractive();
+        this.quitButtonContainer.add([this.quitButtonBackground, this.quitButtonText]);
+        this.quitButtonText.on('pointerdown', () => {
+            this.router.push('/menu');
+        });
+        this.quitButtonContainer.on('pointerover', () => {
+            //ТУТ НАДО КАК-ТО МЕНЯТЬ ФОН КНОПКИ
+        });
+
+        this.quitButtonContainer.on('pointerout', () => {
+            //ТУТ НАДО КАК-ТО МЕНЯТЬ ФОН КНОПКИ
+        });
         // if (stor.state.username)
         this.record_text = scene.add.text(
             this.x - 350,
@@ -1401,7 +1454,6 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         )
 
         this.animation_targets.push(this.record_text)
-
         if (!stor.state.username) {
             this.not_authorised_text = scene.add.text(
                 this.x - 150,
@@ -1466,5 +1518,9 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         this.scene.children.bringToTop(this.new_record_text);
         this.scene.children.bringToTop(this.not_authorised_text);
         this.scene.children.bringToTop(this.waves_text);
+        this.scene.children.bringToTop(this.graphics);
+        this.scene.children.bringToTop(this.retryButtonContainer);
+        this.scene.children.bringToTop(this.quitButtonContainer);
+        this.scene.children.bringToTop(this.ratingButtonContaner);
     }
 }

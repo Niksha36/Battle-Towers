@@ -21,7 +21,9 @@ function logout() {
 function login() {
     router.push("/login")
 }
-
+function closeGame() {
+    window.close();
+}
 </script>
 <template>
     <div class="background-wrapper">
@@ -39,6 +41,9 @@ function login() {
                 </button>
                 <button v-else class="quit" @click="logout">
                     Выйти
+                </button>
+                <button class="close-game" @click="closeGame">
+                    Закрыть
                 </button>
             </div>
         </div>

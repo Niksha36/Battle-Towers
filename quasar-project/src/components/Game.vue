@@ -139,6 +139,7 @@ body {
 .buttons-wrapper{
     display: flex;
     justify-content: space-between;
+    margin-top: 35px;
 }
 .buttons-wrapper button{
     border: none;
