@@ -148,9 +148,15 @@ export default class PlayScene extends Scene {
 
         this.towers.push(this.add.existing(new MainTower(this)))
         this.generateShop(this.shop_towers, this.shop_plates)
+        this.towerDeleteButton = this.add.sprite(250 - 1400, 20, 'shovel', 0).setOrigin(0, 0).setScale(0.7, 0.7).setInteractive();
+
+        this.rerollButton = this.add.sprite(1270 - 1400, 850, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
+        this.add.existing(this.rerollButton);
+
+
 
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -158,11 +164,15 @@ export default class PlayScene extends Scene {
                 this.shop_towers.forEach((element) => {
                     element.disableInteractive()
                 })
+                this.rerollButton.disableInteractive();
+                this.towerDeleteButton.disableInteractive();
             },
             onComplete: () => {
                 this.shop_towers.forEach((element) => {
                     element.setupInteractive();
                 });
+                this.rerollButton.setInteractive();
+                this.towerDeleteButton.setInteractive();
             },
         });
 
@@ -294,7 +304,6 @@ export default class PlayScene extends Scene {
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
 
-        this.towerDeleteButton = this.add.sprite(250, 20, 'shovel', 0).setOrigin(0, 0).setScale(0.7, 0.7).setInteractive();
         this.towerDeleteButton.on("pointerdown", () => {
             if (!this.deleteMode) {
                 this.towerDeleteButton.setTint(0xc1c1c1)
@@ -321,12 +330,6 @@ export default class PlayScene extends Scene {
                 this.deleteMode = false
                 this.towerDeleteButton.clearTint()
                 this.towerDeleteButton.setFrame(0);
-
-                for (let i = 1; i < this.towers.length; i++) {
-                    this.towers[i]?.on("pointerdown", () => {
-
-                    })
-                }
             }
 
         })
@@ -346,9 +349,6 @@ export default class PlayScene extends Scene {
             this.router.push('/menu');
         });
 
-        this.rerollButton = this.add.sprite(1270, 850, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
-
-        this.add.existing(this.rerollButton);
 
         this.children.bringToTop(this.rerollButton);
         this.rerollButton.on('pointerover', () => {
@@ -525,7 +525,7 @@ export default class PlayScene extends Scene {
         this.clearShop(this.shop_towers, this.shop_plates)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
-            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
+            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -533,6 +533,8 @@ export default class PlayScene extends Scene {
                 this.shop_towers.forEach((element) => {
                     element.disableInteractive()
                 })
+                this.rerollButton.disableInteractive();
+                this.towerDeleteButton.disableInteractive()
             },
             onComplete: () => {
                 this.shop_towers.forEach((element) => {
@@ -547,6 +549,8 @@ export default class PlayScene extends Scene {
                         }
                     }
                 });
+                this.rerollButton.setInteractive();
+                this.towerDeleteButton.setInteractive();
             },
         });
     }
@@ -562,7 +566,7 @@ export default class PlayScene extends Scene {
         this.hideSlots()
 
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
             x: '-=1400',
             duration: 1000,
             ease: 'Power2',
@@ -571,12 +575,16 @@ export default class PlayScene extends Scene {
                 this.shop_towers.forEach((element) => {
                     element.disableInteractive()
                 })
+                this.rerollButton.disableInteractive();
+                this.towerDeleteButton.disableInteractive()
             },
             onComplete: () => {
                 this.clearShop(this.shop_towers, this.shop_plates)
                 this.shop_towers.forEach((element) => {
                     element.setupInteractive();
                 });
+                this.rerollButton.setInteractive();
+                this.towerDeleteButton.setInteractive();
             },
         });
 
