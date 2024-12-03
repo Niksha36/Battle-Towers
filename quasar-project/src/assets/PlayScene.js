@@ -30,7 +30,7 @@ import description from "../assets/sprites/description.png"
 import towerInfoBg from "../assets/sprites/progressbar_green_bg_1.png"
 import reroll_sprite from "../assets/sprites/reroll_sprite.png"
 import explosion_sprite from "../assets/sprites/explosion_sprite_v1.png"
-import setting_button from "../assets/sprites/spr_settings.png"
+import setting_button from "../assets/sprites/menu.png"
 import shovel from "../assets/sprites/shovel.png"
 import stor from "../store.js"
 import axios from "axios";
