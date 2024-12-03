@@ -103,6 +103,7 @@ export default class PlayScene extends Scene {
         this.es = null
 
         this.deleteMode = false
+        this.inGame = true
 
         this.width = this.scale.width
         this.height = this.scale.height
@@ -453,6 +454,7 @@ export default class PlayScene extends Scene {
     }
 
     generateShop(shop_towers, shop_plates) {
+        if (!this.inGame) return
         for (let i = 0; i < this.count_shop_slots; ++i) {
             let x_pos = (this.step_sprite + 40) * i + 90 - 1400
             let y_pos = this.platform_start + 295
@@ -632,6 +634,7 @@ export default class PlayScene extends Scene {
     }
 
     endWave() {
+        if (!this.inGame) return
         this.startWaveButtonContainer.setVisible(true);
         this.roundsFlagContainer.setVisible(true)
         this.generateShop(this.shop_towers, this.shop_plates)
@@ -726,6 +729,7 @@ export default class PlayScene extends Scene {
                 this.towers[0].updateDMGText()
             }
             if (tower.constructor.name === "MainTower") {
+                this.inGame = false
                 const mainTowerAnim = this.add.sprite(tower.x, tower.y, 'explosion');
                 mainTowerAnim.setScale(4);
                 mainTowerAnim.on('animationcomplete', () => {
@@ -735,6 +739,7 @@ export default class PlayScene extends Scene {
                 attackAnim.on('animationcomplete', () => {
                     attackAnim.destroy();
                 });
+                stor.dispatch("updateRecord", this.wave)
                 if (stor.state.username) {
                     try {
                         const response = this.get_user_record();
@@ -793,7 +798,6 @@ export default class PlayScene extends Scene {
                         console.log("ido")
                     }
                 })
-                stor.dispatch("updateRecord", this.wave)
                 this.update_user_record()
             }
             tower.is_die = true
