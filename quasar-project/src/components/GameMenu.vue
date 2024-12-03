@@ -69,6 +69,7 @@ function closeGame() {
     align-items: center;
 }
 .game-menu .button-wrapper button {
+    cursor: pointer ;
     border: 7px solid #c2b067;
     border-radius: 30px;
     padding: 10px 20px;
@@ -98,5 +99,11 @@ function closeGame() {
     margin: 0 0 100px 0;
     color: #E1491A;
     white-space: nowrap;
+}
+.close-game{
+    background: #a10202!important;
+}
+.close-game:hover{
+    background: #e80000 !important;
 }
 </style>
