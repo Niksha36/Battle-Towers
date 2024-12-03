@@ -777,17 +777,17 @@ export default class PlayScene extends Scene {
 
                 console.log(this.es)
 
-                this.es?.on(
-                    'pointerdown',
-                    () => {
-                        this.es.destroyComponents()
-                        this.es.destroy()
-                        this.removeScreen()
-
-                        this.scene.restart()
-                        console.log("data")
-                    }
-                )
+                // this.es?.on(
+                //     'pointerdown',
+                //     () => {
+                //         this.es.destroyComponents()
+                //         this.es.destroy()
+                //         this.removeScreen()
+                //
+                //         this.scene.restart()
+                //         console.log("data")
+                //     }
+                // )
 
                 this.tweens.add({
                     targets: this.es.animation_targets,
@@ -1389,6 +1389,52 @@ class EndScreen extends Phaser.GameObjects.Sprite {
             }
 
         }
+        this.graphics = scene.add.graphics();
+        const radius = 10;
+        const paddingX = 25;
+        const paddingY = 10
+        const textWidth = 100; // Adjust based on your text width
+        const textHeight = 40; // Adjust based on your text height
+
+// Create retry button container
+        this.retryButtonContainer = scene.add.container(this.x - 120, this.y + 120);
+        this.retryButtonBackground = scene.add.graphics();
+        this.retryButtonBackground.fillStyle(0x1D7E7C, 1);
+        const buttonBackgroundX = -60
+        const buttonBackgroundY = -30
+        this.retryButtonBackground.fillRoundedRect(buttonBackgroundX, buttonBackgroundY, textWidth + 2 * paddingX, textHeight + 2 * paddingY, radius);
+        const textX = buttonBackgroundX + (textWidth + 2 * paddingX) / 2;
+        const textY = buttonBackgroundY + (textHeight + 2 * paddingY) / 2;
+        this.retryButtonText = scene.add.text(textX,textY, 'Retry', {
+            fontSize: '30px',
+            fill: '#ffffff'
+        }).setOrigin(0.5, 0.5).setInteractive();
+        this.retryButtonContainer.add([this.retryButtonBackground, this.retryButtonText]);
+
+        this.retryButtonText.on('pointerdown', () => {
+            this.scene.scene.restart();
+            this.destroyComponents()
+            this.destroy();
+            console.log("data");
+        });
+
+// Create quit button container
+        this.quitButtonContainer = scene.add.container(this.x + 120, this.y + 120);
+        this.quitButtonBackground = scene.add.graphics();
+        this.quitButtonBackground.fillStyle(0x1D7E7C, 1);
+        this.quitButtonBackground.fillRoundedRect(buttonBackgroundX, buttonBackgroundY, textWidth + 2 * paddingX, textHeight + 2 * paddingY, radius);
+        this.quitButtonText = scene.add.text(textX, textY, 'Quit', {
+            fontSize: '30px',
+            fill: '#ffffff'
+        }).setOrigin(0.5, 0.5).setInteractive();
+        this.quitButtonContainer.add([this.quitButtonBackground, this.quitButtonText]);
+
+// Add interactivity
+        this.quitButtonText.on('pointerdown', () => {
+            router.push('/menu');
+        });
+
+        this.animation_targets.push(this.retryButtonContainer, this.quitButtonContainer);
         // if (stor.state.username)
         this.record_text = scene.add.text(
             this.x - 350,
@@ -1463,5 +1509,7 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         this.scene.children.bringToTop(this.new_record_text);
         this.scene.children.bringToTop(this.not_authorised_text);
         this.scene.children.bringToTop(this.waves_text);
+        this.scene.children.bringToTop(this.quitButtonContainer)
+        this.scene.children.bringToTop(this.retryButtonContainer)
     }
 }
