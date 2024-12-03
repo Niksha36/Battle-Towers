@@ -38,9 +38,10 @@ import router from "src/router/index.js";
 
 export default class PlayScene extends Scene {
 
-    constructor() {
+    constructor(vueInstance) {
         super({key: 'PlayScene'})
         this.router = router;
+        this.vueInstance = vueInstance;
         console.log('Router initialized:', this.router);
     }
 
@@ -343,7 +344,9 @@ export default class PlayScene extends Scene {
 
 
         settingButton.on('pointerdown', () => {
-            this.router.push('/menu');
+            settingButton.clearTint();
+            this.vueInstance.displayDialog();
+            this.scene.pause();
         });
 
         this.rerollButton = this.add.sprite(1270, 850, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
