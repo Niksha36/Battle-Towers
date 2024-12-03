@@ -525,7 +525,7 @@ export default class PlayScene extends Scene {
         this.clearShop(this.shop_towers, this.shop_plates)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
-            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
+            targets: [...this.shop_towers, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -637,7 +637,7 @@ export default class PlayScene extends Scene {
         this.generateShop(this.shop_towers, this.shop_plates)
         this.showSlots()
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -645,11 +645,17 @@ export default class PlayScene extends Scene {
                 this.shop_towers.forEach((element) => {
                     element.disableInteractive()
                 })
+
+                this.rerollButton.disableInteractive()
+                this.towerDeleteButton.disableInteractive()
             },
             onComplete: () => {
                 this.shop_towers.forEach((element) => {
                     element.setupInteractive();
                 });
+
+                this.rerollButton.setInteractive()
+                this.towerDeleteButton.setInteractive()
             },
         });
 
@@ -1328,7 +1334,7 @@ function getRandomNumber(max) {
 }
 
 class EndScreen extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, waves, playerRecord) {
+        constructor(scene, x, y, texture, waves, playerRecord) {
         super(scene, x, y, texture);
         this.height = this.texture.height
         this.width = this.texture.width
