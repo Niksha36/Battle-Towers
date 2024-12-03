@@ -1421,7 +1421,7 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         }).setOrigin(0.5, 0.5).setInteractive();
         this.ratingButtonContaner.add([this.ratingButtonBackground, this.ratingButtonText]);
         this.ratingButtonText.on('pointerdown', () => {
-            this.router.push('/rating');
+            router.push('/rating');
         });
 // Create quit button container
         this.quitButtonContainer = scene.add.container(this.x + 220, this.y + 125).setInteractive();
@@ -1434,7 +1434,7 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         }).setOrigin(0.5, 0.5).setInteractive();
         this.quitButtonContainer.add([this.quitButtonBackground, this.quitButtonText]);
         this.quitButtonText.on('pointerdown', () => {
-            this.router.push('/menu');
+            router.push('/menu');
         });
         this.quitButtonContainer.on('pointerover', () => {
             //ТУТ НАДО КАК-ТО МЕНЯТЬ ФОН КНОПКИ
