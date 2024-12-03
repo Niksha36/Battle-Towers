@@ -104,6 +104,7 @@ export default class PlayScene extends Scene {
         this.es = null
 
         this.deleteMode = false
+        this.inGame = true
 
         this.width = this.scale.width
         this.height = this.scale.height
@@ -149,9 +150,15 @@ export default class PlayScene extends Scene {
 
         this.towers.push(this.add.existing(new MainTower(this)))
         this.generateShop(this.shop_towers, this.shop_plates)
+        this.towerDeleteButton = this.add.sprite(250 - 1400, 20, 'shovel', 0).setOrigin(0, 0).setScale(0.7, 0.7).setInteractive();
+
+        this.rerollButton = this.add.sprite(1270 - 1400, 850, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
+        this.add.existing(this.rerollButton);
+
+
 
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -159,11 +166,15 @@ export default class PlayScene extends Scene {
                 this.shop_towers.forEach((element) => {
                     element.disableInteractive()
                 })
+                this.rerollButton.disableInteractive();
+                this.towerDeleteButton.disableInteractive();
             },
             onComplete: () => {
                 this.shop_towers.forEach((element) => {
                     element.setupInteractive();
                 });
+                this.rerollButton.setInteractive();
+                this.towerDeleteButton.setInteractive();
             },
         });
 
@@ -295,7 +306,6 @@ export default class PlayScene extends Scene {
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
 
-        this.towerDeleteButton = this.add.sprite(250, 20, 'shovel', 0).setOrigin(0, 0).setScale(0.7, 0.7).setInteractive();
         this.towerDeleteButton.on("pointerdown", () => {
             if (!this.deleteMode) {
                 this.towerDeleteButton.setTint(0xc1c1c1)
@@ -322,12 +332,6 @@ export default class PlayScene extends Scene {
                 this.deleteMode = false
                 this.towerDeleteButton.clearTint()
                 this.towerDeleteButton.setFrame(0);
-
-                for (let i = 1; i < this.towers.length; i++) {
-                    this.towers[i]?.on("pointerdown", () => {
-
-                    })
-                }
             }
 
         })
@@ -349,9 +353,6 @@ export default class PlayScene extends Scene {
             this.scene.pause();
         });
 
-        this.rerollButton = this.add.sprite(1270, 850, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
-
-        this.add.existing(this.rerollButton);
 
         this.children.bringToTop(this.rerollButton);
         this.rerollButton.on('pointerover', () => {
@@ -456,6 +457,7 @@ export default class PlayScene extends Scene {
     }
 
     generateShop(shop_towers, shop_plates) {
+        if (!this.inGame) return
         for (let i = 0; i < this.count_shop_slots; ++i) {
             let x_pos = (this.step_sprite + 40) * i + 90 - 1400
             let y_pos = this.platform_start + 295
@@ -536,6 +538,8 @@ export default class PlayScene extends Scene {
                 this.shop_towers.forEach((element) => {
                     element.disableInteractive()
                 })
+                this.rerollButton.disableInteractive();
+                this.towerDeleteButton.disableInteractive()
             },
             onComplete: () => {
                 this.shop_towers.forEach((element) => {
@@ -550,6 +554,8 @@ export default class PlayScene extends Scene {
                         }
                     }
                 });
+                this.rerollButton.setInteractive();
+                this.towerDeleteButton.setInteractive();
             },
         });
     }
@@ -565,7 +571,7 @@ export default class PlayScene extends Scene {
         this.hideSlots()
 
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
             x: '-=1400',
             duration: 1000,
             ease: 'Power2',
@@ -574,12 +580,16 @@ export default class PlayScene extends Scene {
                 this.shop_towers.forEach((element) => {
                     element.disableInteractive()
                 })
+                this.rerollButton.disableInteractive();
+                this.towerDeleteButton.disableInteractive()
             },
             onComplete: () => {
                 this.clearShop(this.shop_towers, this.shop_plates)
                 this.shop_towers.forEach((element) => {
                     element.setupInteractive();
                 });
+                this.rerollButton.setInteractive();
+                this.towerDeleteButton.setInteractive();
             },
         });
 
@@ -627,12 +637,13 @@ export default class PlayScene extends Scene {
     }
 
     endWave() {
+        if (!this.inGame) return
         this.startWaveButtonContainer.setVisible(true);
         this.roundsFlagContainer.setVisible(true)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.showSlots()
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container)],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -640,11 +651,17 @@ export default class PlayScene extends Scene {
                 this.shop_towers.forEach((element) => {
                     element.disableInteractive()
                 })
+
+                this.rerollButton.disableInteractive()
+                this.towerDeleteButton.disableInteractive()
             },
             onComplete: () => {
                 this.shop_towers.forEach((element) => {
                     element.setupInteractive();
                 });
+
+                this.rerollButton.setInteractive()
+                this.towerDeleteButton.setInteractive()
             },
         });
 
@@ -715,6 +732,7 @@ export default class PlayScene extends Scene {
                 this.towers[0].updateDMGText()
             }
             if (tower.constructor.name === "MainTower") {
+                this.inGame = false
                 const mainTowerAnim = this.add.sprite(tower.x, tower.y, 'explosion');
                 mainTowerAnim.setScale(4);
                 mainTowerAnim.on('animationcomplete', () => {
@@ -724,6 +742,7 @@ export default class PlayScene extends Scene {
                 attackAnim.on('animationcomplete', () => {
                     attackAnim.destroy();
                 });
+                stor.dispatch("updateRecord", this.wave)
                 if (stor.state.username) {
                     try {
                         const response = this.get_user_record();
@@ -782,7 +801,6 @@ export default class PlayScene extends Scene {
                         console.log("ido")
                     }
                 })
-                stor.dispatch("updateRecord", this.wave)
                 this.update_user_record()
             }
             tower.is_die = true
@@ -1323,7 +1341,7 @@ function getRandomNumber(max) {
 }
 
 class EndScreen extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, waves, playerRecord) {
+        constructor(scene, x, y, texture, waves, playerRecord) {
         super(scene, x, y, texture);
         this.height = this.texture.height
         this.width = this.texture.width
