@@ -752,7 +752,6 @@ export default class PlayScene extends Scene {
                             "loseBackground",
                             this.wave,
                             response.record,
-                            this.router
                         )
                     } catch (e) {
                         console.log(e)
@@ -763,7 +762,6 @@ export default class PlayScene extends Scene {
                             "loseBackground",
                             this.wave,
                             0,
-                            this.router
                         )
                     }
 
@@ -775,7 +773,6 @@ export default class PlayScene extends Scene {
                         "loseBackground",
                         this.wave,
                         0,
-                        this.router
                     )
                 }
 
@@ -1339,8 +1336,9 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         this.waves = waves
         this.playerRecord = playerRecord
         this.setInteractive()
+
         this.animation_targets = [this]
-        this.router = router;
+
         this.TEXTS = {
             not_authorised: {
                 text: "Вы не авторизованы",
@@ -1454,6 +1452,7 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         )
 
         this.animation_targets.push(this.record_text)
+
         if (!stor.state.username) {
             this.not_authorised_text = scene.add.text(
                 this.x - 150,
