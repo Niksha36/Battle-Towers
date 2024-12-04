@@ -87,11 +87,10 @@ body {
 }
 
 .dialog-box {
-    background: white;
+    background: rgba(255, 255, 255, 0.6);
     padding: 30px;
     border-radius: 15px;
     min-width: 500px;
-    border: 4px solid gold;
 }
 
 .dialog-box h1 {
@@ -113,7 +112,7 @@ body {
     border: none;
     padding: 10px 50px;
     background: #1D7E7C;
-    color: white;
+    color: #dddddd;
     font-size: 30px;
     border-radius: 15px;
 

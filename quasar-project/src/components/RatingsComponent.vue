@@ -68,7 +68,7 @@ console.log(data)
     background-size: cover;
     overflow-y: auto;
     max-height: 100%;
-
+    position: relative;
 }
 .ratings-table {
     font-family: 'Roboto', sans-serif;
@@ -89,15 +89,15 @@ console.log(data)
 .ratings-table th{
     padding: 8px;
     text-transform: uppercase;
-
     background: #AA382C;
     text-align: center;
     font-size: 40px;
     color: #EDDDB8;
+    min-width: 420px;
 
 }
 .ratings-table td{
-    background: white;
+    background: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
     font-size: 40px;
     text-align: center;

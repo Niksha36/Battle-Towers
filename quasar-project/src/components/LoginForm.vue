@@ -148,6 +148,7 @@ input {
     outline: none;
     font-size: 20px;
     border-radius: 4px;
+    background: #f9f9f9
 }
 
 .input-wrapper {
