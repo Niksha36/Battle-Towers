@@ -151,14 +151,14 @@ export default class PlayScene extends Scene {
 
         this.towers.push(this.add.existing(new MainTower(this)))
         this.generateShop(this.shop_towers, this.shop_plates)
-        this.towerDeleteButton = this.add.sprite(250 - 1400, 20, 'shovel', 0).setOrigin(0, 0).setScale(0.7, 0.7).setInteractive();
+        this.towerDeleteButton = this.add.sprite(250, 20, 'shovel', 0).setOrigin(0, 0).setScale(0.7, 0.7).setAlpha(0).setInteractive();
 
         this.rerollButton = this.add.sprite(1270 - 1400, 850, 'reroll_button', 0).setOrigin(0.5, 0.5).setInteractive();
         this.add.existing(this.rerollButton);
 
 
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -167,13 +167,23 @@ export default class PlayScene extends Scene {
                     element.disableInteractive()
                 })
                 this.rerollButton.disableInteractive();
-                this.towerDeleteButton.disableInteractive();
             },
             onComplete: () => {
                 this.shop_towers.forEach((element) => {
                     element.setupInteractive();
                 });
                 this.rerollButton.setInteractive();
+            },
+        });
+        this.tweens.add({
+            targets: this.towerDeleteButton,
+            alpha: 1,
+            duration: 500,
+            ease: 'Power2',
+            onStart: () => {
+                this.towerDeleteButton.disableInteractive();
+            },
+            onComplete: () => {
                 this.towerDeleteButton.setInteractive();
             },
         });
@@ -331,7 +341,6 @@ export default class PlayScene extends Scene {
             } else {
                 this.deleteMode = false
                 this.towerDeleteButton.clearTint()
-                this.towerDeleteButton.setFrame(0);
             }
 
         })
@@ -539,7 +548,6 @@ export default class PlayScene extends Scene {
                     element.disableInteractive()
                 })
                 this.rerollButton.disableInteractive();
-                this.towerDeleteButton.disableInteractive()
             },
             onComplete: () => {
                 this.shop_towers.forEach((element) => {
@@ -555,12 +563,13 @@ export default class PlayScene extends Scene {
                     }
                 });
                 this.rerollButton.setInteractive();
-                this.towerDeleteButton.setInteractive();
             },
         });
     }
 
     startWave() {
+        this.deleteMode = false
+        this.towerDeleteButton.clearTint()
         this.roundsFlagText.text = (parseInt(this.roundsFlagText.text) + 1).toString();
         for (let i = 0; i < this.towers.length; i++) {
             if (this.towers[i]) {
@@ -571,7 +580,7 @@ export default class PlayScene extends Scene {
         this.hideSlots()
 
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton],
             x: '-=1400',
             duration: 1000,
             ease: 'Power2',
@@ -581,7 +590,6 @@ export default class PlayScene extends Scene {
                     element.disableInteractive()
                 })
                 this.rerollButton.disableInteractive();
-                this.towerDeleteButton.disableInteractive()
             },
             onComplete: () => {
                 this.clearShop(this.shop_towers, this.shop_plates)
@@ -589,6 +597,22 @@ export default class PlayScene extends Scene {
                     element.setupInteractive();
                 });
                 this.rerollButton.setInteractive();
+            },
+        });
+
+        this.tweens.add({
+            targets: this.towerDeleteButton,
+            alpha: 0,
+            duration: 500,
+            ease: 'Power2',
+            onStart: () => {
+                this.towerDeleteButton.disableInteractive();
+            },
+            onComplete: () => {
+                this.clearShop(this.shop_towers, this.shop_plates)
+                this.shop_towers.forEach((element) => {
+                    element.setupInteractive();
+                });
                 this.towerDeleteButton.setInteractive();
             },
         });
@@ -643,7 +667,7 @@ export default class PlayScene extends Scene {
         this.generateShop(this.shop_towers, this.shop_plates)
         this.showSlots()
         this.tweens.add({
-            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton, this.towerDeleteButton],
+            targets: [...this.shop_towers, this.shopLine, ...this.shop_plates, ...this.shop_towers.map(el => el.container), this.rerollButton],
             x: '+=1400',
             duration: 1000,
             ease: 'Power2',
@@ -661,6 +685,18 @@ export default class PlayScene extends Scene {
                 });
 
                 this.rerollButton.setInteractive()
+                this.towerDeleteButton.setInteractive()
+            },
+        });
+        this.tweens.add({
+            targets: [this.towerDeleteButton],
+            alpha: 1,
+            duration: 500,
+            ease: 'Power2',
+            onStart: () => {
+                this.towerDeleteButton.disableInteractive()
+            },
+            onComplete: () => {
                 this.towerDeleteButton.setInteractive()
             },
         });
