@@ -55,38 +55,6 @@ export default {
         leaveGame() {
             this.$router.push('/menu');
         },
-        async get_top() {
-            const response = await axios.get("http://localhost:8000/get_top", {
-                    withCredentials: true,
-                    params: {
-                        "username": this.$store.state.username
-
-                    }
-                }
-            )
-            console.log(response.data)
-        },
-
-        async get_user_record() {
-            const response = await axios.get("http://localhost:8000/get_user_record", {
-                withCredentials: true,
-                params: {
-                    "username": this.$store.state.username,
-                }
-            })
-            console.log(response.data)
-        },
-
-        async update_user_record() {
-            const response = await axios.post("http://localhost:8000/update_user_record", {
-                withCredentials: true,
-                params: {
-                    "username": this.$store.state.username,
-                    "record": 0
-                }
-            })
-            console.log(response.data.record)
-        }
     }
 }
 </script>

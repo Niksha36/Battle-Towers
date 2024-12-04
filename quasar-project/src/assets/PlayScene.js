@@ -661,6 +661,17 @@ export default class PlayScene extends Scene {
     }
 
     endWave() {
+        stor.dispatch("updateRecord", this.wave)
+        if (stor.state.username) {
+            try {
+                this.update_user_record();
+                console.log('123')
+            }
+            catch(e) {
+                console.log(e)
+            }
+        }
+
         if (!this.inGame) return
         this.startWaveButtonContainer.setVisible(true);
         this.roundsFlagContainer.setVisible(true)
