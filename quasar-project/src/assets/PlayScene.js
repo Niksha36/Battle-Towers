@@ -1408,7 +1408,14 @@ class EndScreen extends Phaser.GameObjects.Sprite {
             this.scene.scene.restart();
             this.destroyComponents()
             this.destroy();
-            console.log("data");
+        });
+
+         this.retryButtonText.on('pointerover', () => {
+            this.retryButtonText.setTint(0xc1c1c1)
+        });
+
+        this.retryButtonText.on('pointerout', () => {
+            this.retryButtonText.clearTint()
         });
         //rating container
         this.ratingButtonContaner = scene.add.container(this.x+10, this.y + 125);
@@ -1424,6 +1431,14 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         this.ratingButtonText.on('pointerdown', () => {
             this.scene.router.push('/rating');
         });
+
+        this.ratingButtonText.on('pointerover', () => {
+            this.ratingButtonText.setTint(0xc1c1c1)
+        });
+
+        this.ratingButtonText.on('pointerout', () => {
+            this.ratingButtonText.clearTint()
+        });
 // Create quit button container
         this.quitButtonContainer = scene.add.container(this.x + 220, this.y + 125).setInteractive();
         this.quitButtonBackground = scene.add.graphics();
@@ -1437,12 +1452,12 @@ class EndScreen extends Phaser.GameObjects.Sprite {
         this.quitButtonText.on('pointerdown', () => {
             this.scene.router.push('/menu');
         });
-        this.quitButtonContainer.on('pointerover', () => {
-            //ТУТ НАДО КАК-ТО МЕНЯТЬ ФОН КНОПКИ
+        this.quitButtonText.on('pointerover', () => {
+            this.quitButtonText.setTint(0xc1c1c1)
         });
 
-        this.quitButtonContainer.on('pointerout', () => {
-            //ТУТ НАДО КАК-ТО МЕНЯТЬ ФОН КНОПКИ
+        this.quitButtonText.on('pointerout', () => {
+            this.quitButtonText.clearTint()
         });
         // if (stor.state.username)
         this.record_text = scene.add.text(
