@@ -58,6 +58,7 @@ const isLogging = ref(getUser());
     height: 100vh;
     background-size: cover;
     background-image: url('../assets/background/background.png') !important;
+
 }
 .game-menu {
     font-family: 'Roboto', sans-serif;

@@ -26,9 +26,10 @@
   },
   "devDependencies": {
     "@electron/packager": "^18.3.6",
-    "@quasar/app-vite": "^2.0.0-rc.1",
+    "@quasar/app-vite": "^2.0.0",
     "autoprefixer": "^10.4.2",
     "electron": "^33.2.1",
+    "electron-packager": "^17.1.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-vue": "^9.0.0",
