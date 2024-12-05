@@ -16,8 +16,8 @@
             <img src="../assets/background/lose_background.png" alt="/lose_background">
             <h1 class="defeat-text">Поражение</h1>
             <div class="defeat-info">
-                <p class="record">Ваш рекорд: {{ record }}</p>
-                <p class="waves">Колличество волн: {{ waves }}</p>
+                <p class="record">Ваш рекорд: {{ this.record }}</p>
+                <p class="waves">Количество волн: {{ this.waves }}</p>
             </div>
             <div class="defeat-screen-buttons-wrapper">
                 <button @click="startNewGame" class="new-game defeat-screen-button">
@@ -33,13 +33,13 @@
         </div>
     </div>
 
-    </div>
+</div>
 </template>
 
 <script>
 import Phaser from "phaser";
 import PlayScene from "../assets/PlayScene";
-import axios from "axios";
+import stor from "../store.js"
 
 export default {
     name: "PhaserGame",
@@ -81,8 +81,9 @@ export default {
             this.$router.push('/menu');
         },
 
-
         displayEndScreen() {
+            this.record = stor.state.record
+            this.waves = this.game.scene.scenes[0].wave
             this.showEndScreen = true;
         },
         displayDialog() {
