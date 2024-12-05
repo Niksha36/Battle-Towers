@@ -72,9 +72,9 @@ export default {
                     username: this.username,
                     password: this.password
                 });
-                await this.$router.push({path: "game"});
                 await stor.dispatch("updateUsername", this.username)
                 await stor.dispatch("updateRecord", response.data.record)
+                await this.$router.push("/menu");
             } catch (error) {
                 console.error('Login failed:', error);
                 alert('Ошибка входа: неверный никнейм или пароль');
