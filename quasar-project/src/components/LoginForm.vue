@@ -1,5 +1,6 @@
 <template>
     <div class="background-wrapper">
+        <img src="../assets/sprites/ic_back_to_home.svg" alt="" class="back-to-menu-button" @click="goBackToMenu">
         <div class="left-decoration">
             <img src="../assets/towers/towerS_4.png" alt="left-decoration" width="500">
         </div>
@@ -54,6 +55,9 @@ export default {
         };
     },
     methods: {
+        goBackToMenu(){
+            router.push('/menu')
+        },
         togglePassword() {
             this.showPassword = !this.showPassword;
         },
@@ -78,6 +82,15 @@ export default {
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+.back-to-menu-button {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    cursor: pointer;
+}
+.back-to-menu-button:hover{
+    content: url("../assets/sprites/ic_back_to_home_active.svg");
+}
 
 .left-decoration {
     position: absolute;
@@ -206,4 +219,5 @@ i:hover {
 .password-toggle-icon{
     width: 35px;
 }
+
 </style>

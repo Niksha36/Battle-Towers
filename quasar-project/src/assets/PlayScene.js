@@ -790,53 +790,59 @@ export default class PlayScene extends Scene {
                     attackAnim.destroy();
                 });
                 stor.dispatch("updateRecord", this.wave)
-                if (stor.state.username) {
-                    try {
-                        const response = this.get_user_record();
-                        this.es = new EndScreen(
-                            this,
-                            900,
-                            500,
-                            "loseBackground",
-                            this.wave,
-                            response.record,
-                        )
-                    } catch (e) {
-                        console.log(e)
-                        this.es = new EndScreen(
-                            this,
-                            900,
-                            500,
-                            "loseBackground",
-                            this.wave,
-                            0,
-                        )
-                    }
-
-                } else {
-                    this.es = new EndScreen(
-                        this,
-                        900,
-                        500,
-                        "loseBackground",
-                        this.wave,
-                        0,
-                    )
+                try {
+                    this.vueInstance.displayEndScreen();
+                    console.log('displayEndScreen called successfully');
+                } catch (error) {
+                    console.error('Error calling displayEndScreen:', error);
                 }
+                // if (stor.state.username) {
+                //     try {
+                //         const response = this.get_user_record();
+                //         this.es = new EndScreen(
+                //             this,
+                //             900,
+                //             500,
+                //             "loseBackground",
+                //             this.wave,
+                //             response.record,
+                //         )
+                //     } catch (e) {
+                //         console.log(e)
+                //         this.es = new EndScreen(
+                //             this,
+                //             900,
+                //             500,
+                //             "loseBackground",
+                //             this.wave,
+                //             0,
+                //         )
+                //     }
+                //
+                // } else {
+                //     this.es = new EndScreen(
+                //         this,
+                //         900,
+                //         500,
+                //         "loseBackground",
+                //         this.wave,
+                //         0,
+                //     )
+                // }
 
 
                 console.log(this.es)
 
 
-                this.tweens.add({
-                    targets: this.es.animation_targets,
-                    alpha: 1,
-                    duration: 2000,
-                    ease: "Power2",
-                    onComplete() {
-                        console.log("ido")
-                    }
-                })
+                // this.tweens.add({
+                //     targets: this.es.animation_targets,
+                //     alpha: 1,
+                //     duration: 2000,
+                //     ease: "Power2",
+                //     onComplete() {
+                //         console.log("ido")
+                //     }
+                // })
                 this.update_user_record()
             }
             tower.is_die = true

@@ -84,6 +84,8 @@ const isLogging = ref(getUser());
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     margin-top: 20px;
     font-weight: 500;
+    margin-left: 0;
+    margin-right: 0;
 }
 .game-menu .button-wrapper button:hover {
     background: #AA382C;

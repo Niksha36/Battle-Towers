@@ -11,6 +11,28 @@
                 </div>
             </div>
         </div>
+        <div v-if="showEndScreen" class="dialog-overlay">
+        <div class="defeat-screen">
+            <img src="../assets/background/lose_background.png" alt="/lose_background">
+            <h1 class="defeat-text">Поражение</h1>
+            <div class="defeat-info">
+                <p class="record">Ваш рекорд: {{ record }}</p>
+                <p class="waves">Колличество волн: {{ waves }}</p>
+            </div>
+            <div class="defeat-screen-buttons-wrapper">
+                <button @click="startNewGame" class="new-game defeat-screen-button">
+                    Новая игра
+                </button>
+                <button @click="viewRatings" class="rating defeat-screen-button">
+                    Рейтинг
+                </button>
+                <button @click="goToMenu" class="menu defeat-screen-button">
+                    Меню
+                </button>
+            </div>
+        </div>
+    </div>
+
     </div>
 </template>
 
@@ -24,6 +46,9 @@ export default {
     data() {
         return {
             showDialog: false,
+            showEndScreen: false,
+            record: 0,
+            waves: 0
         };
     },
     mounted() {
@@ -45,6 +70,21 @@ export default {
     },
 
     methods: {
+        startNewGame() {
+            this.game.scene.scenes[0].scene.restart();
+            this.showEndScreen = false;
+        },
+        viewRatings() {
+            this.$router.push('/rating');
+        },
+        goToMenu() {
+            this.$router.push('/menu');
+        },
+
+
+        displayEndScreen() {
+            this.showEndScreen = true;
+        },
         displayDialog() {
             this.showDialog = true;
         },
@@ -60,14 +100,54 @@ export default {
 </script>
 
 <style>
-
+.defeat-text{
+    color: #600000;
+    font-size: 40px;
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    top: -47px;
+}
+.defeat-screen{
+    position: relative;
+}
+.defeat-info{
+    position: absolute;
+    left: 30px;
+    top: 100px
+}
+.record, .waves{
+    font-size: 30px;
+    color: rgba(255, 255, 255, 0.8);
+}
 .game-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
-
+.defeat-screen-buttons-wrapper{
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+.defeat-screen-button{
+    background: #1D7E7C;
+    padding: 10px 30px;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    font-size: 25px;
+    cursor: pointer;
+}
+.defeat-screen-button:hover{
+    background: #149f9b;
+}
+.rating{
+    margin: 0 30px;
+}
 body {
     display: flex;
     overflow: hidden;
@@ -100,15 +180,18 @@ body {
     font-size: 40px;
     font-weight: 700;
 }
-.dialog-box p{
+
+.dialog-box p {
     font-size: 25px;
 }
-.buttons-wrapper{
+
+.buttons-wrapper {
     display: flex;
     justify-content: space-between;
     margin-top: 35px;
 }
-.buttons-wrapper button{
+
+.buttons-wrapper button {
     border: none;
     padding: 10px 50px;
     background: #1D7E7C;
@@ -117,7 +200,23 @@ body {
     border-radius: 15px;
 
 }
-.buttons-wrapper button:hover{
+
+.buttons-wrapper button:hover {
     background: #AA382C;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.defeat-screen {
+    animation: fadeIn 0.7s ease-in-out;
 }
 </style>
