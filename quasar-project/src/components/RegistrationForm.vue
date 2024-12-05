@@ -1,6 +1,6 @@
 <template>
     <div class="background-wrapper">
-        <img src="../assets/sprites/ic_back_to_home.svg" alt="" class="back-to-menu-button" @click="goBackToMenu">
+        <img src="../assets/sprites/ic_back_to_home.svg" alt="" class="back-to-menu-button" @click="goBackToMenu" @mouseover="playHoverSound">
         <div class="left-decoration">
             <img src="../assets/towers/towerS_2.png" alt="left-decoration" width="500">
         </div>
@@ -31,7 +31,7 @@
                                required/>
                     </div>
                 </div>
-                <button type="submit" class="submit-button">Зарегистрироваться</button>
+                <button type="submit" class="submit-button"  @mouseover="playHoverSound">Зарегистрироваться</button>
                 <p class="signin-link">
                     Уже есть аккаунт?
                     <router-link to="/login">Войти</router-link>
@@ -47,6 +47,9 @@ import axios from 'axios';
 import router from "../router/index.js";
 import showPasswordIcon from '../assets/sprites/show-password.svg';
 import hidePasswordIcon from '../assets/sprites/hide-password.svg';
+import buttonHoverSound from '../assets/sounds/button_hover.mp3';
+import buttonClickSound from '../assets/sounds/button_click.mp3';
+
 import stor from "../store.js"
 
 export default {
@@ -57,11 +60,20 @@ export default {
             repeatPassword: '',
             showPassword: false,
             showPasswordIcon, // Add this line
-            hidePasswordIcon
+            hidePasswordIcon,
+            hoverSound: new Audio(buttonHoverSound),
+            clickSound: new Audio(buttonClickSound)
         };
     },
     methods: {
+        playHoverSound() {
+            this.hoverSound.play();
+        },
+        playClickSound() {
+            this.clickSound.play();
+        },
         goBackToMenu(){
+            this.playClickSound();
             router.push('/menu')
         },
         togglePassword() {

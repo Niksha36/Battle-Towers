@@ -34,6 +34,19 @@ import setting_button from "../assets/sprites/menu.png"
 import shovel from "../assets/sprites/shovel.png"
 import stor from "../store.js"
 import axios from "axios";
+import newWaveSound from "../assets/sounds/new_wave_sound.mp3"
+import newWaveHoverSound from "../assets/sounds/menu_appearing.mp3"
+import newLevelSound from "../assets/sounds/new_level.mp3"
+import selectTower from "../assets/sounds/button_hover.mp3"
+import buildingTowerSound from "../assets/sounds/building_tower_sound.mp3"
+import glassTowerSound from "../assets/sounds/glass_tower_sound.mp3"
+import towerHitSound from "../assets/sounds/tower_hit.mp3"
+import towerDestroySound from "../assets/sounds/tower_destroy.mp3"
+import buttonClickSound from "../assets/sounds/button_click.mp3"
+import loseSound from '../assets/sounds/lose_sound.mp3'
+import gameMusic from '../assets/sounds/game_sound.mp3'
+
+
 import router from "src/router/index.js";
 import {useRouter} from "vue-router";
 
@@ -49,6 +62,7 @@ export default class PlayScene extends Scene {
     preload() {
         this.load.image('bg', bg)
         this.load.image('bgSky', bgSky)
+        this.load.audio('gameMusic', gameMusic)
         this.load.image('bgClouds', bgClouds)
         this.load.image('mainTower', mainTower)
         this.load.image('milk', milk)
@@ -74,6 +88,17 @@ export default class PlayScene extends Scene {
         this.load.image('description', description)
         this.load.image('setting_button', setting_button)
         this.load.image('shovel', shovel)
+        this.load.audio('newWaveSound', newWaveSound);
+        this.load.audio('newWaveHoverSound',newWaveHoverSound);
+        this.load.audio('newLevelSound', newLevelSound);
+        this.load.audio('selectTower', selectTower);
+        this.load.audio('buildingTowerSound', buildingTowerSound);
+        this.load.audio('glassTowerSound', glassTowerSound);
+        this.load.audio('towerHitSound', towerHitSound);
+        this.load.audio('towerDestroySound', towerDestroySound);
+        this.load.audio('buttonClickSound', buttonClickSound);
+        this.load.audio('loseSound', loseSound)
+
         this.load.spritesheet('enemyAttack', enemies_attack_sprite, {
             frameWidth: 192,
             frameHeight: 192,
@@ -133,6 +158,19 @@ export default class PlayScene extends Scene {
         this.slots = [0]
         this.enemies = []
         this.shop_plates = []
+
+        this.newWaveSound = this.sound.add('newWaveSound');
+        this.newWaveHoverSound = this.sound.add('newWaveHoverSound');
+        this.newLevelSound = this.sound.add('newLevelSound')
+        this.selectTowerSound = this.sound.add('selectTower');
+        this.buildingTowerSound = this.sound.add('buildingTowerSound');
+        this.glassTowerSound = this.sound.add('glassTowerSound');
+        this.towerHitSound = this.sound.add('towerHitSound');
+        this.towerDestroySound = this.sound.add('towerDestroySound');
+        this.buttonClickSound = this.sound.add('buttonClickSound');
+        this.loseSound = this.sound.add('loseSound');
+        this.gameMusic = this.sound.add('gameMusic')
+        this.gameMusic.play({ volume: 0.3, loop: true });
 
         this.platform = this.physics.add.staticGroup();
         this.platform.create(0, this.platform_start + 75, null).setScale(800, 0.01).setOrigin(0, 0).refreshBody().setAlpha(0);
@@ -235,6 +273,11 @@ export default class PlayScene extends Scene {
             console.log(this.towers[dropZone.dropZoneIndex])
             if (this.slots[dropZone.dropZoneIndex] !== 0) {
                 dropZone.setScale(1)
+                if (gameObject instanceof Glass) {
+                    this.glassTowerSound.play();
+                } else{
+                    this.buildingTowerSound.play();
+                }
                 dropZone.setTexture('slot')
                 dropZone.clearTint();
                 gameObject.x = dropZone.x;
@@ -319,6 +362,7 @@ export default class PlayScene extends Scene {
         this.towerDeleteButton.on("pointerdown", () => {
             if (!this.deleteMode) {
                 this.towerDeleteButton.setTint(0xc1c1c1)
+                this.buttonClickSound.play()
                 this.deleteMode = true
                 for (let i = 1; i < this.towers.length; i++) {
 
@@ -348,6 +392,7 @@ export default class PlayScene extends Scene {
         const settingButton = this.add.image(this.width - 20, 0, 'setting_button').setOrigin(1, 0).setInteractive();
 
         settingButton.on('pointerover', () => {
+            this.buttonClickSound.play()
             settingButton.setTint(0xA5A5A5);
         });
 
@@ -365,6 +410,7 @@ export default class PlayScene extends Scene {
 
         this.children.bringToTop(this.rerollButton);
         this.rerollButton.on('pointerover', () => {
+            this.buttonClickSound.play()
             this.rerollButton.setFrame(1);
         });
 
@@ -392,6 +438,7 @@ export default class PlayScene extends Scene {
         this.startWaveButton.on('pointerover', () => {
             this.startWaveButton.setTint(0xc1c1c1);
             this.startWaveButtonText.setTint(0xc1c1c1);
+            this.newWaveHoverSound.play();
         });
 
 // Add event listener for pointerout to reset tint
@@ -472,7 +519,9 @@ export default class PlayScene extends Scene {
             let y_pos = this.platform_start + 295
 
             shop_plates.push(this.add.sprite(x_pos, y_pos, "shopPlate").setScale(1.1, 0.95));
+
             let shop_tower;
+
             switch (getRandomNumber(this.count_tower_types)) {
                 case 0:
                     shop_tower = new Chest(this, x_pos, y_pos + 15)
@@ -499,6 +548,9 @@ export default class PlayScene extends Scene {
                     shop_tower = new Obsidian(this, x_pos, y_pos + 15)
                     break
             }
+            shop_tower.on('pointerover', () => {
+                this.selectTowerSound.play();
+            });
             shop_towers.push(this.add.existing(shop_tower))
             for (let slot of this.slots) {
                 if (slot) {
@@ -568,6 +620,7 @@ export default class PlayScene extends Scene {
     }
 
     startWave() {
+        this.newWaveSound.play();
         this.deleteMode = false
         this.towerDeleteButton.clearTint()
         this.roundsFlagText.text = (parseInt(this.roundsFlagText.text) + 1).toString();
@@ -673,6 +726,7 @@ export default class PlayScene extends Scene {
         }
 
         if (!this.inGame) return
+        this.newLevelSound.play();
         this.startWaveButtonContainer.setVisible(true);
         this.roundsFlagContainer.setVisible(true)
         this.generateShop(this.shop_towers, this.shop_plates)
@@ -750,7 +804,9 @@ export default class PlayScene extends Scene {
         });
         tower.hp -= enemy.dmg;
         enemy.hp -= tower.dmg;
-
+        if(tower.hp > 0) {
+            this.towerHitSound.play()
+        }
         this.tweens.add({
             targets: this.enemies[0],
             angle: 20, // Конечная прозрачность (полностью видимый)
@@ -763,6 +819,7 @@ export default class PlayScene extends Scene {
 
 
         if (tower.hp <= 0) {
+            this.towerDestroySound.play()
             if (tower.constructor.name !== "MainTower") {
                 const destroyAnim = this.add.sprite(tower.x, tower.y, 'tower_destroy');
                 try {
@@ -791,6 +848,7 @@ export default class PlayScene extends Scene {
                 });
                 stor.dispatch("updateRecord", this.wave)
                 try {
+                    this.loseSound.play()
                     this.vueInstance.displayEndScreen();
                     console.log('displayEndScreen called successfully');
                 } catch (error) {

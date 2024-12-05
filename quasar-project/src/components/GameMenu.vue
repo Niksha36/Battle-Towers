@@ -1,51 +1,95 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref } from 'vue'
+import {onMounted, ref} from 'vue'
 import stor from "../store.js"
+import offSoundCondition from '../assets/sprites/audio-off.svg'
+import onSoundCondition from '../assets/sprites/audio-on.svg'
+import buttonHoverSound from '../assets/sounds/button_hover.mp3';
+import buttonClickSound from '../assets/sounds/button_click.mp3';
+import menuAppearingSound from '../assets/sounds/menu_appearing.mp3';
+import gameMenuMusic from '../assets/sounds/game_menu_music.mp3';
 const router = useRouter();
 
 function getUser() {
     return stor.state.username
 }
 function redirectToGame() {
+    playClickSound()
+    backgroundMusic.pause();
+    backgroundMusic.currentTime = 0;
     router.push('/game');
 }
 function redirectToRating(){
+    playClickSound()
     router.push('/rating');
 }
 
 function logout() {
+    playClickSound()
     stor.dispatch("logout")
     isLogging.value = false
 }
 
 function login() {
+    playClickSound()
     router.push("/login")
 }
 function closeGame() {
+    playClickSound()
     window.close();
+}
+//звуки кнопок
+const hoverSound = new Audio(buttonHoverSound);
+const clickSound = new Audio(buttonClickSound);
+const appearingSound = new Audio(menuAppearingSound);
+const backgroundMusic = new Audio(gameMenuMusic);
+
+function playHoverSound() {
+    hoverSound.play();
+}
+
+function playClickSound() {
+    clickSound.play();
+}
+
+
+// onMounted(() => {
+//     backgroundMusic.loop = true;
+//     backgroundMusic.play();
+// });
+const isSoundOn = ref(false);
+
+function toggleSound() {
+    isSoundOn.value = !isSoundOn.value;
+    if (isSoundOn.value) {
+        backgroundMusic.loop = true;
+        backgroundMusic.play();
+    } else {
+        backgroundMusic.pause();
+    }
 }
 
 const isLogging = ref(getUser());
 </script>
 <template>
     <div class="background-wrapper">
+        <img :src="isSoundOn ? onSoundCondition : offSoundCondition" alt="" class="audio-switcher" @click="toggleSound">
         <div class="game-menu">
             <h1>Battle Towers</h1>
             <div class="button-wrapper">
-                <button class="play" @click="redirectToGame">
+                <button class="play" @click="redirectToGame" @mouseover="playHoverSound">
                     Играть
                 </button>
-                <button class="rating" @click="redirectToRating">
+                <button class="rating" @click="redirectToRating" @mouseover="playHoverSound">
                     Рейтинг
                 </button>
-                <button v-if="!isLogging" class="quit" @click="login">
+                <button v-if="!isLogging" class="quit" @click="login" @mouseover="playHoverSound">
                     Войти
                 </button>
-                <button v-else class="quit" @click="logout">
+                <button v-else class="quit" @click="logout" @mouseover="playHoverSound">
                     Выйти
                 </button>
-                <button class="close-game" @click="closeGame">
+                <button class="close-game" @click="closeGame" @mouseover="playHoverSound">
                     Закрыть
                 </button>
             </div>
@@ -58,7 +102,12 @@ const isLogging = ref(getUser());
     height: 100vh;
     background-size: cover;
     background-image: url('../assets/background/background.png') !important;
-
+    position: relative;
+}
+.audio-switcher{
+    position: absolute;
+    left: 15px;
+    top: 15px;
 }
 .game-menu {
     font-family: 'Roboto', sans-serif;

@@ -1,6 +1,6 @@
 <template>
     <div class="background-wrapper">
-        <img src="../assets/sprites/ic_back_to_home.svg" alt="" class="back-to-menu-button" @click="goBackToMenu">
+        <img src="../assets/sprites/ic_back_to_home.svg" alt="" class="back-to-menu-button" @click="goBackToMenu" @mouseover="playHoverSound">
         <div class="left-decoration">
             <img src="../assets/towers/towerS_4.png" alt="left-decoration" width="500">
         </div>
@@ -25,7 +25,7 @@
                              class="password-toggle-icon"/>
                     </div>
                 </div>
-                <button type="submit" class="submit-button">Войти</button>
+                <button type="submit" class="submit-button" @mouseover="playHoverSound">Войти</button>
                 <p class="signup-link">
                     Нет аккаунта?
                     <router-link to="/register">Зарегистрироваться</router-link>
@@ -43,7 +43,8 @@ import hidePasswordIcon from '../assets/sprites/hide-password.svg';
 import router from "../router/index.js";
 
 import {useRouter} from 'vue-router'
-
+import buttonHoverSound from '../assets/sounds/button_hover.mp3';
+import buttonClickSound from '../assets/sounds/button_click.mp3';
 export default {
     data() {
         return {
@@ -51,11 +52,14 @@ export default {
             password: '',
             showPassword: false,
             showPasswordIcon,
-            hidePasswordIcon
+            hidePasswordIcon,
+            hoverSound: new Audio(buttonHoverSound),
+            clickSound: new Audio(buttonClickSound)
         };
     },
     methods: {
         goBackToMenu(){
+            this.playClickSound()
             router.push('/menu')
         },
         togglePassword() {
@@ -75,7 +79,14 @@ export default {
                 console.error('Login failed:', error);
                 alert('Ошибка входа: неверный никнейм или пароль');
             }
-        }
+        },
+        //звуки кнопки назад в меню
+        playHoverSound() {
+            this.hoverSound.play();
+        },
+        playClickSound() {
+            this.clickSound.play();
+        },
     }
 };
 </script>

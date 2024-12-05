@@ -6,8 +6,8 @@
                 <h1>Выход из игры</h1>
                 <p>Вы уверены, что хотите выйти?</p>
                 <div class="buttons-wrapper">
-                    <button @click="leaveGame">Выйти</button>
-                    <button @click="hideDialog">Назад</button>
+                    <button @click="leaveGame" @mouseover="playHoverSound">Выйти</button>
+                    <button @click="hideDialog" @mouseover="playHoverSound">Назад</button>
                 </div>
             </div>
         </div>
@@ -20,13 +20,13 @@
                 <p class="waves">Колличество волн: {{ waves }}</p>
             </div>
             <div class="defeat-screen-buttons-wrapper">
-                <button @click="startNewGame" class="new-game defeat-screen-button">
+                <button @click="startNewGame" @mouseover="playHoverSound" class="new-game defeat-screen-button">
                     Новая игра
                 </button>
-                <button @click="viewRatings" class="rating defeat-screen-button">
+                <button @click="viewRatings" @mouseover="playHoverSound" class="rating defeat-screen-button">
                     Рейтинг
                 </button>
-                <button @click="goToMenu" class="menu defeat-screen-button">
+                <button @click="goToMenu" @mouseover="playHoverSound" class="menu defeat-screen-button">
                     Меню
                 </button>
             </div>
@@ -40,7 +40,7 @@
 import Phaser from "phaser";
 import PlayScene from "../assets/PlayScene";
 import axios from "axios";
-
+import buttonClickSound from "../assets/sounds/button_click.mp3"
 export default {
     name: "PhaserGame",
     data() {
@@ -48,7 +48,8 @@ export default {
             showDialog: false,
             showEndScreen: false,
             record: 0,
-            waves: 0
+            waves: 0,
+            hoverSound: new Audio(buttonClickSound)
         };
     },
     mounted() {
@@ -73,11 +74,15 @@ export default {
         startNewGame() {
             this.game.scene.scenes[0].scene.restart();
             this.showEndScreen = false;
+            this.game.scene.scenes[0].gameMusic.stop();
+            this.gameMusic.play({ volume: 0.3, loop: true });
         },
         viewRatings() {
+            this.game.scene.scenes[0].gameMusic.stop();
             this.$router.push('/rating');
         },
         goToMenu() {
+            this.game.scene.scenes[0].gameMusic.stop();
             this.$router.push('/menu');
         },
 
@@ -93,8 +98,12 @@ export default {
             this.game.scene.resume('PlayScene');
         },
         leaveGame() {
+            this.game.scene.scenes[0].gameMusic.stop();
             this.$router.push('/menu');
         },
+        playHoverSound() {
+            this.hoverSound.play();
+        }
     }
 }
 </script>
