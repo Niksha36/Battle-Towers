@@ -74,7 +74,7 @@ export default class PlayScene extends Scene {
         this.load.image('chest', chest)
         this.load.image('thief', thief)
         this.load.image('ghost', ghost)
-        this.load.image('boss1', boss1) 
+        this.load.image('boss1', boss1)
         this.load.image('stairs', stairs)
         this.load.image('towerInfoBg', towerInfoBg)
         this.load.image('obsidian', obsidian)
@@ -512,7 +512,7 @@ export default class PlayScene extends Scene {
         this.anims.create({
             key: 'bossAnim',
             frames: bossFrames,
-            frameRate: 60,
+            frameRate: 35,
             repeat: 0
         })
     }
@@ -692,14 +692,14 @@ export default class PlayScene extends Scene {
         this.startWaveButtonContainer.setVisible(false);
         this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
-        if (this.wave % 1 == 0) { 
-            this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss1'))) 
-        } 
-        else { 
-            for (let i = 0; i < 5; i++) { 
-                this.enemies.push(this.add.existing(new Enemy(this, this.width + 50 * i, this.platform_start - 30, 'ghost', this.wave * 2, this.wave * 2))) 
-            } 
-        } 
+        if (this.wave % 1 == 0) {
+            this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss1')))
+        }
+        else {
+            for (let i = 0; i < 5; i++) {
+                this.enemies.push(this.add.existing(new Enemy(this, this.width + 50 * i, this.platform_start - 30, 'ghost', this.wave * 2, this.wave * 2)))
+            }
+        }
         this.tweens.add({
             targets: [...this.enemies, ...this.enemies.map(el => el.hpText)
                 , ...this.enemies.map(el => el.hpIcon)
@@ -886,17 +886,31 @@ export default class PlayScene extends Scene {
 
         if (enemy.hp <= 0) {
             this.time.delayedCall(150, () => {
-                const destroyAnim = this.add.sprite(enemy.x, enemy.y, 'ghost_destroy').setAngle(enemy.angle);
-                this.physics.world.enable(destroyAnim);
-                destroyAnim.body.velocity.x = enemy.body.velocity.x
-                try {
-                    destroyAnim.play('ghostDies');
-                } catch (error) {
-                    console.error('Error playing destroy animation:', error);
+                if (enemy instanceof Boss1) {
+                    const destroyAnim = this.add.sprite(enemy.x, enemy.y, 'bossAnim').setAngle(enemy.angle);
+                    this.physics.world.enable(destroyAnim);
+                    destroyAnim.body.velocity.x = enemy.body.velocity.x
+                    try {
+                        destroyAnim.play('bossAnim');
+                    } catch (error) {
+                        console.error('Error playing destroy animation:', error);
+                    }
+                    destroyAnim.on('animationcomplete', () => {
+                        destroyAnim.destroy('bossAnim');
+                    });
+                } else {
+                    const destroyAnim = this.add.sprite(enemy.x, enemy.y, 'ghost_destroy').setAngle(enemy.angle);
+                    this.physics.world.enable(destroyAnim);
+                    destroyAnim.body.velocity.x = enemy.body.velocity.x
+                    try {
+                        destroyAnim.play('ghostDies');
+                    } catch (error) {
+                        console.error('Error playing destroy animation:', error);
+                    }
+                    destroyAnim.on('animationcomplete', () => {
+                        destroyAnim.destroy('ghostDies');
+                    });
                 }
-                destroyAnim.on('animationcomplete', () => {
-                    destroyAnim.destroy('ghostDies');
-                });
                 this.enemies.shift()
                 enemy.destroy()
                 enemy.component_destroy();
@@ -1411,19 +1425,31 @@ class Enemy extends Phaser.GameObjects.Sprite {
     }
 }
 
-class Boss1 extends Enemy { 
-    constructor(scene, x, y, texture) { 
-        super(scene, x, y, texture, 200, 200); 
-    } 
- 
-    damage(dmg) { 
-        this.hp -= dmg; 
-        this.dmg -= dmg; 
-        this.updateHPText(); 
-        this.updateDMGText(); 
-    } 
+class Boss1 extends Enemy {
+    constructor(scene, x, y, texture) {
+        super(scene, x, y, texture, 2, 2);
+    }
+
+    damage(dmg) {
+        this.hp -= dmg;
+        this.dmg -= dmg;
+        this.updateHPText();
+        this.updateDMGText();
+    }
 }
 
 function getRandomNumber(max) {
     return Math.floor(Math.random() * max)
 }
+
+
+
+// const destroyAnim = this.add.sprite(tower.x, tower.y, 'tower_destroy');
+// try {
+//     destroyAnim.play('destroy');
+// } catch (error) {
+//     console.error('Error playing destroy animation:', error);
+// }
+// destroyAnim.on('animationcomplete', () => {
+//     destroyAnim.destroy();
+// });
