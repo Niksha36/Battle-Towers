@@ -12,6 +12,7 @@ import stairs from "../assets/towers/towerS_14.png"
 import chest from "../assets/towers/towerS_4.png"
 import thief from "../assets/towers/towerS_8.png"
 import ghost from "../assets/towers/diss_ghost_0.png"
+import boss1 from "../assets/sprites/boss_2_spr_0.png"
 import hp from "../assets/sprites/spr_sword_1.png"
 import dmg from "../assets/sprites/spr_sword_0.png"
 import coin from "../assets/sprites/spr_coin_0.png"
@@ -71,6 +72,7 @@ export default class PlayScene extends Scene {
         this.load.image('chest', chest)
         this.load.image('thief', thief)
         this.load.image('ghost', ghost)
+        this.load.image('boss1', boss1) 
         this.load.image('stairs', stairs)
         this.load.image('towerInfoBg', towerInfoBg)
         this.load.image('obsidian', obsidian)
@@ -673,9 +675,14 @@ export default class PlayScene extends Scene {
         this.startWaveButtonContainer.setVisible(false);
         this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
-        for (let i = 0; i < 5; i++) {
-            this.enemies.push(this.add.existing(new Enemy(this, this.width + 50 * i, this.platform_start - 30, 'ghost', this.wave * 2, this.wave * 2)))
-        }
+        if (this.wave % 1 == 0) { 
+            this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss1'))) 
+        } 
+        else { 
+            for (let i = 0; i < 5; i++) { 
+                this.enemies.push(this.add.existing(new Enemy(this, this.width + 50 * i, this.platform_start - 30, 'ghost', this.wave * 2, this.wave * 2))) 
+            } 
+        } 
         this.tweens.add({
             targets: [...this.enemies, ...this.enemies.map(el => el.hpText)
                 , ...this.enemies.map(el => el.hpIcon)
@@ -802,7 +809,7 @@ export default class PlayScene extends Scene {
             attackAnim.destroy();
         });
         tower.hp -= enemy.dmg;
-        enemy.hp -= tower.dmg;
+        enemy.damage(tower.dmg);
         if(tower.hp > 0) {
             this.towerHitSound.play()
         }
@@ -814,7 +821,6 @@ export default class PlayScene extends Scene {
         });
 
         tower.updateHPText();
-        enemy.updateHPText();
 
 
         if (tower.hp <= 0) {
@@ -1361,6 +1367,11 @@ class Enemy extends Phaser.GameObjects.Sprite {
         this.dmgIcon.destroy();
     }
 
+    damage(dmg) {
+        this.hp -= dmg;
+        this.updateHPText();
+    }
+
     updatePosition() {
         this.hpIcon.setPosition(this.x - 60, this.y + 115);
         this.hpText.setPosition(this.hpIcon.x + 20, this.hpIcon.y - 13)
@@ -1380,6 +1391,19 @@ class Enemy extends Phaser.GameObjects.Sprite {
             this.body.velocity.x -= 50;
         }
     }
+}
+
+class Boss1 extends Enemy { 
+    constructor(scene, x, y, texture) { 
+        super(scene, x, y, texture, 200, 200); 
+    } 
+ 
+    damage(dmg) { 
+        this.hp -= dmg; 
+        this.dmg -= dmg; 
+        this.updateHPText(); 
+        this.updateDMGText(); 
+    } 
 }
 
 function getRandomNumber(max) {
