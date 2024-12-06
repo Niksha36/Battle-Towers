@@ -6,8 +6,8 @@
                 <h1>Выход из игры</h1>
                 <p>Вы уверены, что хотите выйти?</p>
                 <div class="buttons-wrapper">
-                    <button @click="leaveGame" @mouseover="playHoverSound">Выйти</button>
-                    <button @click="hideDialog" @mouseover="playHoverSound">Назад</button>
+                    <button @click="leaveGame" @mouseover="playButtonClickSound">Выйти</button>
+                    <button @click="hideDialog" @mouseover="playButtonClickSound">Назад</button>
                 </div>
             </div>
         </div>
@@ -20,13 +20,13 @@
                 <p class="waves">Количество волн: {{ this.waves }}</p>
             </div>
             <div class="defeat-screen-buttons-wrapper">
-                <button @click="startNewGame" @mouseover="playHoverSound" class="new-game defeat-screen-button">
+                <button @click="startNewGame" @mouseover="playButtonClickSound" class="new-game defeat-screen-button">
                     Новая игра
                 </button>
-                <button @click="viewRatings" @mouseover="playHoverSound" class="rating defeat-screen-button">
+                <button @click="viewRatings" @mouseover="playButtonClickSound" class="rating defeat-screen-button">
                     Рейтинг
                 </button>
-                <button @click="goToMenu" @mouseover="playHoverSound" class="menu defeat-screen-button">
+                <button @click="goToMenu" @mouseover="playButtonClickSound" class="menu defeat-screen-button">
                     Меню
                 </button>
             </div>
@@ -37,10 +37,24 @@
 </template>
 
 <script>
-import Phaser from "phaser";
+import  Phaser from "phaser";
 import PlayScene from "../assets/PlayScene";
 import stor from "../store.js"
+
+//music
 import buttonClickSound from "../assets/sounds/button_click.mp3"
+import newWaveSound from "../assets/sounds/new_wave_sound.mp3"
+import newWaveHoverSound from "../assets/sounds/menu_appearing.mp3"
+import newLevelSound from "../assets/sounds/new_level.mp3"
+import selectTower from "../assets/sounds/button_hover.mp3"
+import buildingTowerSound from "../assets/sounds/building_tower_sound.mp3"
+import glassTowerSound from "../assets/sounds/glass_tower_sound.mp3"
+import towerHitSound from "../assets/sounds/tower_hit.mp3"
+import towerDestroySound from "../assets/sounds/tower_destroy.mp3"
+import loseSound from '../assets/sounds/lose_sound.mp3'
+import gameMusic from '../assets/sounds/game_sound.mp3'
+import diggingSound from '../assets/sounds/digging_sound.mp3'
+import towerLevelUpSound from '../assets/sounds/tower_level_up.mp3'
 
 export default {
     name: "PhaserGame",
@@ -50,10 +64,75 @@ export default {
             showEndScreen: false,
             record: 0,
             waves: 0,
-            hoverSound: new Audio(buttonClickSound)
+            hoverSoundGame: new Audio(buttonClickSound),
+            newWaveSoundGame:new Audio(newWaveSound),
+            newWaveHoverSoundGame:new Audio(newWaveHoverSound),
+            newLevelSoundGame:new Audio(newLevelSound),
+            selectTowerGame:new Audio(selectTower),
+            buildingTowerSoundGame:new Audio(buildingTowerSound),
+            glassTowerSoundGame:new Audio(glassTowerSound),
+            towerHitSoundGame:new Audio(towerHitSound),
+            towerDestroySoundGame:new Audio(towerDestroySound),
+            loseSoundGame:new Audio(loseSound),
+            gameMusicGame:new Audio(gameMusic),
+            diggingSoundGame: new Audio(diggingSound),
+            towerLevelUpSoundGame: new Audio(towerLevelUpSound)
         };
     },
     mounted() {
+        this.towerLevelUpSound = () => {
+            const sound = new Audio(towerLevelUpSound);
+            this.towerLevelUpSoundGame.play();
+        }
+        this.playDiggingSound = () => {
+            this.diggingSoundGame.play();
+        }
+        this.playButtonClickSound = () => {
+            this.hoverSoundGame.play();
+        };
+        this.playHoverSoundGame = () => {
+            this.hoverSoundGame.play();
+        };
+        this.playNewWaveSoundGame = () => {
+            this.newWaveSoundGame.play();
+        };
+        this.playNewWaveHoverSoundGame = () => {
+            this.newWaveHoverSoundGame.play();
+        };
+        this.playNewLevelSoundGame = () => {
+            this.newLevelSoundGame.play();
+        };
+        this.playSelectTowerGame = () => {
+            this.selectTowerGame.play();
+        };
+        this.playBuildingTowerSoundGame = () => {
+            const sound = new Audio(buildingTowerSound);
+            sound.play();
+        };
+        this.playGlassTowerSoundGame = () => {
+            this.glassTowerSoundGame.play();
+        };
+        this.playTowerHitSoundGame = () => {
+            const sound = new Audio(towerHitSound);
+            sound.play();
+        };
+
+        this.playTowerDestroySoundGame = () => {
+            const sound = new Audio(towerDestroySound);
+            sound.play();
+        };
+        this.playLoseSoundGame = () => {
+            this.loseSoundGame.play();
+        };
+        this.playGameMusicGame = () => {
+            this.gameMusicGame.volume = 0.2;
+            this.gameMusicGame.loop = true;
+            this.gameMusicGame.play();
+        };
+        this.stopGameMusicGame = () => {
+            this.gameMusicGame.pause();
+            this.gameMusicGame.currentTime = 0;
+        };
         const config = {
             type: Phaser.AUTO,
             width: 1920,
@@ -79,11 +158,11 @@ export default {
             this.gameMusic.play({ volume: 0.3, loop: true });
         },
         viewRatings() {
-            this.game.scene.scenes[0].gameMusic.stop();
+            this.stopGameMusicGame();
             this.$router.push('/rating');
         },
         goToMenu() {
-            this.game.scene.scenes[0].gameMusic.stop();
+            this.stopGameMusicGame();
             this.$router.push('/menu');
         },
 
@@ -101,12 +180,9 @@ export default {
             this.game.scene.resume('PlayScene');
         },
         leaveGame() {
-            this.game.scene.scenes[0].gameMusic.stop();
+            this.stopGameMusicGame();
             this.$router.push('/menu');
         },
-        playHoverSound() {
-            this.hoverSound.play();
-        }
     }
 }
 </script>
