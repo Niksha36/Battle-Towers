@@ -12,7 +12,10 @@ import stairs from "../assets/towers/towerS_14.png"
 import chest from "../assets/towers/towerS_4.png"
 import thief from "../assets/towers/towerS_8.png"
 import ghost from "../assets/towers/diss_ghost_0.png"
+import lis from "../assets/sprites/diss_lis_0.png"
+import umbrella from "../assets/sprites/monster_fish_2.png"
 import boss1 from "../assets/sprites/boss_2_spr_0.png"
+import boss2 from "../assets/sprites/boss_spr_0.png"
 import hp from "../assets/sprites/spr_sword_1.png"
 import dmg from "../assets/sprites/spr_sword_0.png"
 import coin from "../assets/sprites/spr_coin_0.png"
@@ -74,7 +77,10 @@ export default class PlayScene extends Scene {
         this.load.image('chest', chest)
         this.load.image('thief', thief)
         this.load.image('ghost', ghost)
+        this.load.image('lis', lis)
+        this.load.image('umbrella', umbrella)
         this.load.image('boss1', boss1)
+        this.load.image('boss2', boss2)
         this.load.image('stairs', stairs)
         this.load.image('towerInfoBg', towerInfoBg)
         this.load.image('obsidian', obsidian)
@@ -692,12 +698,29 @@ export default class PlayScene extends Scene {
         this.startWaveButtonContainer.setVisible(false);
         this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
-        if (this.wave % 1 == 0) {
-            this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss1')))
+        if (this.wave % 10 == 0) {
+            if (this.wave % 20 == 1) {
+                this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss1')));
+            } else {
+                this.enemies.push(this.add.existing(new Boss2(this, this.width, this.platform_start - 90, 'boss2')));
+            }
         }
         else {
             for (let i = 0; i < 5; i++) {
-                this.enemies.push(this.add.existing(new Enemy(this, this.width + 50 * i, this.platform_start - 30, 'ghost', this.wave * 2, this.wave * 2)))
+                var enemy;
+                switch (getRandomNumber(3)) {
+                    case 0:
+                        enemy = new Ghost(this, this.width + 50 * i, this.platform_start - 30, this.wave * 2, this.wave * 2);
+                        break;
+                    case 1:
+                        enemy = new Umbrella(this, this.width + 50 * i, this.platform_start, this.wave * 2 + 2, this.wave * 2 - 1);
+                        break;
+                    case 2:
+                        enemy = new Lis(this, this.width + 50 * i, this.platform_start - 30, this.wave * 2 - 1, this.wave * 2 + 2);
+                        break;
+                }
+
+                this.enemies.push(this.add.existing(enemy));
             }
         }
         this.tweens.add({
@@ -1354,7 +1377,7 @@ class Obsidian extends Tower {
 
 class Enemy extends Phaser.GameObjects.Sprite {
 
-    constructor(scene, x, y, texture, hp, dmg) {
+    constructor(scene, x, y, texture, hp, dmg, y_step=115) {
         super(scene, x, y, texture);
 
         scene.physics.world.enable(this);
@@ -1364,16 +1387,17 @@ class Enemy extends Phaser.GameObjects.Sprite {
 
         this.hp = hp
         this.dmg = dmg
+        this.y_step = y_step
         this.arrived = false
 
-        this.hpIcon = scene.add.sprite(x - 60, y + 115, 'hpIcon');
+        this.hpIcon = scene.add.sprite(x - 60, y + this.y_step, 'hpIcon');
         this.hpText = scene.add.text(this.hpIcon.x + 20, this.hpIcon.y - 15, hp.toString(), {
             textAlign: 'center',
             fontSize: '30px',
             fill: '#fff'
         })
 
-        this.dmgIcon = scene.add.sprite(x + 15, y + 115, 'dmgIcon');
+        this.dmgIcon = scene.add.sprite(x + 15, y + this.y_step, 'dmgIcon');
         this.dmgText = scene.add.text(this.dmgIcon.x + 20, this.dmgIcon.y - 13, dmg.toString(), {
             textAlign: 'center',
             fontSize: '30px',
@@ -1405,10 +1429,10 @@ class Enemy extends Phaser.GameObjects.Sprite {
     }
 
     updatePosition() {
-        this.hpIcon.setPosition(this.x - 60, this.y + 115);
+        this.hpIcon.setPosition(this.x - 60, this.y + this.y_step);
         this.hpText.setPosition(this.hpIcon.x + 20, this.hpIcon.y - 13)
 
-        this.dmgIcon.setPosition(this.x, this.y + 115)
+        this.dmgIcon.setPosition(this.x, this.y + this.y_step)
         this.dmgText.setPosition(this.dmgIcon.x + 20, this.dmgIcon.y - 13);
 
         if (this.body.velocity.x === 0 && this.arrived) {
@@ -1427,7 +1451,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
 
 class Boss1 extends Enemy {
     constructor(scene, x, y, texture) {
-        super(scene, x, y, texture, 2, 2);
+        super(scene, x, y, texture, 200, 200);
     }
 
     damage(dmg) {
@@ -1435,6 +1459,37 @@ class Boss1 extends Enemy {
         this.dmg -= dmg;
         this.updateHPText();
         this.updateDMGText();
+    }
+}
+
+class Boss2 extends Enemy {
+    constructor(scene, x, y, texture) {
+        super(scene, x, y, texture, 400, 600);
+    }
+
+    damage(dmg) {
+        this.hp -= dmg;
+        this.dmg -= dmg;
+        this.updateHPText();
+        this.updateDMGText();
+    }
+}
+
+class Ghost extends Enemy {
+    constructor(scene, x, y, hp, dmg) {
+        super(scene, x, y, 'ghost', hp, dmg);
+    }
+}
+
+class Lis extends Enemy {
+    constructor(scene, x, y, hp, dmg) {
+        super(scene, x, y, 'lis', hp, dmg);
+    }
+}
+
+class Umbrella extends Enemy {
+    constructor(scene, x, y, hp, dmg) {
+        super(scene, x, y, 'umbrella', hp, dmg, 85);
     }
 }
 
