@@ -88,6 +88,7 @@ export default class PlayScene extends Scene {
         this.load.image('description', description)
         this.load.image('setting_button', setting_button)
         this.load.image('shovel', shovel)
+
         this.load.audio('newWaveSound', newWaveSound);
         this.load.audio('newWaveHoverSound',newWaveHoverSound);
         this.load.audio('newLevelSound', newLevelSound);
@@ -168,6 +169,7 @@ export default class PlayScene extends Scene {
         this.towerDestroySound = this.sound.add('towerDestroySound');
         this.buttonClickSound = this.sound.add('buttonClickSound');
         this.loseSound = this.sound.add('loseSound');
+
         this.gameMusic = this.sound.add('gameMusic')
         this.gameMusic.play({ volume: 0.3, loop: true });
 

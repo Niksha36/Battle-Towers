@@ -1,14 +1,17 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import {onMounted, ref} from 'vue'
-import stor from "../store.js"
-import offSoundCondition from '../assets/sprites/audio-off.svg'
-import onSoundCondition from '../assets/sprites/audio-on.svg'
+import { onMounted, onBeforeUnmount, ref } from 'vue';
+import { createStore } from 'vuex';
+import stor from "../store.js";
+import offSoundCondition from '../assets/sprites/audio-off.svg';
+import onSoundCondition from '../assets/sprites/audio-on.svg';
 import buttonHoverSound from '../assets/sounds/button_hover.mp3';
 import buttonClickSound from '../assets/sounds/button_click.mp3';
 import menuAppearingSound from '../assets/sounds/menu_appearing.mp3';
 import gameMenuMusic from '../assets/sounds/game_menu_music.mp3';
 const router = useRouter();
+
+
 
 function getUser() {
     return stor.state.username
@@ -52,11 +55,6 @@ function playClickSound() {
     clickSound.play();
 }
 
-
-// onMounted(() => {
-//     backgroundMusic.loop = true;
-//     backgroundMusic.play();
-// });
 const isSoundOn = ref(false);
 
 function toggleSound() {
@@ -70,6 +68,18 @@ function toggleSound() {
 }
 
 const isLogging = ref(getUser());
+
+onMounted(() => {
+    if (isSoundOn.value) {
+        backgroundMusic.loop = true;
+        backgroundMusic.play();
+    }
+});
+
+onBeforeUnmount(() => {
+    backgroundMusic.pause();
+    backgroundMusic.currentTime = 0;
+});
 </script>
 <template>
     <div class="background-wrapper">
