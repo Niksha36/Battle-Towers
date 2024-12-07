@@ -708,10 +708,10 @@ export default class PlayScene extends Scene {
         this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
         if (this.wave % 10 == 0) {
-            if (this.wave % 20 == 1) {
-                this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss1')));
+            if (this.wave % 20 == 0) {
+                this.enemies.push(this.add.existing(new Boss2(this, this.width, this.platform_start - 90, 'boss1')));
             } else {
-                this.enemies.push(this.add.existing(new Boss2(this, this.width, this.platform_start - 90, 'boss2')));
+                this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss2')));
             }
         }
         else {
@@ -719,13 +719,13 @@ export default class PlayScene extends Scene {
                 var enemy;
                 switch (getRandomNumber(3)) {
                     case 0:
-                        enemy = new Ghost(this, this.width + 50 * i, this.platform_start - 30, this.wave * 2, this.wave * 2);
+                        enemy = new Ghost(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * 1.5),  Math.floor(this.wave * 1.5));
                         break;
                     case 1:
-                        enemy = new Umbrella(this, this.width + 50 * i, this.platform_start, this.wave * 2 + 2, this.wave * 2 - 1);
+                        enemy = new Umbrella(this, this.width + 50 * i, this.platform_start, Math.floor(this.wave * 2), Math.floor(this.wave * 1.3));
                         break;
                     case 2:
-                        enemy = new Lis(this, this.width + 50 * i, this.platform_start - 30, this.wave * 2 - 1, this.wave * 2 + 2);
+                        enemy = new Lis(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * 1.3), Math.floor(this.wave * 2));
                         break;
                 }
 
@@ -1460,7 +1460,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
 
 class Boss1 extends Enemy {
     constructor(scene, x, y, texture) {
-        super(scene, x, y, texture, 200, 200);
+        super(scene, x, y, texture, 100, 100);
     }
 
     damage(dmg) {
@@ -1473,7 +1473,7 @@ class Boss1 extends Enemy {
 
 class Boss2 extends Enemy {
     constructor(scene, x, y, texture) {
-        super(scene, x, y, texture, 400, 600);
+        super(scene, x, y, texture, 200, 200);
     }
 
     damage(dmg) {
