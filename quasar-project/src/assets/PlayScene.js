@@ -322,7 +322,7 @@ export default class PlayScene extends Scene {
                 this.shop_plates.splice(index, 1);
                 this.shop_towers.splice(index, 1);
             } else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
-                this.vueInstance.playNewLevelSoundGame();
+                this.vueInstance.playTowerLevelUpSound();
                 dropZone.clearTint();
                 let index = this.shop_towers.indexOf(gameObject);
                 this.shop_towers[index].component_destroy()
@@ -375,7 +375,12 @@ export default class PlayScene extends Scene {
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
 
+        this.towerDeleteButton.on("pointerover", () => {
+            this.vueInstance.playHoverSoundGame();
+        })
+
         this.towerDeleteButton.on("pointerdown", () => {
+            this.vueInstance.playGameClickSound();
             if (!this.deleteMode) {
                 this.towerDeleteButton.setTint(0xc1c1c1)
                 this.deleteMode = true
@@ -387,7 +392,6 @@ export default class PlayScene extends Scene {
                             console.log(this.towers[i])
                             this.vueInstance.playDiggingSound();
                             this.towers[i].component_destroy()
-                            this.vueInstance.playHoverSoundGame();
                             this.towers[i].destroy()
                             this.towers[i] = 0
                             this.slots[i] = this.add.sprite(140 + this.step_sprite * (i), this.platform_start, 'slot').setInteractive().setAlpha(0.4)
@@ -419,6 +423,7 @@ export default class PlayScene extends Scene {
 
 
         settingButton.on('pointerdown', () => {
+            this.vueInstance.playGameClickSound();
             settingButton.clearTint();
             this.vueInstance.displayDialog();
             this.scene.pause();
@@ -436,9 +441,12 @@ export default class PlayScene extends Scene {
         });
         this.rerollButton.on("pointerdown", () => {
             if (this.money > 1) {
+                this.vueInstance.playGameClickSound();
                 this.money -= 2
                 this.rerollShop()
                 this.moneyText.setText(this.money.toString());
+            } else{
+                this.vueInstance.playNotEnoughMoneyGame()
             }
         })
         this.roundsFlag = this.add.sprite(0, 0, 'roundsFlag').setOrigin(1, 1);
@@ -612,6 +620,7 @@ export default class PlayScene extends Scene {
     }
 
     rerollShop() {
+        this.vueInstance.playRerollSound();
         this.clearShop(this.shop_towers, this.shop_plates)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
@@ -1496,15 +1505,3 @@ class Umbrella extends Enemy {
 function getRandomNumber(max) {
     return Math.floor(Math.random() * max)
 }
-
-
-
-// const destroyAnim = this.add.sprite(tower.x, tower.y, 'tower_destroy');
-// try {
-//     destroyAnim.play('destroy');
-// } catch (error) {
-//     console.error('Error playing destroy animation:', error);
-// }
-// destroyAnim.on('animationcomplete', () => {
-//     destroyAnim.destroy();
-// });

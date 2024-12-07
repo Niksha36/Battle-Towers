@@ -18,8 +18,8 @@ function getUser() {
 }
 function redirectToGame() {
     playClickSound()
-    backgroundMusic.pause();
-    backgroundMusic.currentTime = 0;
+    backgroundMusicMenu.pause();
+    backgroundMusicMenu.currentTime = 0;
     router.push('/game');
 }
 function redirectToRating(){
@@ -45,7 +45,7 @@ function closeGame() {
 const hoverSound = new Audio(buttonHoverSound);
 const clickSound = new Audio(buttonClickSound);
 const appearingSound = new Audio(menuAppearingSound);
-const backgroundMusic = new Audio(gameMenuMusic);
+const backgroundMusicMenu = new Audio(gameMenuMusic);
 
 function playHoverSound() {
     hoverSound.play();
@@ -55,30 +55,41 @@ function playClickSound() {
     clickSound.play();
 }
 
-const isSoundOn = ref(false);
+const isSoundOn = ref(stor.state.isMenuMusicPlaying);
 
 function toggleSound() {
-    isSoundOn.value = !isSoundOn.value;
+    isSoundOn.value = !isSoundOn.value;console.log(isSoundOn.value)
+    stor.dispatch("updateMusicState", {
+        isPlaying: isSoundOn.value,
+        currentTime: backgroundMusicMenu.currentTime
+    })
+
     if (isSoundOn.value) {
-        backgroundMusic.loop = true;
-        backgroundMusic.play();
+        backgroundMusicMenu.loop = true;
+        backgroundMusicMenu.play();
     } else {
-        backgroundMusic.pause();
+        backgroundMusicMenu.pause();
     }
 }
 
 const isLogging = ref(getUser());
+const startTime = stor.state.time
 
 onMounted(() => {
     if (isSoundOn.value) {
-        backgroundMusic.loop = true;
-        backgroundMusic.play();
+        backgroundMusicMenu.loop = true;
+        backgroundMusicMenu.currentTime = startTime
+        backgroundMusicMenu.play();
     }
 });
 
 onBeforeUnmount(() => {
-    backgroundMusic.pause();
-    backgroundMusic.currentTime = 0;
+    stor.dispatch("updateMusicState", {
+        isPlaying: !backgroundMusicMenu.paused,
+        currentTime: backgroundMusicMenu.currentTime ? backgroundMusicMenu.currentTime : 0}
+    )
+    backgroundMusicMenu.pause();
+    backgroundMusicMenu.currentTime = 0;
 });
 </script>
 <template>
@@ -147,7 +158,8 @@ onBeforeUnmount(() => {
     margin-right: 0;
 }
 .game-menu .button-wrapper button:hover {
-    background: #AA382C;
+    background: #136e6c;
+
 }
 .button-wrapper {
     padding: 0 15%
