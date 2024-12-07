@@ -886,7 +886,7 @@ export default class PlayScene extends Scene {
                 });
             }
             if (tower.constructor.name === "Glass") {
-                this.towers[0].dmg += Math.ceil(tower.dmg * 0.2 * tower.level)
+                this.towers[0].dmg += Math.ceil(tower.dmg * 0.4 * tower.level)
                 this.towers[0].updateDMGText()
             }
             if (tower.constructor.name === "MainTower") {
@@ -1006,8 +1006,8 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.hpScale = hp
         this.default_hp = hp
         this.default_dmg = dmg
-        this.hp = hp * this.level
-        this.dmg = dmg * this.level
+        this.hp = hp * Math.floor(this.level * 1.5)
+        this.dmg = dmg * Math.floor(this.level * 1.5)
         this.cost = cost
         this.description = description
         this.draggable = draggable
