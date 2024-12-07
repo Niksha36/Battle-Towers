@@ -6,8 +6,8 @@
                 <h1>Выход из игры</h1>
                 <p>Вы уверены, что хотите выйти?</p>
                 <div class="buttons-wrapper">
-                    <button @click="leaveGame" @mouseover="playButtonClickSound">Выйти</button>
-                    <button @click="hideDialog" @mouseover="playButtonClickSound">Назад</button>
+                    <button @click="leaveGame" @mouseover="playSelectTowerGame">Выйти</button>
+                    <button @click="hideDialog" @mouseover="playSelectTowerGame">Назад</button>
                 </div>
             </div>
         </div>
@@ -16,17 +16,21 @@
             <img src="../assets/background/lose_background.png" alt="/lose_background">
             <h1 class="defeat-text">Поражение</h1>
             <div class="defeat-info">
-                <p class="record">Ваш рекорд: {{ this.record }}</p>
+                <div v-if="isUserNotRegistered" class="warning-wrapper">
+                    <img src="../assets/sprites/ic_warning.svg" alt="ic_warning">
+                    <span class="warning-text">Вы не зарегистрированы</span>
+                </div>
+                <p v-else class="record">Ваш рекорд: {{ this.record }}</p>
                 <p class="waves">Количество волн: {{ this.waves }}</p>
             </div>
             <div class="defeat-screen-buttons-wrapper">
-                <button @click="startNewGame" @mouseover="playButtonClickSound" class="new-game defeat-screen-button">
+                <button @click="startNewGame" @mouseover="playSelectTowerGame" class="new-game defeat-screen-button">
                     Новая игра
                 </button>
-                <button @click="viewRatings" @mouseover="playButtonClickSound" class="rating defeat-screen-button">
+                <button @click="viewRatings" @mouseover="playSelectTowerGame" class="rating defeat-screen-button">
                     Рейтинг
                 </button>
-                <button @click="goToMenu" @mouseover="playButtonClickSound" class="menu defeat-screen-button">
+                <button @click="goToMenu" @mouseover="playSelectTowerGame" class="menu defeat-screen-button">
                     Меню
                 </button>
             </div>
@@ -55,7 +59,9 @@ import loseSound from '../assets/sounds/lose_sound.mp3'
 import gameMusic from '../assets/sounds/game_sound.mp3'
 import diggingSound from '../assets/sounds/digging_sound.mp3'
 import towerLevelUpSound from '../assets/sounds/tower_level_up.mp3'
-
+import rerollSound from '../assets/sounds/reroll_sound.mp3'
+import gameClickSound from '../assets/sounds/game_click.mp3'
+import notEnoughMoney from '../assets/sounds/not_enought_money.mp3'
 export default {
     name: "PhaserGame",
     data() {
@@ -76,13 +82,32 @@ export default {
             loseSoundGame:new Audio(loseSound),
             gameMusicGame:new Audio(gameMusic),
             diggingSoundGame: new Audio(diggingSound),
-            towerLevelUpSoundGame: new Audio(towerLevelUpSound)
+            towerLevelUpSoundGame: new Audio(towerLevelUpSound),
+            rerollSoundGame: new Audio(rerollSound),
+            gameClickSoundGame: new Audio(gameClickSound),
+            notEnoughMoneyGame:new Audio(notEnoughMoney)
         };
     },
+    computed: {
+        isUserNotRegistered() {
+            return stor.state.username === "";
+        }
+    },
     mounted() {
-        this.towerLevelUpSound = () => {
+        this.playNotEnoughMoneyGame = () => {
+            const sound = new Audio(notEnoughMoney);
+            sound.play()
+        }
+        this.playGameClickSound = () => {
+            this.gameClickSoundGame.play();
+        }
+        this.playRerollSound = () => {
+            const sound = new Audio(rerollSound);
+            sound.play()
+        }
+        this.playTowerLevelUpSound = () => {
             const sound = new Audio(towerLevelUpSound);
-            this.towerLevelUpSoundGame.play();
+            sound.play();
         }
         this.playDiggingSound = () => {
             this.diggingSoundGame.play();
@@ -152,34 +177,41 @@ export default {
 
     methods: {
         startNewGame() {
+            this.playButtonClickSound();
             this.game.scene.scenes[0].scene.restart();
             this.showEndScreen = false;
             this.game.scene.scenes[0].gameMusic.stop();
             this.gameMusic.play({ volume: 0.3, loop: true });
         },
         viewRatings() {
+            this.playButtonClickSound();
             this.stopGameMusicGame();
             this.$router.push('/rating');
         },
         goToMenu() {
+            this.playButtonClickSound();
             this.stopGameMusicGame();
             this.$router.push('/menu');
         },
 
 
         displayEndScreen() {
+            this.playButtonClickSound();
             this.record = stor.state.record
             this.waves = this.game.scene.scenes[0].wave
             this.showEndScreen = true;
         },
         displayDialog() {
+            this.playButtonClickSound();
             this.showDialog = true;
         },
         hideDialog() {
+            this.playButtonClickSound();
             this.showDialog = false;
             this.game.scene.resume('PlayScene');
         },
         leaveGame() {
+            this.playButtonClickSound();
             this.stopGameMusicGame();
             this.$router.push('/menu');
         },
@@ -188,6 +220,16 @@ export default {
 </script>
 
 <style>
+.warning-text{
+    color: red;
+    margin-left: 15px;
+    font-size: 30px;
+}
+.warning-wrapper{
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
 .defeat-text{
     color: #600000;
     font-size: 40px;

@@ -337,7 +337,7 @@ export default class PlayScene extends Scene {
                 this.shop_plates.splice(index, 1);
                 this.shop_towers.splice(index, 1);
             } else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
-                this.vueInstance.playNewLevelSoundGame();
+                this.vueInstance.playTowerLevelUpSound();
                 dropZone.clearTint();
                 let index = this.shop_towers.indexOf(gameObject);
                 this.shop_towers[index].component_destroy()
@@ -390,7 +390,12 @@ export default class PlayScene extends Scene {
             fill: '#E8CA8F'
         }).setOrigin(-0.98, 0.1);
 
+        this.towerDeleteButton.on("pointerover", () => {
+            this.vueInstance.playHoverSoundGame();
+        })
+
         this.towerDeleteButton.on("pointerdown", () => {
+            this.vueInstance.playGameClickSound();
             if (!this.deleteMode) {
                 this.towerDeleteButton.setTint(0xc1c1c1)
                 this.deleteMode = true
@@ -402,7 +407,6 @@ export default class PlayScene extends Scene {
                             console.log(this.towers[i])
                             this.vueInstance.playDiggingSound();
                             this.towers[i].component_destroy()
-                            this.vueInstance.playHoverSoundGame();
                             this.towers[i].destroy()
                             this.towers[i] = 0
                             this.slots[i] = this.add.sprite(140 + this.step_sprite * (i), this.platform_start, 'slot').setInteractive().setAlpha(0.4)
@@ -434,6 +438,7 @@ export default class PlayScene extends Scene {
 
 
         settingButton.on('pointerdown', () => {
+            this.vueInstance.playGameClickSound();
             settingButton.clearTint();
             this.vueInstance.displayDialog();
             this.scene.pause();
@@ -451,9 +456,12 @@ export default class PlayScene extends Scene {
         });
         this.rerollButton.on("pointerdown", () => {
             if (this.money > 1) {
+                this.vueInstance.playGameClickSound();
                 this.money -= 2
                 this.rerollShop()
                 this.moneyText.setText(this.money.toString());
+            } else{
+                this.vueInstance.playNotEnoughMoneyGame()
             }
         })
         this.roundsFlag = this.add.sprite(0, 0, 'roundsFlag').setOrigin(1, 1);
@@ -648,6 +656,7 @@ export default class PlayScene extends Scene {
     }
 
     rerollShop() {
+        this.vueInstance.playRerollSound();
         this.clearShop(this.shop_towers, this.shop_plates)
         this.generateShop(this.shop_towers, this.shop_plates)
         this.tweens.add({
@@ -735,10 +744,10 @@ export default class PlayScene extends Scene {
         this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
         if (this.wave % 10 == 0) {
-            if (this.wave % 20 == 1) {
-                this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss1')));
+            if (this.wave % 20 == 0) {
+                this.enemies.push(this.add.existing(new Boss2(this, this.width, this.platform_start - 90, 'boss1')));
             } else {
-                this.enemies.push(this.add.existing(new Boss2(this, this.width, this.platform_start - 90, 'boss2')));
+                this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss2')));
             }
         }
         else {
@@ -746,13 +755,13 @@ export default class PlayScene extends Scene {
                 var enemy;
                 switch (getRandomNumber(3)) {
                     case 0:
-                        enemy = new Ghost(this, this.width + 50 * i, this.platform_start - 30, this.wave * 2, this.wave * 2);
+                        enemy = new Ghost(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * 1.5),  Math.floor(this.wave * 1.5));
                         break;
                     case 1:
-                        enemy = new Umbrella(this, this.width + 50 * i, this.platform_start, this.wave * 2 + 2, this.wave * 2 - 1);
+                        enemy = new Umbrella(this, this.width + 50 * i, this.platform_start, Math.floor(this.wave * 2), Math.floor(this.wave * 1.3));
                         break;
                     case 2:
-                        enemy = new Lis(this, this.width + 50 * i, this.platform_start - 30, this.wave * 2 - 1, this.wave * 2 + 2);
+                        enemy = new Lis(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * 1.3), Math.floor(this.wave * 2));
                         break;
                 }
 
@@ -913,7 +922,7 @@ export default class PlayScene extends Scene {
                 });
             }
             if (tower.constructor.name === "Glass") {
-                this.towers[0].dmg += Math.ceil(tower.dmg * 0.2 * tower.level)
+                this.towers[0].dmg += Math.ceil(tower.dmg * 0.4 * tower.level)
                 this.towers[0].updateDMGText()
             }
             if (tower.constructor.name === "MainTower") {
@@ -1039,8 +1048,8 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.hpScale = hp
         this.default_hp = hp
         this.default_dmg = dmg
-        this.hp = hp * this.level
-        this.dmg = dmg * this.level
+        this.hp = hp * Math.floor(this.level * 1.5)
+        this.dmg = dmg * Math.floor(this.level * 1.5)
         this.cost = cost
         this.description = description
         this.draggable = draggable
@@ -1493,7 +1502,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
 
 class Boss1 extends Enemy {
     constructor(scene, x, y, texture) {
-        super(scene, x, y, texture, 200, 200);
+        super(scene, x, y, texture, 100, 100);
     }
 
     damage(dmg) {
@@ -1506,7 +1515,7 @@ class Boss1 extends Enemy {
 
 class Boss2 extends Enemy {
     constructor(scene, x, y, texture) {
-        super(scene, x, y, texture, 400, 600);
+        super(scene, x, y, texture, 200, 200);
     }
 
     damage(dmg) {
@@ -1538,15 +1547,3 @@ class Umbrella extends Enemy {
 function getRandomNumber(max) {
     return Math.floor(Math.random() * max)
 }
-
-
-
-// const destroyAnim = this.add.sprite(tower.x, tower.y, 'tower_destroy');
-// try {
-//     destroyAnim.play('destroy');
-// } catch (error) {
-//     console.error('Error playing destroy animation:', error);
-// }
-// destroyAnim.on('animationcomplete', () => {
-//     destroyAnim.destroy();
-// });

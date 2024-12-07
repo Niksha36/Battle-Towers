@@ -4,7 +4,9 @@ const store = createStore({
     state () {
         return {
             username: '',
-            record: 0
+            record: 0,
+            time: 0,
+            isMenuMusicPlaying: false
         }
     },
     mutations: {
@@ -16,9 +18,18 @@ const store = createStore({
             state.record = Math.max(state.record, record)
         },
 
+        setIsPlaying(state, isPlaying) {
+            state.isMenuMusicPlaying = isPlaying
+        },
+        setTime(state, time) {
+            state.time = time
+        },
+
         setDefault() {
             this.username = ""
             this.record = 0
+            this.isMenuMusicPlaying = false
+            this.time = 0;
         }
     },
 
@@ -33,6 +44,10 @@ const store = createStore({
 
         logout({commit}) {
             commit("setDefault")
+        },
+        updateMusicState({ commit }, data) {
+            commit("setIsPlaying", data.isPlaying)
+            commit("setTime", data.currentTime)
         }
     },
 

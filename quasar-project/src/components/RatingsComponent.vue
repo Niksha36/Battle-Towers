@@ -1,9 +1,27 @@
 <script setup>
-import { ref } from 'vue';
+import {onBeforeMount, onBeforeUnmount, ref} from 'vue';
 import axios from "axios";
 import stor from "../store.js"
 import router from "src/router/index.js";
+import gameMenuMusic from "assets/sounds/game_menu_music.mp3";
+import buttonHoverSound from '../assets/sounds/button_hover.mp3';
+import buttonClickSound from '../assets/sounds/button_click.mp3';
+
+const hoverSound = new Audio(buttonHoverSound);
+const clickSound = new Audio(buttonClickSound);
+const backgroundMusicMenu = new Audio(gameMenuMusic);
+const isPlaying = stor.state.isMenuMusicPlaying
+const currentTime = stor.state.time
+console.log(stor.state.isMenuMusicPlaying)
+console.log(stor.state.time)
+backgroundMusicMenu.currentTime = currentTime
+if (isPlaying) {
+    backgroundMusicMenu.loop = true
+    backgroundMusicMenu.play()
+}
+
 function backToMenu(){
+    clickSound.play();
     router.push('/menu')
 }
 let data = ref([])
@@ -18,14 +36,20 @@ let response = axios.get("http://localhost:8000/get_top", {
     }
 )
 
-console.log(data)
-// console.log(response.status)
+onBeforeUnmount(() => {
+    stor.dispatch("updateMusicState", {
+        isPlaying: !backgroundMusicMenu.paused,
+        currentTime: backgroundMusicMenu.currentTime ? backgroundMusicMenu.currentTime : 0}
+    )
+    backgroundMusicMenu.pause();
+    backgroundMusicMenu.currentTime = 0;
+})
 
 </script>
 
 <template>
     <div class="background-wrapper">
-        <img @click="backToMenu" src="../assets/sprites/ic_go_back.svg" alt="" class="back-button" width="150">
+        <img @click="backToMenu" @mouseover="hoverSound.play()" src="../assets/sprites/ic_go_back.svg" alt="" class="back-button" width="150">
         <div class="ratings-table">
             <h1>Рейтинг</h1>
             <table>
@@ -52,10 +76,12 @@ console.log(data)
 <style scoped>
 .back-button{
     position: absolute;
+    opacity: 0.7;
     top: 10px;
     left: 20px
 }
 .back-button:hover {
+    opacity: 1;
     cursor: pointer;
     content: url('../assets/sprites/ic_go_back_hover.svg');
 }
