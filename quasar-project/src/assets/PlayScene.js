@@ -38,7 +38,10 @@ import setting_button from "../assets/sprites/menu.png"
 import shovel from "../assets/sprites/shovel.png"
 import stor from "../store.js"
 import axios from "axios";
-import boss_sprite from '../assets/sprites/boss_sprite.png'
+import boss1_destroy_sprite from '../assets/sprites/boss_sprite.png'
+import boss2_destroy_sprite from '../assets/sprites/boss2_sprite_sheet.png'
+import umbrella_destroy_sprite from '../assets/sprites/umbrella_sprite_sheet.png'
+import lis_destroy_sprite from '../assets/sprites/lis_sprite_sheet.png'
 
 // import newWaveSound from "../assets/sounds/new_wave_sound.mp3"
 // import newWaveHoverSound from "../assets/sounds/menu_appearing.mp3"
@@ -126,6 +129,14 @@ export default class PlayScene extends Scene {
             frameWidth: 179,
             frameHeight: 217,
         });
+        this.load.spritesheet('lis_destroy', lis_destroy_sprite, {
+            frameWidth: 195,
+            frameHeight: 221,
+        });
+        this.load.spritesheet('umbrella_destroy', umbrella_destroy_sprite, {
+            frameWidth: 163,
+            frameHeight: 183,
+        });
         this.load.spritesheet('reroll_button', reroll_sprite, {
             frameWidth: 96,
             frameHeight: 101
@@ -134,7 +145,11 @@ export default class PlayScene extends Scene {
             frameWidth: 100,
             frameHeight: 100
         })
-        this.load.spritesheet('boss', boss_sprite,{
+        this.load.spritesheet('boss1_destroy', boss1_destroy_sprite,{
+            frameWidth: 400,
+            frameHeight: 400
+        })
+        this.load.spritesheet('boss2_destroy', boss2_destroy_sprite,{
             frameWidth: 400,
             frameHeight: 400
         })
@@ -507,6 +522,20 @@ export default class PlayScene extends Scene {
             frameRate: 30,
             repeat: 0
         });
+        const umbrellaDiesFrames = this.anims.generateFrameNumbers("umbrella_destroy", {start: 0, end: 31});
+        this.anims.create({
+            key: 'umbrellaDies',
+            frames: umbrellaDiesFrames,
+            frameRate: 30,
+            repeat: 0
+        });
+        const lisDiesFrames = this.anims.generateFrameNumbers("lis_destroy", {start: 0, end: 23});
+        this.anims.create({
+            key: 'lisDies',
+            frames: lisDiesFrames,
+            frameRate: 30,
+            repeat: 0
+        });
         const explosionFrames = this.anims.generateFrameNumbers("explosion", {start: 0, end: 41});
         this.anims.create({
             key: 'towerExplosion',
@@ -514,10 +543,17 @@ export default class PlayScene extends Scene {
             frameRate: 60,
             repeat: 0
         });
-        const bossFrames = this.anims.generateFrameNumbers("boss", {start:0, end: 34});
+        const boss1Frames = this.anims.generateFrameNumbers("boss1_destroy", {start:0, end: 34});
         this.anims.create({
-            key: 'bossAnim',
-            frames: bossFrames,
+            key: 'boss1Dies',
+            frames: boss1Frames,
+            frameRate: 35,
+            repeat: 0
+        });
+        const boss2Frames = this.anims.generateFrameNumbers("boss2_destroy", {start:0, end: 34});
+        this.anims.create({
+            key: 'boss2Dies',
+            frames: boss2Frames,
             frameRate: 35,
             repeat: 0
         })
@@ -909,31 +945,37 @@ export default class PlayScene extends Scene {
 
         if (enemy.hp <= 0) {
             this.time.delayedCall(150, () => {
-                if (enemy instanceof Boss1) {
-                    const destroyAnim = this.add.sprite(enemy.x, enemy.y, 'bossAnim').setAngle(enemy.angle);
-                    this.physics.world.enable(destroyAnim);
-                    destroyAnim.body.velocity.x = enemy.body.velocity.x
-                    try {
-                        destroyAnim.play('bossAnim');
-                    } catch (error) {
-                        console.error('Error playing destroy animation:', error);
-                    }
-                    destroyAnim.on('animationcomplete', () => {
-                        destroyAnim.destroy('bossAnim');
-                    });
-                } else {
-                    const destroyAnim = this.add.sprite(enemy.x, enemy.y, 'ghost_destroy').setAngle(enemy.angle);
-                    this.physics.world.enable(destroyAnim);
-                    destroyAnim.body.velocity.x = enemy.body.velocity.x
-                    try {
-                        destroyAnim.play('ghostDies');
-                    } catch (error) {
-                        console.error('Error playing destroy animation:', error);
-                    }
-                    destroyAnim.on('animationcomplete', () => {
-                        destroyAnim.destroy('ghostDies');
-                    });
+                var animName; 
+                switch (enemy.constructor) {
+                    case Ghost: 
+                        animName = 'ghostDies';
+                        break;
+                    case Umbrella: 
+                        animName = 'umbrellaDies';
+                        break;
+                    case Lis: 
+                        animName = 'lisDies';
+                        break;
+                    case Boss1:
+                        animName = 'boss1Dies';
+                        break;
+                    case Boss1:
+                        animName = 'boss2Dies';
+                        break;
                 }
+
+                const destroyAnim = this.add.sprite(enemy.x, enemy.y, animName).setAngle(enemy.angle);
+                this.physics.world.enable(destroyAnim);
+                destroyAnim.body.velocity.x = enemy.body.velocity.x
+                try {
+                    destroyAnim.play(animName);
+                } catch (error) {
+                    console.error('Error playing destroy animation:', error);
+                }
+                destroyAnim.on('animationcomplete', () => {
+                    destroyAnim.destroy(animName);
+                });
+
                 this.enemies.shift()
                 enemy.destroy()
                 enemy.component_destroy();
