@@ -14,8 +14,8 @@ import thief from "../assets/towers/towerS_8.png"
 import ghost from "../assets/towers/diss_ghost_0.png"
 import lis from "../assets/sprites/diss_lis_0.png"
 import umbrella from "../assets/sprites/monster_fish_2.png"
-import boss1 from "../assets/sprites/boss_2_spr_0.png"
-import boss2 from "../assets/sprites/boss_spr_0.png"
+import boss2 from "../assets/sprites/boss_2_spr_0.png"
+import boss1 from "../assets/sprites/boss_spr_0.png"
 import hp from "../assets/sprites/spr_sword_1.png"
 import dmg from "../assets/sprites/spr_sword_0.png"
 import coin from "../assets/sprites/spr_coin_0.png"
@@ -38,8 +38,8 @@ import setting_button from "../assets/sprites/menu.png"
 import shovel from "../assets/sprites/shovel.png"
 import stor from "../store.js"
 import axios from "axios";
-import boss1_destroy_sprite from '../assets/sprites/boss_sprite.png'
-import boss2_destroy_sprite from '../assets/sprites/boss2_sprite_sheet.png'
+import boss2_destroy_sprite from '../assets/sprites/boss_sprite.png'
+import boss1_destroy_sprite from '../assets/sprites/boss2_sprite_sheet.png'
 import umbrella_destroy_sprite from '../assets/sprites/umbrella_sprite_sheet.png'
 import lis_destroy_sprite from '../assets/sprites/lis_sprite_sheet.png'
 
@@ -146,8 +146,8 @@ export default class PlayScene extends Scene {
             frameHeight: 100
         })
         this.load.spritesheet('boss1_destroy', boss1_destroy_sprite,{
-            frameWidth: 400,
-            frameHeight: 400
+            frameWidth: 474,
+            frameHeight: 359
         })
         this.load.spritesheet('boss2_destroy', boss2_destroy_sprite,{
             frameWidth: 400,
@@ -698,7 +698,7 @@ export default class PlayScene extends Scene {
                 this.towers[i].buff(i);
             }
         }
-
+        
         this.hideSlots()
 
         this.tweens.add({
@@ -745,9 +745,9 @@ export default class PlayScene extends Scene {
         // this.clearShop(this.shop_towers, this.shop_plates)
         if (this.wave % 10 == 0) {
             if (this.wave % 20 == 0) {
-                this.enemies.push(this.add.existing(new Boss2(this, this.width, this.platform_start - 90, 'boss1')));
+                this.enemies.push(this.add.existing(new Boss2(this, this.width, this.platform_start - 90, 'boss2')));
             } else {
-                this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss2')));
+                this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss1')));
             }
         }
         else {
@@ -968,7 +968,7 @@ export default class PlayScene extends Scene {
                     case Boss1:
                         animName = 'boss1Dies';
                         break;
-                    case Boss1:
+                    case Boss2:
                         animName = 'boss2Dies';
                         break;
                 }
@@ -1259,6 +1259,7 @@ class MainTower extends Tower {
 
     buff(index) {
         this.scene.money += 6;
+        this.gainExp(3);
     }
 
 }
@@ -1309,8 +1310,8 @@ class Milk extends Tower {
                 return;
             }
             if (this.scene.towers[i + 1].constructor.name === "Cat") {
-                this.scene.towers[i + 1].default_hp += 2 * this.scene.towers[i + 1].level
-                this.scene.towers[i + 1].default_dmg += 2 * this.scene.towers[i + 1].level
+                this.scene.towers[i + 1].default_hp += this.scene.towers[i + 1].level
+                this.scene.towers[i + 1].default_dmg += this.scene.towers[i + 1].level
             } else {
                 this.scene.towers[i + 1].default_hp += this.level;
             }
@@ -1332,8 +1333,12 @@ class Guard extends Tower {
         if (this.is_die) {
             for (let tower of this.scene.towers) {
                 if (tower && tower.constructor.name === "Obsidian") {
-                    tower.default_hp += this.default_hp;
-                    tower.default_dmg += this.default_dmg;
+                    if (tower.is_die) {
+                        continue;
+                    }
+
+                    tower.default_hp += Math.ceil(this.scene.wave * this.default_hp / (5 + this.default_hp) / 2);
+                    tower.default_dmg += Math.ceil(this.scene.wave * this.default_dmg / (5 + this.default_dmg) / 2);
                     tower.hp += this.default_hp;
                     tower.dmg += this.default_dmg;
                     tower.updateDMGText();
