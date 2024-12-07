@@ -698,7 +698,7 @@ export default class PlayScene extends Scene {
                 this.towers[i].buff(i);
             }
         }
-        
+
         this.hideSlots()
 
         this.tweens.add({
@@ -900,7 +900,7 @@ export default class PlayScene extends Scene {
         }
         this.tweens.add({
             targets: this.enemies[0],
-            angle: 20, // Конечная прозрачность (полностью видимый)
+            angle: 10, // Конечная прозрачность (полностью видимый)
             duration: 500, // Длительность анимации в миллисекундах
             ease: 'Power2', // Тип easing
         });
@@ -954,15 +954,15 @@ export default class PlayScene extends Scene {
 
         if (enemy.hp <= 0) {
             this.time.delayedCall(150, () => {
-                var animName; 
+                var animName;
                 switch (enemy.constructor) {
-                    case Ghost: 
+                    case Ghost:
                         animName = 'ghostDies';
                         break;
-                    case Umbrella: 
+                    case Umbrella:
                         animName = 'umbrellaDies';
                         break;
-                    case Lis: 
+                    case Lis:
                         animName = 'lisDies';
                         break;
                     case Boss1:
@@ -1494,7 +1494,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
         if (this.body.velocity.x === 0 && this.arrived) {
             this.scene.tweens.add({
                 targets: this,
-                angle: -20,
+                angle: -10,
                 duration: 800,
                 ease: 'Power2',
             });
