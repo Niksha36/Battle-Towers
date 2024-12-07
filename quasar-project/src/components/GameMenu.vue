@@ -159,6 +159,8 @@ onBeforeUnmount(() => {
 }
 .game-menu .button-wrapper button:hover {
     background: #136e6c;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+;
 
 }
 .button-wrapper {
