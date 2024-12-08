@@ -87,6 +87,7 @@ onBeforeUnmount(() => {
 }
 
 .background-wrapper{
+    user-select: none;
     width: 100vw;
     height: 100vh;
     background: #1D7E7C;

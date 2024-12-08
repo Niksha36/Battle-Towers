@@ -180,7 +180,31 @@ export default {
         };
         this.game = new Phaser.Game(config);
     },
+    beforeUnmount() {
+        // Stop all sounds
+        this.hoverSoundGame.pause();
+        this.newWaveSoundGame.pause();
+        this.newWaveHoverSoundGame.pause();
+        this.newLevelSoundGame.pause();
+        this.selectTowerGame.pause();
+        this.buildingTowerSoundGame.pause();
+        this.glassTowerSoundGame.pause();
+        this.towerHitSoundGame.pause();
+        this.towerDestroySoundGame.pause();
+        this.loseSoundGame.pause();
+        this.gameMusicGame.pause();
+        this.diggingSoundGame.pause();
+        this.towerLevelUpSoundGame.pause();
+        this.rerollSoundGame.pause();
+        this.gameClickSoundGame.pause();
+        this.notEnoughMoneyGame.pause();
+        this.towerDragAndDropSoundGame.pause();
 
+        // Destroy the Phaser game instance
+        if (this.game) {
+            this.game.destroy(true);
+        }
+    },
     methods: {
         startNewGame() {
             this.playButtonClickSound();
@@ -221,6 +245,7 @@ export default {
             this.stopGameMusicGame();
             this.$router.push('/menu');
         },
+
     }
 }
 </script>
