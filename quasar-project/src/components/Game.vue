@@ -92,6 +92,7 @@ export default {
     },
     computed: {
         isUserNotRegistered() {
+            console.log(stor.state.username)
             return stor.state.username === "";
         }
     },
