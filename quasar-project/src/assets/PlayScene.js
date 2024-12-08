@@ -755,13 +755,13 @@ export default class PlayScene extends Scene {
                 var enemy;
                 switch (getRandomNumber(3)) {
                     case 0:
-                        enemy = new Ghost(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * 1.5),  Math.floor(this.wave * 1.5));
+                        enemy = new Ghost(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * (1.5 + 0.6 * Math.floor(this.wave / 10))),  Math.floor(this.wave * 1.5));
                         break;
                     case 1:
-                        enemy = new Umbrella(this, this.width + 50 * i, this.platform_start, Math.floor(this.wave * 2), Math.floor(this.wave * 1.3));
+                        enemy = new Umbrella(this, this.width + 50 * i, this.platform_start, Math.floor(this.wave * 2 + (0.5 * Math.floor(this.wave / 10))), Math.floor(this.wave * 1.3));
                         break;
                     case 2:
-                        enemy = new Lis(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * 1.3), Math.floor(this.wave * 2));
+                        enemy = new Lis(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * 1.3 + (0.7 * Math.floor(this.wave / 10))), Math.floor(this.wave * 2));
                         break;
                 }
 
@@ -1339,8 +1339,8 @@ class Guard extends Tower {
 
                     tower.default_hp += Math.ceil(this.scene.wave * this.default_hp / (5 + this.default_hp) / 2);
                     tower.default_dmg += Math.ceil(this.scene.wave * this.default_dmg / (5 + this.default_dmg) / 2);
-                    tower.hp += this.default_hp;
-                    tower.dmg += this.default_dmg;
+                    tower.hp += Math.ceil(this.scene.wave * this.default_hp / (5 + this.default_hp) / 2);
+                    tower.dmg += Math.ceil(this.scene.wave * this.default_dmg / (5 + this.default_dmg) / 2);
                     tower.updateDMGText();
                     tower.updateHPText();
 
