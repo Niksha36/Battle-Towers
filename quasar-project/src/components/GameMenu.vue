@@ -71,7 +71,17 @@ function toggleSound() {
         backgroundMusicMenu.pause();
     }
 }
-
+function getParticleStyle(index) {
+    const top = Math.random() * 100 + 'vh';
+    const left = Math.random() * 100 + 'vw';
+    const delay = (index * 0.07) + 's';
+    return {
+        top,
+        left,
+        animationDelay: delay,
+    };
+}
+const particles = ref(Array.from({ length: 100 }, (_, index) => index));
 const isLogging = ref(getUser());
 const startTime = stor.state.time
 
@@ -94,6 +104,7 @@ onBeforeUnmount(() => {
 </script>
 <template>
     <div class="background-wrapper">
+        <div class="particle" v-for="n in particles" :key="n" :style="getParticleStyle(n)"></div>
         <img :src="isSoundOn ? onSoundCondition : offSoundCondition" alt="" class="audio-switcher" @click="toggleSound">
         <div class="game-menu">
             <h1>Battle Towers</h1>
@@ -185,4 +196,27 @@ onBeforeUnmount(() => {
 .close-game:hover{
     background: #e80000 !important;
 }
+.particle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 251, 0, 0.7);
+    border-radius: 50%;
+    animation: fly 10s linear infinite;
+}
+
+@keyframes fly {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(100vw);
+        opacity: 0;
+    }
+}
+
 </style>
