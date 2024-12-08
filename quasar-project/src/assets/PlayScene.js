@@ -145,11 +145,11 @@ export default class PlayScene extends Scene {
             frameWidth: 100,
             frameHeight: 100
         })
-        this.load.spritesheet('boss1_destroy', boss1_destroy_sprite,{
+        this.load.spritesheet('boss1_destroy', boss1_destroy_sprite, {
             frameWidth: 474,
             frameHeight: 359
         })
-        this.load.spritesheet('boss2_destroy', boss2_destroy_sprite,{
+        this.load.spritesheet('boss2_destroy', boss2_destroy_sprite, {
             frameWidth: 400,
             frameHeight: 400
         })
@@ -456,7 +456,7 @@ export default class PlayScene extends Scene {
                 this.money -= 2
                 this.rerollShop()
                 this.moneyText.setText(this.money.toString());
-            } else{
+            } else {
                 this.vueInstance.playNotEnoughMoneyGame()
             }
         })
@@ -547,14 +547,14 @@ export default class PlayScene extends Scene {
             frameRate: 60,
             repeat: 0
         });
-        const boss1Frames = this.anims.generateFrameNumbers("boss1_destroy", {start:0, end: 34});
+        const boss1Frames = this.anims.generateFrameNumbers("boss1_destroy", {start: 0, end: 34});
         this.anims.create({
             key: 'boss1Dies',
             frames: boss1Frames,
             frameRate: 35,
             repeat: 0
         });
-        const boss2Frames = this.anims.generateFrameNumbers("boss2_destroy", {start:0, end: 34});
+        const boss2Frames = this.anims.generateFrameNumbers("boss2_destroy", {start: 0, end: 34});
         this.anims.create({
             key: 'boss2Dies',
             frames: boss2Frames,
@@ -577,57 +577,60 @@ export default class PlayScene extends Scene {
     }
 
     generateShop(shop_towers, shop_plates) {
-        if (!this.inGame) return
+        if (!this.inGame) return;
         for (let i = 0; i < this.count_shop_slots; ++i) {
-            let x_pos = (this.step_sprite + 40) * i + 90 - 1400
-            let y_pos = this.platform_start + 295
+            let x_pos = (this.step_sprite + 40) * i + 90 - 1400;
+            let y_pos = this.platform_start + 295;
 
             shop_plates.push(this.add.sprite(x_pos, y_pos, "shopPlate").setScale(1.1, 0.95));
 
             let shop_tower;
+            let randomNumber = Math.floor(Math.random() * 100);
 
-            switch (getRandomNumber(this.count_tower_types)) {
-                case 0:
-                    shop_tower = new Chest(this, x_pos, y_pos + 15)
-                    break
-                case 1:
-                    shop_tower = new Cat(this, x_pos, y_pos + 15)
-                    break
-                case 2:
-                    shop_tower = new Milk(this, x_pos, y_pos + 15)
-                    break
-                case 3:
-                    shop_tower = new Guard(this, x_pos, y_pos + 15)
-                    break
-                case 4:
-                    shop_tower = new Thief(this, x_pos, y_pos + 15)
-                    break
-                case 5:
-                    shop_tower = new Glass(this, x_pos, y_pos + 15)
-                    break
-                case 6:
-                    shop_tower = new Stairs(this, x_pos, y_pos + 15)
-                    break
-                case 7:
-                    shop_tower = new Obsidian(this, x_pos, y_pos + 15)
-                    break
+            if (randomNumber < 7) {
+                shop_tower = new Obsidian(this, x_pos, y_pos + 15);
+            } else {
+                switch (getRandomNumber(this.count_tower_types - 1)) {
+                    case 0:
+                        shop_tower = new Chest(this, x_pos, y_pos + 15);
+                        break;
+                    case 1:
+                        shop_tower = new Cat(this, x_pos, y_pos + 15);
+                        break;
+                    case 2:
+                        shop_tower = new Milk(this, x_pos, y_pos + 15);
+                        break;
+                    case 3:
+                        shop_tower = new Guard(this, x_pos, y_pos + 15);
+                        break;
+                    case 4:
+                        shop_tower = new Thief(this, x_pos, y_pos + 15);
+                        break;
+                    case 5:
+                        shop_tower = new Glass(this, x_pos, y_pos + 15);
+                        break;
+                    case 6:
+                        shop_tower = new Stairs(this, x_pos, y_pos + 15);
+                        break;
+                }
             }
+
             shop_tower.on('pointerover', () => {
                 this.vueInstance.playSelectTowerGame();
             });
-            shop_towers.push(this.add.existing(shop_tower))
+            shop_towers.push(this.add.existing(shop_tower));
             for (let slot of this.slots) {
                 if (slot) {
                     shop_tower.on('pointerover', (pointer, localX, localY, event) => {
-                        shop_tower.showDescription(pointer.x, pointer.y)
+                        shop_tower.showDescription(pointer.x, pointer.y);
                     });
 
                     shop_tower.on('pointermove', (pointer, localX, localY, event) => {
-                        shop_tower.showDescription(pointer.x, pointer.y)
-                    })
+                        shop_tower.showDescription(pointer.x, pointer.y);
+                    });
 
                     shop_tower.on('pointerout', () => {
-                        shop_tower.hideDescription()
+                        shop_tower.hideDescription();
                     });
                 }
             }
@@ -745,19 +748,18 @@ export default class PlayScene extends Scene {
             } else {
                 this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss1')));
             }
-        }
-        else {
+        } else {
             for (let i = 0; i < 5; i++) {
                 var enemy;
                 switch (getRandomNumber(3)) {
                     case 0:
-                        enemy = new Ghost(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * (1.5 + 0.6 * Math.floor(this.wave / 10))),  Math.floor(this.wave * 1.5));
+                        enemy = new Ghost(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * (1.5 + 0.4 * Math.floor(this.wave / 5))), Math.floor(this.wave * 1.5));
                         break;
                     case 1:
-                        enemy = new Umbrella(this, this.width + 50 * i, this.platform_start, Math.floor(this.wave * 2 + (0.5 * Math.floor(this.wave / 10))), Math.floor(this.wave * 1.3));
+                        enemy = new Umbrella(this, this.width + 50 * i, this.platform_start, Math.floor(this.wave * (2 + 0.5 * Math.floor(this.wave / 5))), Math.floor(this.wave * 1.3));
                         break;
                     case 2:
-                        enemy = new Lis(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * 1.3 + (0.7 * Math.floor(this.wave / 10))), Math.floor(this.wave * 2));
+                        enemy = new Lis(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * (1.3 + 0.3 * Math.floor(this.wave / 5))), Math.floor(this.wave * 2));
                         break;
                 }
 
@@ -806,8 +808,7 @@ export default class PlayScene extends Scene {
             try {
                 this.update_user_record();
                 console.log('123')
-            }
-            catch(e) {
+            } catch (e) {
                 console.log(e)
             }
         }
@@ -881,7 +882,7 @@ export default class PlayScene extends Scene {
             });
             if (tower instanceof Glass) {
                 this.vueInstance.playGlassTowerSoundGame();
-            } else{
+            } else {
                 this.vueInstance.playBuildingTowerSoundGame();
             }
         }
@@ -896,7 +897,7 @@ export default class PlayScene extends Scene {
         });
         tower.hp -= enemy.dmg;
         enemy.damage(tower.dmg);
-        if(tower.hp > 0) {
+        if (tower.hp > 0) {
             this.vueInstance.playTowerHitSoundGame();
         }
         this.tweens.add({
@@ -1434,7 +1435,7 @@ class Obsidian extends Tower {
 
 class Enemy extends Phaser.GameObjects.Sprite {
 
-    constructor(scene, x, y, texture, hp, dmg, y_step=115) {
+    constructor(scene, x, y, texture, hp, dmg, y_step = 115) {
         super(scene, x, y, texture);
 
         scene.physics.world.enable(this);
@@ -1523,7 +1524,7 @@ class Boss1 extends Enemy {
 
 class Boss2 extends Enemy {
     constructor(scene, x, y, texture) {
-        super(scene, x, y, texture, 200, 200);
+        super(scene, x, y, texture, 400, 400);
         this.y_step += 100
     }
 
