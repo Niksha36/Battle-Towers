@@ -619,21 +619,17 @@ export default class PlayScene extends Scene {
                 this.vueInstance.playSelectTowerGame();
             });
             shop_towers.push(this.add.existing(shop_tower));
-            for (let slot of this.slots) {
-                if (slot) {
-                    shop_tower.on('pointerover', (pointer, localX, localY, event) => {
-                        shop_tower.showDescription(pointer.x, pointer.y);
-                    });
+            shop_tower.on('pointerover', (pointer, localX, localY, event) => {
+                shop_tower.showDescription(pointer.x, pointer.y);
+            });
 
-                    shop_tower.on('pointermove', (pointer, localX, localY, event) => {
-                        shop_tower.showDescription(pointer.x, pointer.y);
-                    });
+            shop_tower.on('pointermove', (pointer, localX, localY, event) => {
+                shop_tower.showDescription(pointer.x, pointer.y);
+            });
 
-                    shop_tower.on('pointerout', () => {
-                        shop_tower.hideDescription();
-                    });
-                }
-            }
+            shop_tower.on('pointerout', () => {
+                shop_tower.hideDescription();
+            });
             this.children.bringToTop(this.shopLine);
         }
     }
@@ -673,7 +669,6 @@ export default class PlayScene extends Scene {
                 this.shop_towers.forEach((element) => {
                     element.setupInteractive();
                     for (let tower of this.shop_towers) {
-                        console.log(this.shop_towers)
                         if (tower.input !== null) {
                             if (tower.cost > this.money) {
                                 tower.input.enabled = false
@@ -685,6 +680,7 @@ export default class PlayScene extends Scene {
                 this.rerollButton.setInteractive();
             },
         });
+        console.log(this.shop_towers)
     }
 
     startWave() {
@@ -1138,6 +1134,7 @@ class Tower extends Phaser.GameObjects.Sprite {
     }
 
     showDescription(x, y) {
+        console.log(123, this.canShowDescription)
         if (!this.canShowDescription) {
             return;
         }
@@ -1147,6 +1144,9 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.descriptionText.y = y - 110 + 20 * (3 - this.description.split("\n").length)
         this.descriptionIcon.visible = true
         this.descriptionText.visible = true
+
+        console.log(this.descriptionText.x)
+        console.log(this.descriptionText.y)
 
         this.scene.children.bringToTop(this.descriptionIcon);
         this.scene.children.bringToTop(this.descriptionText);
