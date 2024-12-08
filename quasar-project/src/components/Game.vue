@@ -62,6 +62,7 @@ import towerLevelUpSound from '../assets/sounds/tower_level_up.mp3'
 import rerollSound from '../assets/sounds/reroll_sound.mp3'
 import gameClickSound from '../assets/sounds/game_click.mp3'
 import notEnoughMoney from '../assets/sounds/not_enought_money.mp3'
+import towerDragAndDropSound from '../assets/sounds/tower_drag_and_drop.mp3'
 export default {
     name: "PhaserGame",
     data() {
@@ -85,7 +86,8 @@ export default {
             towerLevelUpSoundGame: new Audio(towerLevelUpSound),
             rerollSoundGame: new Audio(rerollSound),
             gameClickSoundGame: new Audio(gameClickSound),
-            notEnoughMoneyGame:new Audio(notEnoughMoney)
+            notEnoughMoneyGame:new Audio(notEnoughMoney),
+            towerDragAndDropSoundGame: new Audio(towerDragAndDropSound),
         };
     },
     computed: {
@@ -94,6 +96,10 @@ export default {
         }
     },
     mounted() {
+        this.playTowerDragAndDropSoundGame = () => {
+            const sound = new Audio(towerDragAndDropSound);
+            sound.play()
+        }
         this.playNotEnoughMoneyGame = () => {
             const sound = new Audio(notEnoughMoney);
             sound.play()

@@ -284,6 +284,7 @@ export default class PlayScene extends Scene {
         this.input.on('dragenter', (pointer, gameObject, dropZone) => {
             if (this.slots[dropZone.dropZoneIndex] !== 0) {
                 dropZone.setTexture(gameObject.texture)
+                this.vueInstance.playTowerDragAndDropSoundGame()
                 dropZone.setTint(0x00ff00);
                 dropZone.setScale(0.5)
             } else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
@@ -303,11 +304,6 @@ export default class PlayScene extends Scene {
             console.log(this.towers[dropZone.dropZoneIndex])
             if (this.slots[dropZone.dropZoneIndex] !== 0) {
                 dropZone.setScale(1)
-                if (gameObject instanceof Glass) {
-                    this.vueInstance.playGlassTowerSoundGame();
-                } else{
-                    this.vueInstance.playBuildingTowerSoundGame();
-                }
                 dropZone.setTexture('slot')
                 dropZone.clearTint();
                 gameObject.x = dropZone.x;
@@ -698,7 +694,7 @@ export default class PlayScene extends Scene {
                 this.towers[i].buff(i);
             }
         }
-        
+
         this.hideSlots()
 
         this.tweens.add({
@@ -883,6 +879,11 @@ export default class PlayScene extends Scene {
             dustAnim.on('animationcomplete', () => {
                 dustAnim.destroy();
             });
+            if (tower instanceof Glass) {
+                this.vueInstance.playGlassTowerSoundGame();
+            } else{
+                this.vueInstance.playBuildingTowerSoundGame();
+            }
         }
     }
 
@@ -900,7 +901,7 @@ export default class PlayScene extends Scene {
         }
         this.tweens.add({
             targets: this.enemies[0],
-            angle: 20, // Конечная прозрачность (полностью видимый)
+            angle: 10, // Конечная прозрачность (полностью видимый)
             duration: 500, // Длительность анимации в миллисекундах
             ease: 'Power2', // Тип easing
         });
@@ -922,7 +923,7 @@ export default class PlayScene extends Scene {
                 });
             }
             if (tower.constructor.name === "Glass") {
-                this.towers[0].dmg += Math.ceil(tower.dmg * 0.4 * tower.level)
+                this.towers[0].dmg += Math.ceil(tower.dmg * 0.2 * tower.level)
                 this.towers[0].updateDMGText()
             }
             if (tower.constructor.name === "MainTower") {
@@ -954,15 +955,15 @@ export default class PlayScene extends Scene {
 
         if (enemy.hp <= 0) {
             this.time.delayedCall(150, () => {
-                var animName; 
+                var animName;
                 switch (enemy.constructor) {
-                    case Ghost: 
+                    case Ghost:
                         animName = 'ghostDies';
                         break;
-                    case Umbrella: 
+                    case Umbrella:
                         animName = 'umbrellaDies';
                         break;
-                    case Lis: 
+                    case Lis:
                         animName = 'lisDies';
                         break;
                     case Boss1:
@@ -1048,8 +1049,8 @@ class Tower extends Phaser.GameObjects.Sprite {
         this.hpScale = hp
         this.default_hp = hp
         this.default_dmg = dmg
-        this.hp = hp * Math.floor(this.level * 1.5)
-        this.dmg = dmg * Math.floor(this.level * 1.5)
+        this.hp = hp * this.level
+        this.dmg = dmg * this.level
         this.cost = cost
         this.description = description
         this.draggable = draggable
@@ -1494,7 +1495,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
         if (this.body.velocity.x === 0 && this.arrived) {
             this.scene.tweens.add({
                 targets: this,
-                angle: -20,
+                angle: -10,
                 duration: 800,
                 ease: 'Power2',
             });
