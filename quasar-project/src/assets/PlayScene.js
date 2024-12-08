@@ -301,7 +301,7 @@ export default class PlayScene extends Scene {
         });
         this.input.on('drop', (pointer, gameObject, dropZone) => {
             console.log(this.towers[dropZone.dropZoneIndex])
-            if (this.slots[dropZone.drcoopZoneIndex] !== 0) {
+            if (this.slots[dropZone.dropZoneIndex] !== 0) {
                 dropZone.setScale(1)
 
                 dropZone.setTexture('slot')
