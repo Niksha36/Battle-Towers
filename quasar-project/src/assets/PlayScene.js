@@ -13,7 +13,7 @@ import chest from "../assets/towers/towerS_4.png"
 import thief from "../assets/towers/towerS_8.png"
 import ghost from "../assets/towers/diss_ghost_0.png"
 import lis from "../assets/sprites/diss_lis_0.png"
-import umbrella from "../assets/sprites/monster_fish_2.png"
+import umbrella from "../assets/sprites/diss_zont_0.png"
 import boss2 from "../assets/sprites/boss_2_spr_0.png"
 import boss1 from "../assets/sprites/boss_spr_0.png"
 import hp from "../assets/sprites/spr_sword_1.png"
@@ -739,8 +739,8 @@ export default class PlayScene extends Scene {
         this.startWaveButtonContainer.setVisible(false);
         this.roundsFlagContainer.setVisible(false)
         // this.clearShop(this.shop_towers, this.shop_plates)
-        if (this.wave % 10 == 0) {
-            if (this.wave % 20 == 0) {
+        if (this.wave % 10 === 0) {
+            if (this.wave % 20 === 0) {
                 this.enemies.push(this.add.existing(new Boss2(this, this.width, this.platform_start - 90, 'boss2')));
             } else {
                 this.enemies.push(this.add.existing(new Boss1(this, this.width, this.platform_start - 90, 'boss1')));
@@ -888,7 +888,7 @@ export default class PlayScene extends Scene {
     }
 
     hitEnemy(tower, enemy) {
-        const attackAnim = this.add.sprite(enemy.x - 100, enemy.y, 'enemyAttack');
+        const attackAnim = this.add.sprite(tower.x + 20, tower.y, 'enemyAttack');
 
         attackAnim.play('attack');
         attackAnim.on('animationcomplete', () => {
@@ -1454,7 +1454,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
             fill: '#fff'
         })
 
-        this.dmgIcon = scene.add.sprite(x + 15, y + this.y_step, 'dmgIcon');
+        this.dmgIcon = scene.add.sprite(this.hpText.x + 100, y + this.y_step, 'dmgIcon');
         this.dmgText = scene.add.text(this.dmgIcon.x + 20, this.dmgIcon.y - 13, dmg.toString(), {
             textAlign: 'center',
             fontSize: '30px',
@@ -1489,7 +1489,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
         this.hpIcon.setPosition(this.x - 60, this.y + this.y_step);
         this.hpText.setPosition(this.hpIcon.x + 20, this.hpIcon.y - 13)
 
-        this.dmgIcon.setPosition(this.x, this.y + this.y_step)
+        this.dmgIcon.setPosition(this.hpText.x + 40 + 10 * this.hpText.text.length, this.y + this.y_step)
         this.dmgText.setPosition(this.dmgIcon.x + 20, this.dmgIcon.y - 13);
 
         if (this.body.velocity.x === 0 && this.arrived) {
@@ -1509,6 +1509,8 @@ class Enemy extends Phaser.GameObjects.Sprite {
 class Boss1 extends Enemy {
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture, 100, 100);
+        this.y_step += 100
+        this.x_step += 40
     }
 
     damage(dmg) {
@@ -1522,6 +1524,7 @@ class Boss1 extends Enemy {
 class Boss2 extends Enemy {
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture, 200, 200);
+        this.y_step += 100
     }
 
     damage(dmg) {
