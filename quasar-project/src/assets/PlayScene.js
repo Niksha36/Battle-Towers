@@ -749,10 +749,10 @@ export default class PlayScene extends Scene {
                 var enemy;
                 switch (getRandomNumber(3)) {
                     case 0:
-                        enemy = new Ghost(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * (1.5 + 0.4 * Math.floor(this.wave / 5))), Math.floor(this.wave * 1.5));
+                        enemy = new Ghost(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * (1.5 + 0.4 * Math.floor(this.wave / 5))), Math.floor(this.wave * 1.4));
                         break;
                     case 1:
-                        enemy = new Umbrella(this, this.width + 50 * i, this.platform_start, Math.floor(this.wave * (2 + 0.5 * Math.floor(this.wave / 5))), Math.floor(this.wave * 1.3));
+                        enemy = new Umbrella(this, this.width + 50 * i, this.platform_start, Math.floor(this.wave * (1.8 + 0.5 * Math.floor(this.wave / 5))), Math.floor(this.wave * 1.3));
                         break;
                     case 2:
                         enemy = new Lis(this, this.width + 50 * i, this.platform_start - 30, Math.floor(this.wave * (1.3 + 0.3 * Math.floor(this.wave / 5))), Math.floor(this.wave * 2));
@@ -1334,15 +1334,15 @@ class Guard extends Tower {
     buff() {
         if (this.is_die) {
             for (let tower of this.scene.towers) {
-                if (tower && tower.constructor.name === "Obsidian") {
+                if (tower && tower.constructor.name == "Obsidian") {
                     if (tower.is_die) {
                         continue;
                     }
 
-                    tower.default_hp += Math.ceil(this.scene.wave * this.default_hp / (5 + this.default_hp) / 2);
-                    tower.default_dmg += Math.ceil(this.scene.wave * this.default_dmg / (5 + this.default_dmg) / 2);
-                    tower.hp += Math.ceil(this.scene.wave * this.default_hp / (5 + this.default_hp) / 2);
-                    tower.dmg += Math.ceil(this.scene.wave * this.default_dmg / (5 + this.default_dmg) / 2);
+                    tower.default_hp += Math.ceil(Math.log2(this.default_hp));
+                    tower.default_dmg += Math.ceil(Math.log2(this.default_dmg));
+                    tower.hp += Math.ceil(Math.log2(this.default_hp));
+                    tower.dmg += Math.ceil(Math.log2(this.default_dmg));
                     tower.updateDMGText();
                     tower.updateHPText();
 
@@ -1509,7 +1509,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
 
 class Boss1 extends Enemy {
     constructor(scene, x, y, texture) {
-        super(scene, x, y, texture, 100, 100);
+        super(scene, x, y, texture, 100 * (1 + Math.floor(scene.wave/20)), 100 * (1 + Math.floor(scene.wave/20)));
         this.y_step += 100
         this.x_step += 40
     }
@@ -1524,7 +1524,7 @@ class Boss1 extends Enemy {
 
 class Boss2 extends Enemy {
     constructor(scene, x, y, texture) {
-        super(scene, x, y, texture, 400, 400);
+        super(scene, x, y, texture, 200 * (1 + Math.floor(scene.wave/40)), 200 * (1 + Math.floor(scene.wave/40)));
         this.y_step += 100
     }
 
