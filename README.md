@@ -1,17 +1,18 @@
-# Battle-Towers
+# Battle-Towers 💥💥💥
 
-This is incredible web game powered by Quasar nad Electron. 
+This is incredible web game powered by Quasar and Electron 🔥
 
 ## Features that were applyed in this project
-1) VUE JS
 
-2) Phaser Engine
+1) VUE JS 💻
 
-3) Django
+2) Phaser Engine ⚙️
 
-4) Quasar
+3) Django 🐍
 
-5) Vuex Store
+4) Quasar 💀
+
+5) Vuex Store ❤️
 
 ## Game play screenshots
 
