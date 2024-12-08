@@ -301,13 +301,9 @@ export default class PlayScene extends Scene {
         });
         this.input.on('drop', (pointer, gameObject, dropZone) => {
             console.log(this.towers[dropZone.dropZoneIndex])
-            if (this.slots[dropZone.dropZoneIndex] !== 0) {
+            if (this.slots[dropZone.drcoopZoneIndex] !== 0) {
                 dropZone.setScale(1)
-                if (gameObject instanceof Glass) {
-                    this.vueInstance.playGlassTowerSoundGame();
-                } else{
-                    this.vueInstance.playBuildingTowerSoundGame();
-                }
+
                 dropZone.setTexture('slot')
                 dropZone.clearTint();
                 gameObject.x = dropZone.x;
@@ -883,6 +879,11 @@ export default class PlayScene extends Scene {
             dustAnim.on('animationcomplete', () => {
                 dustAnim.destroy();
             });
+            if (tower instanceof Glass) {
+                this.vueInstance.playGlassTowerSoundGame();
+            } else{
+                this.vueInstance.playBuildingTowerSoundGame();
+            }
         }
     }
 
