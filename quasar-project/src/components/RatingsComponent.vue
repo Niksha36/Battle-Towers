@@ -6,12 +6,14 @@ import router from "src/router/index.js";
 import gameMenuMusic from "assets/sounds/game_menu_music.mp3";
 import buttonHoverSound from '../assets/sounds/button_hover.mp3';
 import buttonClickSound from '../assets/sounds/button_click.mp3';
+import {useRouter} from "vue-router";
 
 const hoverSound = new Audio(buttonHoverSound);
 const clickSound = new Audio(buttonClickSound);
 const backgroundMusicMenu = new Audio(gameMenuMusic);
 const isPlaying = stor.state.isMenuMusicPlaying
 const currentTime = stor.state.time
+const router_ = useRouter()
 console.log(stor.state.isMenuMusicPlaying)
 console.log(stor.state.time)
 backgroundMusicMenu.currentTime = currentTime
@@ -22,7 +24,7 @@ if (isPlaying) {
 
 function backToMenu(){
     clickSound.play();
-    router.push('/menu')
+    router_.push('/menu')
 }
 let data = ref([])
 let response = axios.get("http://localhost:8000/get_top", {

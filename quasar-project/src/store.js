@@ -25,11 +25,9 @@ const store = createStore({
             state.time = time
         },
 
-        setDefault() {
-            this.username = ""
-            this.record = 0
-            this.isMenuMusicPlaying = false
-            this.time = 0;
+        setDefault(state) {
+            state.username = ""
+            state.record = 0
         }
     },
 
