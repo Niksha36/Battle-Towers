@@ -57,7 +57,7 @@ def get_top_user(request):
         user = User.objects.get(username=username)
 
         if user not in users:
-            users += user
+            users.append(user)
         response_body = [
             {
                 "place": i + 1,
