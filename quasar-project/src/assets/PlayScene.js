@@ -284,6 +284,7 @@ export default class PlayScene extends Scene {
         this.input.on('dragenter', (pointer, gameObject, dropZone) => {
             if (this.slots[dropZone.dropZoneIndex] !== 0) {
                 dropZone.setTexture(gameObject.texture)
+                this.vueInstance.playTowerDragAndDropSoundGame()
                 dropZone.setTint(0x00ff00);
                 dropZone.setScale(0.5)
             } else if (this.towers[dropZone.dropZoneIndex].constructor.name === gameObject.constructor.name) {
@@ -301,9 +302,8 @@ export default class PlayScene extends Scene {
         });
         this.input.on('drop', (pointer, gameObject, dropZone) => {
             console.log(this.towers[dropZone.dropZoneIndex])
-            if (this.slots[dropZone.drcoopZoneIndex] !== 0) {
+            if (this.slots[dropZone.dropZoneIndex] !== 0) {
                 dropZone.setScale(1)
-
                 dropZone.setTexture('slot')
                 dropZone.clearTint();
                 gameObject.x = dropZone.x;
